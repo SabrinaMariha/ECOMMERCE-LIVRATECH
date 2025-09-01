@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LivraTec</title>
+    <link rel="stylesheet" href="styles/Style.css">
+    <link rel="stylesheet" href="styles/TelaTroca.css">
+    <link rel="stylesheet" href="styles/Carrinho.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<div id="success-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <p>Salvo com sucesso!</p>
+    </div>
+</div>
+
+<div id="cancel-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <p>Deseja realmente cancelar?</p>
+        <div class="botoes-cancelar">
+            <button type="button" class="btn-principal btn-nao">Não</button>
+            <button type="button" class="btn-principal btn-sim">Sim</button>
+        </div>
+    </div>
+</div>
+
+
+<body>
+    <header id="navbar-container"></header>
+
+
+    <main class="main">
+        <div id="pedidos" class="section">
+            <div class="secao-pedidos">
+                <h2>Pedidos</h2>
+
+                <!-- Pedido 1 -->
+                <div class="pedido-container">
+                    <div class="pedido-card">
+                        <div class="pedido-info">
+                            <p><strong>Pedido:</strong> 12345</p>
+                            <p><strong>Data:</strong> 01/05/2024</p>
+                            <p><strong>Status:</strong> Entregue</p>
+                            <p><strong>Total:</strong> R$ 150,00</p>
+                        </div>
+
+                        <!-- Detalhes  -->
+                        <div class="pedido-detalhes">
+                            <h4>Itens:</h4>
+
+                            <div class="cart-item">
+                                <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg" alt="Livro A">
+                                <div class="item-info">
+                                    <p class="item-name">Livro A</p>
+                                    <p class="item-price">R$ 50,00</p>
+                                    <div class="item-actions" id="actions-solicita-troca">
+                                        <div class="itens-venda">
+                                            <div class="opcoes-motivo-troca">
+                                                <p class="item-name">Escolha o motivo da troca:</p>
+
+                                                <label class="radio-option">
+                                                    <input type="radio" name="motivo" value="errado">
+                                                    Produto errado
+                                                </label>
+
+                                                <label class="radio-option">
+                                                    <input type="radio" name="motivo" value="defeito">
+                                                    Produto com defeito
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <label class="label-campo label-troca" style="display:none;"> Troca em
+                                            análise</label>
+                                        <button class="btn-principal btn-troca">Solicitar troca</button>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <h4>Endereço de Entrega:</h4>
+                            <p>Rua Exemplo, 123, Bairro, Cidade, Estado, CEP</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Outro pedido -->
+                <div class="pedido-container">
+                    <div class="pedido-card">
+                        <div class="pedido-info">
+                            <p><strong>Pedido:</strong> 12346</p>
+                            <p><strong>Data:</strong> 15/05/2024</p>
+                            <p><strong>Status:</strong> Em Trânsito</p>
+                            <p><strong>Total:</strong> R$ 200,00</p>
+                        </div>
+                        <!-- Detalhes -->
+                        <div class="pedido-detalhes">
+                            <h4>Itens:</h4>
+
+                            <div class="cart-item">
+                                <img src="https://m.media-amazon.com/images/I/41RfuBLUbWL._SY445_SX342_ControlCacheEqualizer_.jpg"
+                                    alt="Livro C">
+                                <div class="item-info">
+                                    <p class="item-name">Livro C</p>
+                                    <p class="item-price">R$ 200,00</p>
+                                    <div class="item-actions" id="actions-solicita-troca">
+                                        <div class="itens-venda">
+                                            <div class="opcoes-motivo-troca">
+                                                <p class="item-name">Escolha o motivo da troca:</p>
+
+                                                <label class="radio-option">
+                                                    <input type="radio" name="motivo" value="errado" checked disabled>
+                                                    Produto errado
+                                                </label>
+
+                                                <label class="radio-option">
+                                                    <input type="radio" name="motivo" value="defeito">
+                                                    Produto com defeito
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <label class="label-campo label-troca"> Troca em análise</label>
+                                        <button class="btn-principal btn-troca" style="display:none;">Solicitar
+                                            troca</button>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h4>Endereço de Entrega:</h4>
+                            <p>Avenida Exemplo, 456, Bairro, Cidade, Estado, CEP</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Slidebar do carrinho -->
+    <div id="cartSidebar" class="cart-sidebar"></div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
+    </footer>
+    <script src="scripts/DetalhesProduto.js"></script>
+    <script src="scripts/Script.js"></script>
+</body>
+
+</html>

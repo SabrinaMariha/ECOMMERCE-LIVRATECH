@@ -1,0 +1,170 @@
+.section {
+    display: flex;
+    flex-direction: column; /* Alinha os elementos verticalmente */
+    align-items: center; /* Centraliza horizontalmente */
+    width: 100%; /* Garante que ele ocupe 100% da largura do main */
+}
+
+#pedidos.section {
+    max-width: 60%;
+    margin: 8px auto;
+    padding: 20px; /* Este padding agora afeta o produto-container e a descricao-detalhada */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+    background-color: white;
+}
+
+
+/* Container para as duas colunas: galeria e detalhes */
+.pedidos-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    width: 100%;
+    margin-top:1rem;
+    padding: 20px;
+}
+
+.container {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Área de conteúdo ocupa o resto */
+.content {
+  flex: 1;
+  padding: 20px 10px;
+  position: relative;
+}
+
+
+.pedido-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 15px 0;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.pedido-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pedido-info p {
+  margin: 0;
+}
+
+.pedido-detalhes  > * + *{
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+.cart-item img {
+  width: 80px;
+  height: auto;
+  border-radius: 6px;
+}
+
+.item-info {
+  flex: 1;
+}
+.itens-total{
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+
+
+
+
+.secao-pedidos{
+    width: 90%;
+    margin: auto;
+    padding: 0px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+.opcoes-motivo-troca {
+    display: flex;
+    flex-direction: column; /* um embaixo do outro */
+    gap: 6px; /* espaço entre as opções */
+    margin-top: 8px;
+   
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* espaço entre bolinha e texto */
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.radio-option input {
+    margin: 0;
+}
+.label-campo {
+    display: flex;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+    width: 100%;
+    align-self: flex-end;
+
+}
+#actions-solicita-troca {
+  display: flex;
+  justify-content: space-between; /* distribui os 3 itens */
+  align-items: flex-end;          /* alinha pela base */
+  gap: 15px;                      /* espaço entre eles */
+  width: 100%;
+  margin-top: 15px;
+}
+
+.itens-venda {
+  flex: 2; /* ocupa mais espaço à esquerda */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: self-start;
+}
+
+.label-troca {
+  flex: 1;              /* ocupa o espaço central */
+  text-align: center;   /* centraliza o texto */
+  margin: 0;            /* remove margin extra */
+  align-self: flex-end; /* garante alinhamento pela base */
+}
+
+.btn-troca {
+  width: auto;        /* garante que não force largura */
+  display: inline-block; /* botão ocupa só o necessário */
+  padding: 8px 16px;  /* espaço interno: cima/baixo 8px, lados 16px */
+  border: none;
+  border-radius: 5px;
+  background: #007bff;
+  color: #fff;
+  cursor: pointer;
+}

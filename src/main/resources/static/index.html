@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LivraTec</title>
+    <link rel="stylesheet" href="styles/Style.css">
+    <link rel="stylesheet" href="styles/TelaPrincipal.css">
+    <link rel="stylesheet" href="styles/Chatbot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header id="navbar-container"></header>
+
+    <main class="main">
+        <!-- Carrossel -->
+        <section class="carousel">
+            <div class="slides">
+                <div class="slide active">
+                    <img src="img/saldao.png" alt="Slide 1">
+                </div>
+                <div class="slide">
+                    <img src="img/livros-tecnicos.png" alt="Slide 2">
+                </div>
+                <div class="slide">
+                    <img src="img/psicologo.png" alt="Slide 3">
+                </div>
+                <div class="slide">
+                    <img src="img/desconto.png" alt="Slide 4">
+                </div>
+            </div>
+            <div class="indicators">
+                <span class="dot active" onclick="currentSlide(0)"></span>
+                <span class="dot" onclick="currentSlide(1)"></span>
+                <span class="dot" onclick="currentSlide(2)"></span>
+                <span class="dot" onclick="currentSlide(3)"></span>
+            </div>
+        </section>
+
+        <!-- Layout com filtros e livros -->
+        <div class="cont">
+            <section class="content">
+                <aside class="filters">
+                    <h2>Filtros</h2>
+
+                    <!-- Nome do livro -->
+                    <div class="filter-group">
+                        <label for="book-name">Nome do Livro:</label>
+                        <input type="text" id="book-name" placeholder="Digite o nome...">
+                    </div>
+
+                    <!-- Categorias de literatura -->
+                    <div class="filter-group">
+                        <p>Categoria:</p>
+                        <label><input type="checkbox" value="Romance"> Romance</label>
+                        <label><input type="checkbox" value="Fantasia"> Fantasia</label>
+                        <label><input type="checkbox" value="Ficção Científica"> Ficção Científica</label>
+                        <label><input type="checkbox" value="Poesia"> Poesia</label>
+                        <label><input type="checkbox" value="Drama"> Drama</label>
+                        <label><input type="checkbox" value="Suspense"> Suspense</label>
+                        <label><input type="checkbox" value="Biografia"> Biografia</label>
+                    </div>
+
+                    <!-- Autor -->
+                    <div class="filter-group">
+                        <label for="author">Autor:</label>
+                        <input type="text" id="author" placeholder="Digite o nome do autor">
+                    </div>
+
+                    <!-- Faixa de preço -->
+                    <div class="filter-group">
+                        <p>Preço:</p>
+                        <div class="filter-price">
+                            <input type="number" placeholder="Min" style="width: 45%;"> -
+                            <input type="number" placeholder="Max" style="width: 45%;">
+                        </div>
+                    </div>
+
+                    <!-- Idioma -->
+                    <div class="filter-group">
+                        <p>Idioma:</p>
+                        <label><input type="checkbox" value="Português"> Português</label>
+                        <label><input type="checkbox" value="Inglês"> Inglês</label>
+                        <label><input type="checkbox" value="Espanhol"> Espanhol</label>
+                    </div>
+
+                    <!-- Botão filtrar -->
+                    <button class="filter-btn">Filtrar</button>
+                </aside>
+
+                <section class="books">
+                    <h2>Livros</h2>
+                    <div class="container-books" id="books-container"></div>
+
+                    <div class="pagination" id="pagination"></div>
+                </section>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Slidebar do carrinho -->
+    <div id="cartSidebar" class="cart-sidebar"></div>
+
+    <!-- Chatbot -->
+    <div id="chatbot-container"></div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
+    </footer>
+    <script src="scripts/Script.js"></script>
+    <script src="scripts/TelaPrincipal.js"></script>
+    <script src="scripts/Chatbot.js"></script>
+</body>
+
+</html>

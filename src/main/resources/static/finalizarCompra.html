@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LivraTec</title>
+    <link rel="stylesheet" href="styles/Style.css">
+    <link rel="stylesheet" href="styles/FinalizarCompra.css">
+    <link rel="stylesheet" href="styles/Carrinho.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<div id="success-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <p>Salvo com sucesso!</p>
+    </div>
+</div>
+
+<div id="cancel-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <p>Deseja realmente cancelar?</p>
+        <div class="botoes-cancelar">
+            <button type="button" class="btn-principal btn-nao">Não</button>
+            <button type="button" class="btn-principal btn-sim">Sim</button>
+        </div>
+    </div>
+</div>
+
+
+<body>
+    <header id="navbar-container"></header>
+
+
+    <main class="main">
+        <div id="compra" class="section">
+            <h1 class="titulo-compra">Finalizar Compra</h1>
+            <div class="compra-container">
+
+                <div class="secao-endereco">
+                    <h2 class="endereco">Endereço para entrega</h2>
+                    <div id="enderecos-cadastrados" class="section">
+                        <label class="label-campo">Endereços Cadastrados</label>
+                        <select class="input-campo" name="enderecos">
+                            <option selected>R. São João 53 - São Paulo</option>
+                            <option>R. da Consolação 123 - São Paulo</option>
+                            <option>Av. Paulista 456 - São Paulo</option>
+                            <option>R. Augusta 789 - São Paulo</option>
+                        </select>
+                    </div>
+
+                    <div id="outro-endereco" class="section">
+                        <form class="formulario-endereco-novo-entrega" id="formulario-endereco-novo-entrega">
+                            <label class="label-campo">Novo Endereço</label>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo" for="tipoResidencia">Tipo de Residência</label>
+                                    <select class="input-campo" id="tipoResidencia" name="tipoResidencia">
+                                        <option value="">Selecione</option>
+                                        <option value="CASA">Casa</option>
+                                        <option value="APARTAMENTO">Apartamento</option>
+                                        <option value="KITNET">Kitnet</option>
+                                        <option value="SOBRADO">Sobrados</option>
+                                        <option value="OUTROS">Outros</option>
+                                    </select>
+                                </div>
+                                <div class="coluna-40">
+                                    <label class="label-campo" for="cep">CEP</label>
+                                    <div class="cepInputGroup ">
+                                        <input class="input-campo" type="text" id="cep" name="cep" maxlength="9"
+                                            placeholder="00000-000" disabled>
+                                        <button type="button" id="btnBuscarCep" title="Buscar CEP" disabled>
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo" for="tipoLogradouro">Tipo de Logradouro</label>
+                                    <select class="input-campo" id="tipoLogradouro" name="tipoLogradouro">
+                                        <option value="">Selecione</option>
+                                        <option value="RUA">Rua</option>
+                                        <option value="AVENIDA">Avenida</option>
+                                        <option value="TRAVESSA">Travessa</option>
+                                        <option value="ALAMEDA">Alameda</option>
+                                        <option value="ESTRADA">Estrada</option>
+                                        <option value="RODOVIA">Rodovia</option>
+                                        <option value="PRACA">Praça</option>
+                                        <option value="VIELA">Viela</option>
+                                        <option value="LARGO">Largo</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo" for="logradouro">Logradouro</label>
+                                    <input class="input-campo" type="text" id="logradouro" name="logradouro">
+                                </div>
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo" for="numero">Número</label>
+                                    <input class="input-campo" type="text" id="numero" name="numero" disabled>
+                                </div>
+                                <div class="coluna-40">
+                                    <label class="label-campo" for="bairro">Bairro</label>
+                                    <input class="input-campo" type="text" id="bairro" name="bairro" disabled>
+                                </div>
+
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo" for="cidade">Cidade</label>
+                                    <input class="input-campo" type="text" id="cidade" name="cidade" disabled>
+                                </div>
+                                <div class="coluna-20">
+                                    <label class="label-campo" for="estado">Estado</label>
+                                    <input class="input-campo" type="text" id="estado" name="estado" disabled>
+                                </div>
+                                <div class="coluna-20">
+                                    <label class="label-campo" for="pais">País</label>
+                                    <input class="input-campo" type="text" id="pais" name="pais" disabled>
+                                </div>
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo">Observações</label>
+                                    <textarea class="input-campo" name="observacoes" disabled></textarea>
+                                </div>
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <div class="checkbox-group">
+                                        <label class="label-campo"><input type="checkbox"
+                                                name="salvar-endereco-entrega"> Salvar Endereço de Entrega</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="card-container-frete">
+                        <div id="card-template-frete" class="card-container" ">
+                                    <div class=" linha">
+                            <div class="coluna">
+                                <label class="label-campo"> Total do frete: <span id="valorFrete">R$ 15,00</span>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="secao-itens">
+                <h2 class="itens">Itens</h2>
+
+                <!-- Exemplo de item -->
+                <div class="cart-item">
+                    <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg" alt="Livro Exemplo">
+                    <div class="item-info">
+                        <p class="item-name">Entendendo Algoritmos</p>
+                        <p class="item-descricao">Livro Exemplo</p>
+                        <p class="item-price">R$ 59,90</p>
+                        <div class="item-actions">
+                            <div class="itens-venda">
+                                <div class="item-quantidade">
+                                    <input type="number" class="itemQuantidade" value="1" min="1">
+                                    <button class="trash-btn" onclick="removeItem(this)">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                                <div class="itens-total">
+                                    <label class="label-campo">Total: </label>
+                                    <label class="label-campo valorTotal">R$ 0,00</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart-item">
+                    <img src="https://m.media-amazon.com/images/I/41RfuBLUbWL._SY445_SX342_ControlCacheEqualizer_.jpg"
+                        alt="Livro Exemplo">
+                    <div class="item-info">
+                        <p class="item-name">Algoritmos e Lógica da Programação</p>
+                        <p class="item-descricao">Livro Exemplo</p>
+                        <p class="item-price">R$ 71,90</p>
+                        <div class="item-actions">
+                            <div class="itens-venda">
+                                <div class="item-quantidade">
+                                    <input type="number" class="itemQuantidade" value="1" min="1">
+                                    <button class="trash-btn" onclick="removeItem(this)">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                                <div class="itens-total">
+                                    <label class="label-campo">Total: </label>
+                                    <label class="label-campo valorTotal">R$ 0,00</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="secao-pagamento">
+                <h2 class="pagamento">Forma de Pagamento</h2>
+
+                <form class="formulario-outra-forma-pag" id="formulario-outra-forma-pag">
+
+                    <!-- Cartões -->
+                    <div id="card-container-cartoes">
+
+                        <div id="card-template-cartao" class="card-container" style="display:none;">
+
+                            <button type="button" class="remove-btn" title="Remover cartão">&times;</button>
+
+                            <label class="label-campo">Cartões Cadastrados</label>
+                            <select class="input-campo" name="cartoes">
+                                <option selected>Visa **** 1234</option>
+                                <option>MasterCard **** 5678</option>
+                                <option>American Express **** 9012</option>
+                            </select>
+
+                            <label class="label-campo"> Novo Cartão de Crédito </label>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo">Número do Cartão</label>
+                                    <input type="text" class="input-campo" name="numero-cartao">
+                                </div>
+                                <div class="coluna-40">
+                                    <label class="label-campo">Bandeira</label>
+                                    <select class="input-campo" name="bandeira">
+                                        <option selected>Escolha...</option>
+                                        <option>Visa</option>
+                                        <option>MasterCard</option>
+                                        <option>Amex</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo">Nome no Cartão</label>
+                                    <input type="text" class="input-campo" name="nome-titular">
+                                </div>
+                                <div class="coluna-25">
+                                    <label class="label-campo">CCV</label>
+                                    <input type="text" class="input-campo" name="cvv">
+                                </div>
+                            </div>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo">Validade</label>
+                                    <input type="text" class="input-campo" name="validade" placeholder="MM/AA">
+                                </div>
+                                <div class="coluna">
+                                    <label class="label-campo">Valor</label>
+                                    <input type="text" class="input-campo" name="valor" placeholder="R$ 0,00">
+                                </div>
+                            </div>
+
+                            <div class="linha">
+                                <div class="coluna">
+                                    <div class="checkbox-group">
+                                        <label class="label-campo"><input type="checkbox" name="salvar-cartao"> Salvar
+                                            para próximas compras</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-principal" onclick="addCard('cartao')">Adicionar Outro
+                        Cartão</button>
+
+                    <!-- Cupons -->
+                    <div id="card-container-cupom">
+                        <div id="card-template-cupom" class="card-container" style="display:none;">
+                            <button type="button" class="remove-btn" title="Remover cupom">&times;</button>
+                            <label class="label-campo"> CUPOM </label>
+                            <div class="linha">
+                                <div class="coluna">
+                                    <select class="input-campo" name="bandeira">
+                                        <option selected>Escolha...</option>
+                                        <option>10%</option>
+                                        <option>5%</option>
+                                        <option>2%</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-principal" onclick="addCard('cupom')">Adicionar Cupom</button>
+                </form>
+
+                <div id="card-container-total">
+                    <div id="card-template-total" class="card-container" ">
+                                    <label class=" label-campo"> A pagar </label>
+                        <div class="linha">
+                            <div class="coluna">
+                                <p> Itens: R$ 131,80 </p>
+                                <p> Frete: R$ 15,00 </p>
+                                <p> Cupons:- R$ 15,00 </p>
+                                <p> Total: 131,80 </p>
+                            </div>
+                        </div>
+                        <div class="acoes-compra">
+                            <button type="button" id="btnFinalizar" class="btn-principal">
+                                Finalizar Compra
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+        </div>
+    </main>
+
+    <!-- Slidebar do carrinho -->
+    <div id="cartSidebar" class="cart-sidebar"></div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
+    </footer>
+    <script src="scripts/FinalizarCompra.js"></script>
+    <script src="scripts/Script.js"></script>
+</body>
+
+</html>

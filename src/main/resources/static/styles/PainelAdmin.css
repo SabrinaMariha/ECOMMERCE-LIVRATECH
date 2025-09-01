@@ -1,0 +1,422 @@
+.container {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+#painelFiltro.active {
+  display: block;
+}
+
+.tabela-dados {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.tabela-dados th, .tabela-dados td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.tabela-dados th {
+  background: #f0f0f0;
+}
+
+.btn-principal {
+    background: var(--cor-botao);
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.btn-principal:hover {
+    background: #0056b3;
+}
+
+/* FILTRO */
+.header-clientes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.painel-filtro {
+  display: none;
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.campo-filtro {
+  display: flex;
+  flex-direction: column;
+}
+
+.campo-filtro label {
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.campo-filtro input:focus,
+.campo-filtro select:focus {
+  border-color: var(--cor-botao);
+}
+
+.btn-acao {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btnFechar{
+    background: red;
+}
+
+.btnFechar:hover {
+    background: darkred;
+}
+
+.grid-filtros {
+  display: flex;
+  flex-wrap: wrap;           /* permite quebrar linha */
+  gap: 15px 20px;
+  margin-bottom: 20px;
+}
+
+.grid-filtros > .campo-filtro {
+  flex: 1 1 45%;             /* cada campo ocupa ~50% (duas colunas) */
+  min-width: 220px;          /* largura mínima para não ficar muito pequeno */
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .grid-filtros > .campo-filtro {
+    flex: 1 1 100%;          /* ocupa uma coluna só */
+    min-width: 0;
+  }
+}
+
+/* ==========================
+   Estilo da Tabela
+   ========================== */
+.tabela-container {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.tabela-clientes {
+  width: 100%;
+  border-collapse: collapse;
+  background: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tabela-clientes th,
+.tabela-clientes td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabela-clientes th {
+  background: var(--cor-botao);
+  color: white;
+  font-weight: bold;
+  text-align: center;
+}
+
+.tabela-clientes tr:hover {
+  background-color: #f1f1f1;
+}
+
+.tabela-clientes td:last-child {
+  text-align: center;
+}
+.btn-acao-tabela {
+  background-color: var(--cor-botao);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 8px;
+  cursor: pointer;
+  margin: 0 2px;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+}
+
+.btn-acao-tabela:hover {
+  background-color: #0056b3;
+}
+
+.btn-acao-tabela i {
+  font-size: 1.2rem;
+}
+/* CLIENTE */
+/* MODAL */
+/* Modal histórico */
+#modalHistorico {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#modalHistorico h3{
+    padding: 10px; ;
+}
+
+#modalHistorico .modal-conteudo {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+}
+
+#modalHistorico.active {
+  display: flex;
+}
+
+#tabelaHistorico th, #tabelaHistorico td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+#tabelaHistorico th {
+  background-color: var(--cor-botao);
+  color: white;
+}
+
+/* Modal inativar cliente */
+#inativar-modal {
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  align-items: center;
+  justify-content: center;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; 
+  background-color: rgba(0,0,0,0.5); 
+}
+
+#inativar-modal .botoes-inativar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+#inativar-modal .btn-principal {
+  width: 100px;
+}
+
+/* ESTOQUE */
+
+.header-estoque {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#painelFiltroEstoque {
+  display: none;
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+#painelFiltroEstoque.active {
+  display: block;
+}
+/* MODAL ESTOQUE */
+/* ==========================
+   Modal Editar Estoque
+   ========================== */
+#modalEditarEstoque {
+  display: none; 
+  position: fixed; 
+  z-index: 1000; 
+  align-items: center;
+  justify-content: center;
+  width: 100%; 
+  height: 100%; 
+  background-color: rgba(0,0,0,0.5); 
+}
+
+#modalEditarEstoque .btn-acao {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-acao button {
+  width: 100%;
+}
+#btnFecharHistorico{
+  width: 20%;
+}
+
+/* VENDAS */
+.header-vendas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+#painelFiltroVendas {
+  display: none;
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+#painelFiltroVendas.active {
+  display: block;
+}
+
+/* RELATORIOS */
+.header-relatorios {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.painel-filtro {
+  max-width: 100%;
+  margin: 10px auto 20px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.dashboard-graficos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.grafico-container {
+  flex: 1 1 45%;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.grafico-container h3 {
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+  .grafico-container {
+    flex: 1 1 100%;
+  }
+}
+
+/* TROCAS */
+
+#painelFiltroTrocas.active{
+  display: block;
+
+}
+
+#modalStatusVenda,
+#modalStatusTroca {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  
+}
+#modalStatusVenda.active,
+#modalStatusTroca.active {
+  display: flex;
+}
+#modalEditarEstoque h2,
+#modalStatusVenda h2,
+#modalStatusTroca h2{
+  font-size: 1.3rem;
+  margin-top: 0;
+}
+
+#formStatusTroca {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+#formStatusTroca .btn-acao {
+  display: flex;
+  justify-content: center;
+}
+
+/* ajuste */
+#modalEditarEstoque .modal-content{
+  width: 500px;
+}
+
+.modal-content form{
+  width:90%
+}

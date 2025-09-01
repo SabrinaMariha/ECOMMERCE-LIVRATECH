@@ -1,0 +1,325 @@
+
+.container {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Área de conteúdo ocupa o resto */
+.content {
+  flex: 1;
+  padding: 20px 10px;
+  position: relative;
+}
+
+
+.pedido-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 15px 0;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.pedido-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pedido-info p {
+  margin: 0;
+}
+
+.pedido-detalhes  > * + *{
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+
+
+.cart-item img {
+  width: 80px;
+  height: auto;
+  border-radius: 6px;
+}
+
+.item-info {
+  flex: 1;
+}
+.itens-total{
+  display: flex;
+  align-items: start;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+}
+
+.itens-venda {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.btn-troca {
+  background: var(--cor-botao);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+/* Texto inicial */
+.initial-message {
+  text-align: center;
+  margin-top: 100px;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+/* Seções escondidas */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.btn-save {
+  margin-top: 10px;
+  padding: 10px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-save:hover {
+  background: #0d55a1;
+}
+
+/*ESTILO DA SEÇÃO CUPONS*/
+.secao-cupons{
+  max-width: 90%;
+    margin: auto;
+    padding: 0px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+.secao-pedidos{
+  max-width: 90%;
+    margin: auto;
+    padding: 0px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+/*ESTILO DOS FORMULARIOOS*/
+
+.formulario-dados-pessoais,.formulario-enderecos, .formulario-cartoes, .formulario-senha{
+    max-width: 90%;
+    margin: auto;
+    padding: 0px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+
+.linha {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.coluna, .coluna-50 {
+    flex: 1;
+    min-width: 200px;
+}
+
+.coluna-25 {
+    flex: 0 0 25%;
+    max-width: 25%;
+    min-width: 100px;
+}
+
+.label-campo {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.input-campo {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.input-campo:focus {
+    border-color:  var(--cor-botao);;
+    outline: none;
+}
+
+.texto-ajuda {
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: -5px;
+    padding-bottom: 10px;
+}
+
+.btn-principal {
+    background:  var(--cor-botao);;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.btn-principal:hover {
+    background: #0056b3;
+}
+.cupom {
+    font-size: 1rem;
+    padding: 8px;
+    color: #777;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+}
+
+.cupom p {
+    margin: 2px 0; /* Margem de 5px no topo e embaixo, 0 nas laterais */
+}
+.btn-acao, .btn-cancelar, .btn-cancelar-senha,.btn-salvar,.btn-salvar-senha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 0px 15px 0px;
+}
+
+.btn-cancelar, .btn-cancelar-senha{
+    background-color: #f44336; /* vermelho */
+}
+
+.btn-cancelar, .btn-cancelar-senha:hover {
+    background-color: #d32f2f; /* vermelho mais escuro */
+}
+
+.btn-acao .btn-principal {
+    flex: 1; /* cada botão ocupa metade do espaço disponível */
+}
+
+.numero-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.numero-wrapper .input-campo {
+    flex: 1;
+}
+
+.numero-wrapper .remove-btn {
+    position: static;   /* deixa de ser absoluto */
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    border-radius: 50%;
+    margin-left: 5px;
+}
+
+.address-container, .card-container {
+    position: relative; /* necessário para o botão absoluto */
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #f9f9f9; /* mesma cor do endereço */
+}
+
+#btnBuscarCep {
+  background-color:  var(--cor-botao);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding: 3px 20px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+#btnBuscarCep:hover {
+  background-color: #0056b3;
+}
+
+#btnBuscarCep i {
+  color: white;
+  padding-top: 2px;
+  font-size: 20px;
+}
+
+.cepInputGroup {
+  display: flex;
+}
+
+.cepInputGroup input {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+
+  .botoes-cancelar {
+    display: flex;
+    justify-content: center;
+    gap: 10px; 
+}
+  .btn-nao, .btn-sim{
+    margin: 10px 0px 0px 0px;
+  }
+
+  .btn-nao{
+    background-color: red;
+  }
+
+  .btn-nao:hover{
+    background-color: darkred;
+  }
+  
