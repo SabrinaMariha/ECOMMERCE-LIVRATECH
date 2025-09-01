@@ -1,6 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Funções para adicionar clones
-    function adicionarTelefone() {
+function adicionarTelefone() {
         const container = document.getElementById('telefones-container');
         const template = document.getElementById('telefone-template');
         if (!container || !template) return;
@@ -16,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(clone);
     }
 
-    function addAddress() {
+function addAddress() {
         const container = document.getElementById('address-container');
         const template = document.getElementById('address-template');
         if (!container || !template) return;
@@ -34,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(clone);
     }
 
-    function addCard() {
+function addCard() {
         const container = document.getElementById('card-container');
         const template = document.getElementById('card-template');
         if (!container || !template) return;
@@ -49,6 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         container.appendChild(clone);
     }
+    document.addEventListener("DOMContentLoaded", () => {
+    // Funções para adicionar clones
+
 
     // Cria campos iniciais
     adicionarTelefone();
