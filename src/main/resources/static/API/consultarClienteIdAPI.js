@@ -40,6 +40,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             clone.querySelector("input[name='ddd']").value = tel.ddd;
             clone.querySelector("input[name='numero']").value = tel.numero;
 
+            const removeBtn = clone.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', () => clone.remove())
+
             container.appendChild(clone);
         });
     }
@@ -74,6 +77,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 clone.querySelector("input[name='endereco-cobranca']").checked = true;
             }
 
+            const removeBtn = clone.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', () => clone.remove())
+
             container.appendChild(clone);
         });
     }
@@ -97,6 +103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (card.preferencial) {
                 clone.querySelector("input[name='cartao-preferencial']").checked = true;
             }
+
+            const removeBtn = clone.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', () => clone.remove());
 
             container.appendChild(clone);
         });
