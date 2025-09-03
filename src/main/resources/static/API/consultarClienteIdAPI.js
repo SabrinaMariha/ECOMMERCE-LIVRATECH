@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function preencherDadosPessoais(cliente) {
         document.getElementById("nome").value = cliente.nome;
         document.getElementById("data-nascimento").value = cliente.dataNascimento;
-        document.getElementById("genero").value = cliente.genero.charAt(0) + cliente.genero.slice(1).toLowerCase();
+        document.getElementById("genero").value = cliente.genero;
         document.getElementById("cpf").value = cliente.cpf;
         document.getElementById("email").value = cliente.email;
     }
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         enderecos.forEach(end => {
             const template = document.getElementById("address-template");
             const clone = template.cloneNode(true);
-            clone.style.display = "flex";
+            clone.style.display = "block";
             clone.removeAttribute("id");
 
             clone.querySelector("[name='tipoResidencia']").value = end.tipoResidencia;

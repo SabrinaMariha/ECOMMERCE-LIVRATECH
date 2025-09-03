@@ -273,7 +273,7 @@
     background-color: #f9f9f9; /* mesma cor do endereço */
 }
 
-#btnBuscarCep {
+.btnBuscarCep {
   background-color:  var(--cor-botao);
   color: white;
   border: none;
@@ -286,11 +286,11 @@
   transition: background-color 0.3s ease;
 }
 
-#btnBuscarCep:hover {
+.btnBuscarCep:hover {
   background-color: #0056b3;
 }
 
-#btnBuscarCep i {
+.btnBuscarCep i {
   color: white;
   padding-top: 2px;
   font-size: 20px;

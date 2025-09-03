@@ -278,7 +278,7 @@
                 <form class="formulario-enderecos" id="formulario-enderecos">
                     <h2>Endereços</h2>
                     <div id="address-container">
-                        <div id="address-template" class="address-container">
+                        <div id="address-template" class="address-container" style="display: none;">
                             <button type="button" class="remove-btn" title="Remover Endereço">&times;</button>
                             <div class="linha">
                                 <div class="coluna-50">
@@ -296,7 +296,7 @@
                                     <label class="label-campo" for="cep">CEP</label>
                                     <div class="cepInputGroup ">
                                         <input class="input-campo" type="text" name="cep" maxlength="9" placeholder="00000-000" disabled>
-                                        <button type="button" title="Buscar CEP" disabled>
+                                        <button type="button" title="Buscar CEP" class="btnBuscarCep" disabled>
                                             <i class="fa-solid fa-magnifying-glass"></i>
                                         </button>
                                     </div>
@@ -393,9 +393,9 @@
                                     <label class="label-campo">Bandeira</label>
                                     <select class="input-campo" name="bandeira" disabled>
                                         <option selected>Escolha...</option>
-                                        <option>Visa</option>
-                                        <option>MasterCard</option>
-                                        <option>Amex</option>
+                                        <option value="VISA">Visa</option>
+                                        <option value="MASTERCARD">MasterCard</option>
+                                        <option value="ELO">ELO</option>
                                     </select>
                                 </div>
                             </div>
