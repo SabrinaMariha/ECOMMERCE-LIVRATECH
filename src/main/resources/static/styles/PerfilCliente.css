@@ -264,6 +264,7 @@
 }
 
 .address-container, .card-container {
+    display: block;
     position: relative; /* necessário para o botão absoluto */
     border: 1px solid #ccc;
     padding: 15px;
