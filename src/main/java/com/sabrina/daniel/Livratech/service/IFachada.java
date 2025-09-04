@@ -7,7 +7,6 @@ import java.util.List;
 public interface IFachada<DomainEntity> {
 
 	public String save(DomainEntity entity);
-	public String update(DomainEntity entity);
 	public String delete(DomainEntity entity);
 	public List<DomainEntity> findAll(DomainEntity entity);
    	public DadosConsultaCliente findDTOById(Long id) throws Exception;

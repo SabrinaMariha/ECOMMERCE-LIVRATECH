@@ -32,7 +32,7 @@ public class ClienteService implements IFachada<Cliente> {
 
         rns.put(Cliente.class.getName(), regrasCliente);
 
-        repositories.put(Cliente.class.getName(),  clienteRepository);
+        repositories.put(Cliente.class.getName(), clienteRepository);
     }
 
     @Override
@@ -90,20 +90,29 @@ public class ClienteService implements IFachada<Cliente> {
 
         // Telefones
         if (dto.telefones() != null) {
-            dto.telefones().forEach(t -> t.setCliente(cliente));
-            cliente.setTelefones(dto.telefones());
+            cliente.getTelefones().clear();
+            dto.telefones().forEach(t -> {
+                t.setCliente(cliente);
+                cliente.getTelefones().add(t);
+            });
         }
 
         // Endereços
         if (dto.enderecos() != null) {
-            dto.enderecos().forEach(e -> e.setCliente(cliente));
-            cliente.setEnderecos(dto.enderecos());
+            cliente.getEnderecos().clear();
+            dto.enderecos().forEach(e -> {
+                e.setCliente(cliente);
+                cliente.getEnderecos().add(e);
+            });
         }
 
-        // Cartões
+        // Cartões (fazendo manual para evitar erro do orphanRemoval)
         if (dto.cartoesCredito() != null) {
-            dto.cartoesCredito().forEach(c -> c.setCliente(cliente));
-            cliente.setCartoesCredito(dto.cartoesCredito());
+            cliente.getCartoesCredito().clear();
+            dto.cartoesCredito().forEach(c -> {
+                c.setCliente(cliente);
+                cliente.getCartoesCredito().add(c);
+            });
         }
 
         clienteRepository.save(cliente);
@@ -113,7 +122,7 @@ public class ClienteService implements IFachada<Cliente> {
     @Override
     public String updateSenha(Long id, String novaSenha, String confirmarSenha) {
         Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encotrado"));
-        if(!novaSenha.equals(confirmarSenha)){
+        if (!novaSenha.equals(confirmarSenha)) {
             return "As senhas não coincidem";
         }
         cliente.setSenha(novaSenha);
