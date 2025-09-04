@@ -120,15 +120,37 @@ public class ClienteService implements IFachada<Cliente> {
     }
 
     @Override
-    public String updateSenha(Long id, String novaSenha, String confirmarSenha) {
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encotrado"));
-        if (!novaSenha.equals(confirmarSenha)) {
-            return "As senhas não coincidem";
+    public String updateSenha(Long id, String senhaAtual, String novaSenha, String confirmarSenha) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        // Verifica senha atual
+        if (!encoder.matches(senhaAtual, cliente.getSenha())) {
+            throw new RuntimeException("Senha atual incorreta");
         }
-        cliente.setSenha(novaSenha);
+
+        // Verifica se nova senha e confirmação são iguais
+        if (!novaSenha.equals(confirmarSenha)) {
+            throw new RuntimeException("As senhas não coincidem");
+        }
+
+        // Validação da senha forte (RNF0031)
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        if (!novaSenha.matches(regex)) {
+            throw new RuntimeException(
+                    "A senha deve ter no mínimo 8 caracteres, incluir letras maiúsculas, minúsculas, números e caracteres especiais"
+            );
+        }
+
+        // Atualiza senha criptografada
+        cliente.setSenha(encoder.encode(novaSenha));
         clienteRepository.save(cliente);
-        return "Senha atualizada com sucesso";
+
+        return "Senha alterada com sucesso!";
     }
+
 
     @Override
     public String delete(Cliente cliente) {

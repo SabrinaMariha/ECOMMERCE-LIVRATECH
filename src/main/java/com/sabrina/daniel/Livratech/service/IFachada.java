@@ -11,6 +11,6 @@ public interface IFachada<DomainEntity> {
 	public List<DomainEntity> findAll(DomainEntity entity);
    	public DadosConsultaCliente findDTOById(Long id) throws Exception;
 	public String update(Long id, DadosConsultaCliente dto);
-	public String updateSenha(Long id, String novaSenha, String confirmarSenha);
+	public String updateSenha(Long id, String senhaAtual, String novaSenha, String confirmarSenha);
 
 }
