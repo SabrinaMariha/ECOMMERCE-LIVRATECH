@@ -111,23 +111,14 @@ public class ClienteService implements IFachada<Cliente> {
     }
 
     @Override
-    public String updateSenha(Cliente cliente) {
-        String nmClasse = cliente.getClass().getName();
-        List<IStrategy> rn = rns.get(nmClasse);
-        StringBuilder sb = new StringBuilder();
-
-        for (IStrategy s : rn) {
-            String msg = s.processar(cliente);
-            if (msg != null) {
-                sb.append("\n" + msg);
-            }
+    public String updateSenha(Long id, String novaSenha, String confirmarSenha) {
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encotrado"));
+        if(!novaSenha.equals(confirmarSenha)){
+            return "As senhas não coincidem";
         }
-        if (sb.length() == 0) {
-            JpaRepository repository = repositories.get(nmClasse);
-            //repository.updateSenha(cliente);
-            return "Senha atualizada com sucesso!";
-        }
-        return sb.toString();
+        cliente.setSenha(novaSenha);
+        clienteRepository.save(cliente);
+        return "Senha atualizada com sucesso";
     }
 
     @Override
