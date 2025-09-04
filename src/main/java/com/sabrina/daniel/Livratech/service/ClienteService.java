@@ -1,17 +1,18 @@
 package com.sabrina.daniel.Livratech.service;
 
 import com.sabrina.daniel.Livratech.daos.ClienteRepository;
+import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.model.Carrinho;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 @Service
+@Transactional
 public class ClienteService implements IFachada<Cliente> {
 
     Map<String, List<IStrategy>> rns = new HashMap<String, List<IStrategy>>();
@@ -134,8 +135,24 @@ public class ClienteService implements IFachada<Cliente> {
 //        return clientes;
 //    }
 
-//    @Override
-//    public Cliente findById(Long id)  throws SQLException {
-//        return clienteRepository.findById(id);
-//    }
+    @Override
+    public DadosConsultaCliente findDTOById(Long id) throws Exception {
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new Exception("Cliente não encontrado"));
+        return toDTO(cliente);
+    }
+
+    public DadosConsultaCliente toDTO(Cliente cliente) {
+        return new DadosConsultaCliente(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getGenero(),
+                cliente.getDataNascimento(),
+                cliente.getCpf(),
+                List.copyOf(cliente.getTelefones()), // evita mutabilidade externa
+                cliente.getEmail(),
+                cliente.getStatus(),
+                List.copyOf(cliente.getEnderecos()),
+                List.copyOf(cliente.getCartoesCredito())
+        );
+    }
 }

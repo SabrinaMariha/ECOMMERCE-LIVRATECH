@@ -1,4 +1,24 @@
 package com.sabrina.daniel.Livratech.dtos;
 
-public record DadosConsultaCliente() {
-}
+import com.sabrina.daniel.Livratech.enums.Genero;
+import com.sabrina.daniel.Livratech.enums.Status;
+import com.sabrina.daniel.Livratech.model.CartaoDeCredito;
+import com.sabrina.daniel.Livratech.model.Cliente;
+import com.sabrina.daniel.Livratech.model.Endereco;
+import com.sabrina.daniel.Livratech.model.Telefone;
+
+import java.util.Date;
+import java.util.List;
+
+public record DadosConsultaCliente(
+        Long id,
+        String nome,
+        Genero genero,
+        Date dataNascimento,
+        String cpf,
+        List<Telefone> telefones,
+        String email,
+        Status status,
+        List<Endereco> enderecos,
+        List<CartaoDeCredito> cartoesCredito
+){}

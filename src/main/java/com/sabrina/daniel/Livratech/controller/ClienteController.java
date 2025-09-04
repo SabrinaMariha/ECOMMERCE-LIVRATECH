@@ -1,12 +1,15 @@
 package com.sabrina.daniel.Livratech.controller;
 
 
+import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @RestController
@@ -21,6 +24,12 @@ public class ClienteController {
     @Transactional
     public ResponseEntity<String> cadastrar(@RequestBody Cliente cliente) {
         return ResponseEntity.ok(clienteService.save(cliente));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DadosConsultaCliente> buscarPorId(@PathVariable long id) throws Exception {
+        DadosConsultaCliente dto = clienteService.findDTOById(id);
+        return ResponseEntity.ok(dto);
     }
 
 }

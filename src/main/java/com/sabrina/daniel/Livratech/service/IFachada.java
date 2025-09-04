@@ -1,6 +1,6 @@
 package com.sabrina.daniel.Livratech.service;
 
-import com.sabrina.daniel.Livratech.model.Cliente;
+import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ public interface IFachada<DomainEntity> {
 
 	public String delete(DomainEntity entity);
 	public List<DomainEntity> findAll(DomainEntity entity);
-   // public DomainEntity findById(Long id) throws Exception;
-	//
-   public String updateSenha(DomainEntity entity);
+   	public DadosConsultaCliente findDTOById(Long id) throws Exception;
+   	public String updateSenha(DomainEntity entity);
+
 }
