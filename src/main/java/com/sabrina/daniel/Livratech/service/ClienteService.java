@@ -75,25 +75,39 @@ public class ClienteService implements IFachada<Cliente> {
         return sb.toString();
     }
 
-
     @Override
-    public String update(Cliente cliente) {
-        String nmClasse = cliente.getClass().getName();
-        List<IStrategy> rn = rns.get(nmClasse);
-        StringBuilder sb = new StringBuilder();
+    public String update(Long id, DadosConsultaCliente dto) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        for (IStrategy s : rn) {
-            String msg = s.processar(cliente);
-            if (msg != null) {
-                sb.append("\n" + msg);
-            }
+        // Atualiza campos básicos
+        cliente.setNome(dto.nome());
+        cliente.setGenero(dto.genero());
+        cliente.setDataNascimento(dto.dataNascimento());
+        cliente.setCpf(dto.cpf());
+        cliente.setEmail(dto.email());
+        cliente.setStatus(dto.status());
+
+        // Telefones
+        if (dto.telefones() != null) {
+            dto.telefones().forEach(t -> t.setCliente(cliente));
+            cliente.setTelefones(dto.telefones());
         }
-        if (sb.length() == 0) {
-            JpaRepository repository = repositories.get(nmClasse);
-            //repository.update(cliente);
-            return "Cliente atualizado com sucesso!";
+
+        // Endereços
+        if (dto.enderecos() != null) {
+            dto.enderecos().forEach(e -> e.setCliente(cliente));
+            cliente.setEnderecos(dto.enderecos());
         }
-        return sb.toString();
+
+        // Cartões
+        if (dto.cartoesCredito() != null) {
+            dto.cartoesCredito().forEach(c -> c.setCliente(cliente));
+            cliente.setCartoesCredito(dto.cartoesCredito());
+        }
+
+        clienteRepository.save(cliente);
+        return "Cliente atualizado com sucesso!";
     }
 
     @Override
