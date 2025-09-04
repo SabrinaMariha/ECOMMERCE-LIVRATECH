@@ -32,4 +32,14 @@ public class ClienteController {
         return ResponseEntity.ok(dto);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarCliente(@PathVariable Long id, @RequestBody DadosConsultaCliente dto){
+        return ResponseEntity.ok(clienteService.update(id,dto));
+    }
+
+    @PutMapping("/{id}/senha")
+    public ResponseEntity<String> atualizarSenha(@PathVariable Long id, @RequestBody Cliente cliente){
+        return  ResponseEntity.ok(clienteService.updateSenha(id,cliente.getSenha(), cliente.getConfirmarSenha()));
+    }
+
 }
