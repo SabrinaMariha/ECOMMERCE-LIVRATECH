@@ -6,6 +6,7 @@ import com.sabrina.daniel.Livratech.model.Carrinho;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
