@@ -68,6 +68,12 @@ public class ClienteService implements IFachada<Cliente> {
                 cliente.setCarrinho(new Carrinho());
             }
 
+            // Criptografa a senha antes de salvar
+            if (cliente.getSenha() != null && !cliente.getSenha().isEmpty()) {
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                cliente.setSenha(encoder.encode(cliente.getSenha()));
+            }
+
             JpaRepository repository = repositories.get(nmClasse);
             repository.save(cliente);
             return "Cliente cadastrado com sucesso!";
