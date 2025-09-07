@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.toggleCampos = function (formulario, isEditing) {
     const campos = formulario.querySelectorAll("input, select, textarea");
     const botoesExtras = formulario.querySelectorAll(
-      "button.remove-btn, #btnBuscarCep"
+      "button.remove-btn, .btnBuscarCep"
     );
     const btnAlterar = formulario.querySelector(".btn-alterar");
     const btnCancelar = formulario.querySelector(".btn-cancelar");
