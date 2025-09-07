@@ -15,11 +15,15 @@ document.addEventListener("DOMContentLoaded", () => {
     clone.removeAttribute("id");
 
     if (enable) {
-      clone.querySelectorAll("input, select, textarea").forEach(campo => campo.removeAttribute("disabled"));
+      clone
+        .querySelectorAll("input, select, textarea")
+        .forEach((campo) => campo.removeAttribute("disabled"));
       clone.querySelector(".remove-btn").removeAttribute("disabled");
     }
 
-    clone.querySelector(".remove-btn").addEventListener("click", () => clone.remove());
+    clone
+      .querySelector(".remove-btn")
+      .addEventListener("click", () => clone.remove());
     container.appendChild(clone);
   }
 
@@ -36,11 +40,15 @@ document.addEventListener("DOMContentLoaded", () => {
     clone.removeAttribute("id");
 
     if (enable) {
-      clone.querySelectorAll("input, select, textarea").forEach(campo => campo.removeAttribute("disabled"));
+      clone
+        .querySelectorAll("input, select, textarea")
+        .forEach((campo) => campo.removeAttribute("disabled"));
       clone.querySelector(".remove-btn").removeAttribute("disabled");
     }
 
-    clone.querySelector(".remove-btn").addEventListener("click", () => clone.remove());
+    clone
+      .querySelector(".remove-btn")
+      .addEventListener("click", () => clone.remove());
     container.appendChild(clone);
   }
 
@@ -53,11 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
     clone.removeAttribute("id");
 
     if (enable) {
-      clone.querySelectorAll("input, select, textarea").forEach(campo => campo.removeAttribute("disabled"));
+      clone
+        .querySelectorAll("input, select, textarea")
+        .forEach((campo) => campo.removeAttribute("disabled"));
       clone.querySelector(".remove-btn").removeAttribute("disabled");
     }
 
-    clone.querySelector(".remove-btn").addEventListener("click", () => clone.remove());
+    clone
+      .querySelector(".remove-btn")
+      .addEventListener("click", () => clone.remove());
     container.appendChild(clone);
   }
 
@@ -66,7 +78,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // ========================
   window.toggleCampos = function (formulario, isEditing) {
     const campos = formulario.querySelectorAll("input, select, textarea");
-    const botoesExtras = formulario.querySelectorAll("button.remove-btn, #btnBuscarCep");
+    const botoesExtras = formulario.querySelectorAll(
+      "button.remove-btn, #btnBuscarCep"
+    );
     const btnAlterar = formulario.querySelector(".btn-alterar");
     const btnCancelar = formulario.querySelector(".btn-cancelar");
     const btnSalvar = formulario.querySelector(".btn-salvar");
@@ -74,14 +88,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btnAlterar || !btnCancelar || !btnSalvar) return;
 
     if (isEditing) {
-      campos.forEach(campo => campo.removeAttribute("disabled"));
-      botoesExtras.forEach(btn => btn.removeAttribute("disabled"));
+      campos.forEach((campo) => campo.removeAttribute("disabled"));
+      botoesExtras.forEach((btn) => btn.removeAttribute("disabled"));
       btnAlterar.style.visibility = "hidden";
       btnCancelar.style.visibility = "visible";
       btnSalvar.style.visibility = "visible";
     } else {
-      campos.forEach(campo => campo.setAttribute("disabled", "disabled"));
-      botoesExtras.forEach(btn => btn.setAttribute("disabled", "disabled"));
+      campos.forEach((campo) => campo.setAttribute("disabled", "disabled"));
+      botoesExtras.forEach((btn) => btn.setAttribute("disabled", "disabled"));
       btnAlterar.style.visibility = "visible";
       btnCancelar.style.visibility = "hidden";
       btnSalvar.style.visibility = "hidden";
@@ -89,7 +103,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Inicializa formulários como desabilitados
-  document.querySelectorAll("form").forEach(form => toggleCampos(form, false));
+  document
+    .querySelectorAll("form")
+    .forEach((form) => toggleCampos(form, false));
 
   // ========================
   // Modais
@@ -98,19 +114,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalCancelamento = document.getElementById("cancel-modal");
   const modalSenha = document.getElementById("senha-modal");
 
-  function abrirModal(modal) {
+  window.abrirModal = function (modal) {
     if (modal) modal.style.display = "flex";
-  }
+  };
 
-  function fecharModal(modal) {
+  window.fecharModal = function (modal) {
     if (modal) modal.style.display = "none";
-  }
+  };
 
   window.abrirModalSenha = function () {
     abrirModal(modalSenha);
   };
 
-  document.querySelectorAll(".close-btn").forEach(btn => {
+  document.querySelectorAll(".close-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const modal = e.target.closest(".modal");
       fecharModal(modal);
@@ -120,40 +136,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   modalSucesso?.querySelector(".close-btn")?.addEventListener("click", () => {
     fecharModal(modalSucesso);
-    if (formToToggle) {
-      if (formToToggle.id !== "formulario-senha") toggleCampos(formToToggle, false);
-      else fecharModal(modalSenha);
+    if (formToToggle && formToToggle.id !== "formulario-senha") {
+      toggleCampos(formToToggle, false);
       formToToggle = null;
     }
   });
 
-  modalCancelamento?.querySelector(".btn-nao")?.addEventListener("click", () => fecharModal(modalCancelamento));
-  modalCancelamento?.querySelector(".btn-sim")?.addEventListener("click", () => {
-    fecharModal(modalCancelamento);
-    if (formToToggle) {
-      if (formToToggle.id !== "formulario-senha") toggleCampos(formToToggle, false);
-      else fecharModal(modalSenha);
-      formToToggle = null;
-    }
-    location.reload();
-  });
+  modalCancelamento
+    ?.querySelector(".btn-nao")
+    ?.addEventListener("click", () => fecharModal(modalCancelamento));
+  modalCancelamento
+    ?.querySelector(".btn-sim")
+    ?.addEventListener("click", () => {
+      fecharModal(modalCancelamento);
+      if (formToToggle && formToToggle.id !== "formulario-senha") {
+        toggleCampos(formToToggle, false);
+        formToToggle = null;
+      }
+      location.reload();
+    });
 
   // ========================
-  // Submissão dos formulários
+  // Submissão dos formulários (exceto senha)
   // ========================
-  document.querySelectorAll("form").forEach(form => {
+  document.querySelectorAll("form").forEach((form) => {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       formToToggle = form;
 
-      if (form.id === "formulario-senha") {
-        const novaSenha = document.getElementById("nova-senha").value;
-        const confirmacaoSenha = document.getElementById("confirmacao-nova-senha").value;
-        if (novaSenha !== confirmacaoSenha) return alert("A nova senha e a confirmação não correspondem!");
-        fecharModal(modalSenha);
-        abrirModal(modalSucesso);
-        form.reset();
-      } else {
+      // Formulário de senha é tratado em alterarSenhaCliente.js
+      if (form.id !== "formulario-senha") {
         abrirModal(modalSucesso);
         toggleCampos(form, false);
       }
@@ -161,27 +173,33 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ========================
-  // Botões "Adicionar" (apenas 1 listener por botão)
+  // Botões "Adicionar"
   // ========================
-  document.querySelector(".formulario-dados-pessoais .btn-principal")?.addEventListener("click", () => {
-    adicionarTelefone(true);
-    toggleCampos(document.querySelector(".formulario-dados-pessoais"), true);
-  });
+  document
+    .querySelector(".formulario-dados-pessoais .btn-principal")
+    ?.addEventListener("click", () => {
+      adicionarTelefone(true);
+      toggleCampos(document.querySelector(".formulario-dados-pessoais"), true);
+    });
 
-  document.querySelector(".formulario-enderecos .btn-principal")?.addEventListener("click", () => {
-    addAddress(true);
-    toggleCampos(document.querySelector(".formulario-enderecos"), true);
-  });
+  document
+    .querySelector(".formulario-enderecos .btn-principal")
+    ?.addEventListener("click", () => {
+      addAddress(true);
+      toggleCampos(document.querySelector(".formulario-enderecos"), true);
+    });
 
-  document.querySelector(".formulario-cartoes .btn-principal")?.addEventListener("click", () => {
-    addCard(true);
-    toggleCampos(document.querySelector(".formulario-cartoes"), true);
-  });
+  document
+    .querySelector(".formulario-cartoes .btn-principal")
+    ?.addEventListener("click", () => {
+      addCard(true);
+      toggleCampos(document.querySelector(".formulario-cartoes"), true);
+    });
 
   // ========================
   // Botões "Alterar"
   // ========================
-  document.querySelectorAll(".btn-alterar").forEach(btn => {
+  document.querySelectorAll(".btn-alterar").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const form = e.target.closest("form");
@@ -192,16 +210,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // ========================
   // Botões "Cancelar"
   // ========================
-  document.querySelectorAll(".btn-cancelar, .btn-cancelar-senha").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      formToToggle = e.target.closest("form");
-      if (formToToggle.id === "formulario-senha") {
-        fecharModal(modalSenha);
-        formToToggle.reset();
-      } else abrirModal(modalCancelamento);
+  document
+    .querySelectorAll(".btn-cancelar, .btn-cancelar-senha")
+    .forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        formToToggle = e.target.closest("form");
+        if (formToToggle.id === "formulario-senha") {
+          fecharModal(modalSenha);
+          formToToggle.reset();
+        } else abrirModal(modalCancelamento);
+      });
     });
-  });
 
   // ========================
   // Evento customizado
@@ -216,6 +236,8 @@ document.addEventListener("DOMContentLoaded", () => {
 // Toggle detalhes do pedido
 // ========================
 function toggleDetalhes(btn) {
-  const detalhes = btn.closest(".pedido-card").querySelector(".pedido-detalhes");
+  const detalhes = btn
+    .closest(".pedido-card")
+    .querySelector(".pedido-detalhes");
   detalhes.style.display = detalhes.style.display === "none" ? "block" : "none";
 }

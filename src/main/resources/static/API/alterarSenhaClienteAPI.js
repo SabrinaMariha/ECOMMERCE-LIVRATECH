@@ -1,5 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Submissão dos formulários ---
+  const modalSucesso = document.getElementById("success-modal");
+  const modalSenha = document.getElementById("senha-modal");
+
+  function abrirModal(modal) {
+    if (modal) modal.style.display = "flex";
+  }
+
+  function fecharModal(modal) {
+    if (modal) modal.style.display = "none";
+  }
+
+  // --- Submissão do formulário de senha ---
   document.querySelectorAll("form").forEach((form) => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -7,9 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (form.id === "formulario-senha") {
         const senhaAtual = document.getElementById("senha-atual").value;
         const novaSenha = document.getElementById("nova-senha").value;
-        const confirmacaoSenha = document.getElementById(
-          "confirmacao-nova-senha"
-        ).value;
+        const confirmacaoSenha = document.getElementById("confirmacao-nova-senha").value;
 
         if (novaSenha !== confirmacaoSenha) {
           return alert("A nova senha e a confirmação não correspondem!");
@@ -37,12 +46,30 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           );
 
-          if (!response.ok) {
-            const errorMsg = await response.text();
-            throw new Error(errorMsg || "Erro ao alterar senha.");
+          // Lê o texto primeiro
+          const text = await response.text();
+
+          // Tenta converter para JSON, se possível
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = { message: text }; // se não for JSON, considera texto simples
           }
 
+          if (!response.ok) {
+            throw new Error(data.message || "Erro ao alterar senha.");
+          }
+
+          // Sucesso
           fecharModal(modalSenha);
+
+          // Dispara evento customizado para modal de cliente atualizado
+          const event = new CustomEvent("clienteAtualizado", {
+            detail: { message: data.message || "Senha alterada com sucesso!" }
+          });
+          document.dispatchEvent(event);
+
           abrirModal(modalSucesso);
           form.reset();
         } catch (error) {
