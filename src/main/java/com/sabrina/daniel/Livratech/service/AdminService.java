@@ -42,4 +42,23 @@ public class AdminService {
         List<Cliente> clientes = clienteRepository.findAllByFiltros(clienteASerConsultado);
         return clientes;
     }
+    public DadosConsultaCliente findDTOById(Long id) throws Exception {
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new Exception("Cliente não encontrado"));
+        return toDTO(cliente);
+    }
+
+    public DadosConsultaCliente toDTO(Cliente cliente) {
+        return new DadosConsultaCliente(
+                cliente.getId(),
+                cliente.getNome(),
+                cliente.getGenero(),
+                cliente.getDataNascimento(),
+                cliente.getCpf(),
+                List.copyOf(cliente.getTelefones()), // evita mutabilidade externa
+                cliente.getEmail(),
+                cliente.getStatus(),
+                List.copyOf(cliente.getEnderecos()),
+                List.copyOf(cliente.getCartoesCredito())
+        );
+    }
 }

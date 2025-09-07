@@ -55,5 +55,9 @@ public class AdminController {
 
         return ResponseEntity.ok(resposta);
     }
-
+    @GetMapping("/cliente/{id}")
+    public ResponseEntity<DadosConsultaCliente> buscarPorId(@PathVariable long id) throws Exception {
+        DadosConsultaCliente dto = adminService.findDTOById(id);
+        return ResponseEntity.ok(dto);
+    }
 }

@@ -331,6 +331,10 @@
   display: block;
 }
 
+#modalDetalhesCliente.active{
+  display: flex;
+}
+
 /* RELATORIOS */
 .header-relatorios {
   display: flex;
