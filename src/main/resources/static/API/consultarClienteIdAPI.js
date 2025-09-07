@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const clone = template.cloneNode(true);
             clone.style.display = "flex";
             clone.removeAttribute("id");
+            clone.dataset.id=tel.id;
 
             clone.querySelector("select[name='tipo']").value = tel.tipo;
             clone.querySelector("input[name='ddd']").value = tel.ddd;
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const clone = template.cloneNode(true);
             clone.style.display = "block";
             clone.removeAttribute("id");
+            clone.dataset.id=end.id;
 
             clone.querySelector("[name='tipoResidencia']").value = end.tipoResidencia;
             clone.querySelector("[name='cep']").value = end.cep;
@@ -94,6 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const clone = template.cloneNode(true);
             clone.style.display = "block";
             clone.removeAttribute("id");
+            clone.dataset.id=card.id;
 
             clone.querySelector("[name='numero-cartao']").value = card.numeroCartao;
             clone.querySelector("[name='bandeira']").value = card.bandeira;
