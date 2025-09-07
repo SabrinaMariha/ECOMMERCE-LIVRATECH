@@ -26,7 +26,7 @@ public class AdminController {
     private AdminService adminService;
 
 
-    @GetMapping("/clientes")
+    @PostMapping("/clientes")
     public ResponseEntity<Map<String, Object>> buscarClientes(@RequestBody FiltroCliente filtroClientes) throws Exception {
         List<Cliente> clientes = adminService.findAll(filtroClientes);
 
