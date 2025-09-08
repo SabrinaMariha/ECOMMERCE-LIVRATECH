@@ -33,8 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
+          // 🔹 Recupera o ID salvo no localStorage
+          const clienteId = localStorage.getItem("clienteId");
+          if (!clienteId) {
+            throw new Error("ID do cliente não encontrado. Faça login ou cadastre novamente.");
+          }
+
           const response = await fetch(
-            "http://localhost:8080/clientes/4/senha",
+            `http://localhost:8080/clientes/${clienteId}/senha`,
             {
               method: "PUT",
               headers: { "Content-Type": "application/json" },
@@ -46,25 +52,20 @@ document.addEventListener("DOMContentLoaded", () => {
             }
           );
 
-          // Lê o texto primeiro
           const text = await response.text();
-
-          // Tenta converter para JSON, se possível
           let data;
           try {
             data = JSON.parse(text);
           } catch {
-            data = { message: text }; // se não for JSON, considera texto simples
+            data = { message: text };
           }
 
           if (!response.ok) {
             throw new Error(data.message || "Erro ao alterar senha.");
           }
 
-          // Sucesso
           fecharModal(modalSenha);
 
-          // Dispara evento customizado para modal de cliente atualizado
           const event = new CustomEvent("clienteAtualizado", {
             detail: { message: data.message || "Senha alterada com sucesso!" }
           });
