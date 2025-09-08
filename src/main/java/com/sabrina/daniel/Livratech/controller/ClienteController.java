@@ -23,8 +23,9 @@ public class ClienteController {
 
     @PostMapping("/")
     @Transactional
-    public ResponseEntity<String> cadastrar(@RequestBody Cliente cliente) {
-        return ResponseEntity.ok(clienteService.save(cliente));
+    public ResponseEntity<Cliente> cadastrar(@RequestBody Cliente cliente) {
+        Cliente clienteSalvo = clienteService.save(cliente);
+        return ResponseEntity.ok(clienteSalvo);
     }
 
     @GetMapping("/{id}")
