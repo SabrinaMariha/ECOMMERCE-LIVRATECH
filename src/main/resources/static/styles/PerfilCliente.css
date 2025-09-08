@@ -144,6 +144,35 @@
 }
 /*ESTILO DOS FORMULARIOOS*/
 
+/* Modal Senha */
+#senha-modal .modal-content{
+  width: 500px;
+}
+
+#senha-modal label{
+  text-align: left;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-right: 35px; /* espaço pro ícone */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+  z-index: 999;
+}
+
 .formulario-dados-pessoais,.formulario-enderecos, .formulario-cartoes, .formulario-senha{
     max-width: 90%;
     margin: auto;

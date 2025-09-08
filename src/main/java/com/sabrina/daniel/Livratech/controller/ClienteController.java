@@ -1,6 +1,7 @@
 package com.sabrina.daniel.Livratech.controller;
 
 
+import com.sabrina.daniel.Livratech.dtos.AlterarSenhaCliente;
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.service.ClienteService;
@@ -30,6 +31,19 @@ public class ClienteController {
     public ResponseEntity<DadosConsultaCliente> buscarPorId(@PathVariable long id) throws Exception {
         DadosConsultaCliente dto = clienteService.findDTOById(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<String> atualizarCliente(@PathVariable Long id, @RequestBody DadosConsultaCliente dto){
+        return ResponseEntity.ok(clienteService.update(id,dto));
+    }
+
+    @PutMapping("/{id}/senha")
+    public ResponseEntity<String> atualizarSenha(
+            @PathVariable Long id,
+            @RequestBody AlterarSenhaCliente request) {
+        String msg = clienteService.updateSenha(id, request.senhaAtual(), request.novaSenha(), request.confirmarSenha());
+        return ResponseEntity.ok(msg);
     }
 
 }
