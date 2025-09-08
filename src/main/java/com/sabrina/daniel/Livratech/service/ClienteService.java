@@ -157,7 +157,6 @@ public class ClienteService  {
         return "Senha alterada com sucesso!";
     }
 
-    @Override
     public String delete(Cliente cliente) {
         String nmClasse = cliente.getClass().getName();
         JpaRepository repository = repositories.get(nmClasse);
