@@ -37,7 +37,7 @@ public class ClienteService  {
     }
 
 
-    public String save(Cliente cliente) {
+    public Cliente save(Cliente cliente) {
         String nmClasse = cliente.getClass().getName();
         List<IStrategy> rn = rns.get(nmClasse);
         StringBuilder sb = new StringBuilder();
