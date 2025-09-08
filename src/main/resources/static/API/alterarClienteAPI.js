@@ -1,10 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const clienteId = 3; // ou pegue do hidden input
+  // Pega o ID do cliente do localStorage
+  const clienteId = localStorage.getItem("clienteId");
+  if (!clienteId) {
+    alert("ID do cliente não encontrado. Faça login ou cadastre-se.");
+    return;
+  }
 
   // --- Funções auxiliares ---
   function resolverTipoEndereco(containerEnd) {
     const entrega = containerEnd.querySelector("input[name='endereco-entrega']")?.checked;
     const cobranca = containerEnd.querySelector("input[name='endereco-cobranca']")?.checked;
+    if (entrega && cobranca) return "ENTREGA_COBRANCA";
     if (entrega) return "ENTREGA";
     if (cobranca) return "COBRANCA";
     return "COBRANCA";
@@ -12,14 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function montarClienteData() {
     return {
-      id: clienteId,
+      id: Number(clienteId),
       nome: document.getElementById("nome").value,
       genero: document.getElementById("genero").value,
       dataNascimento: document.getElementById("data-nascimento").value,
       cpf: document.getElementById("cpf").value,
       email: document.getElementById("email").value,
       status: "ATIVO",
-      senha: "Senha@123",
+      senha: "Senha@123", // ⚠️ ideal: enviar apenas se for alterar
 
       telefones: Array.from(document.querySelectorAll("#telefones-container .telefone-container"))
         .map(tel => ({
