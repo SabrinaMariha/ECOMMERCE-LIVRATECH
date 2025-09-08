@@ -280,6 +280,8 @@
 #painelFiltroEstoque.active {
   display: block;
 }
+
+
 /* MODAL ESTOQUE */
 /* ==========================
    Modal Editar Estoque
@@ -422,5 +424,5 @@
 }
 
 .modal-content form{
-  width:90%
+  width:90%;
 }

@@ -1,3 +1,42 @@
+const historicoTransacoes = {
+  "Daniel Almeida Andrade": [
+    {
+      dataHora: "20/08/2025 10:15",
+      valor: 150.0,
+      frete: 10.0,
+      status: "Concluída",
+    },
+    {
+      dataHora: "15/07/2025 14:40",
+      valor: 200.0,
+      frete: 15.0,
+      status: "Pendente",
+    },
+  ],
+  "Stella Dias Andrade": [
+    {
+      dataHora: "10/08/2025 12:30",
+      valor: 300.0,
+      frete: 20.0,
+      status: "Concluída",
+    },
+  ],
+  "Beatriz da Costa Santos Dias Andrade": [
+    {
+      dataHora: "01/08/2025 09:00",
+      valor: 120.0,
+      frete: 8.0,
+      status: "Concluída",
+    },
+    {
+      dataHora: "05/08/2025 16:45",
+      valor: 250.0,
+      frete: 12.0,
+      status: "Pendente",
+    },
+  ],
+};
+
 // ======================= CONTROLE DE ABAS =======================
 const buttons = document.querySelectorAll(".menu-btn");
 const sections = document.querySelectorAll(".section");
@@ -12,10 +51,12 @@ buttons.forEach((btn) => {
     if (section) section.classList.add("active");
 
     // Fechar todos os modais que usam a classe 'active'
-    document.querySelectorAll(".modal.active").forEach(modal => modal.classList.remove("active"));
+    document.querySelectorAll(".modal.active").forEach((modal) =>
+      modal.classList.remove("active")
+    );
 
     // Fechar modais que usam style.display
-    ["inativar-modal", "modalEditarEstoque"].forEach(id => {
+    ["inativar-modal", "modalEditarEstoque"].forEach((id) => {
       const modal = document.getElementById(id);
       if (modal) modal.style.display = "none";
     });
@@ -39,6 +80,7 @@ const btnFecharDetalhesBtn = document.getElementById("btnFecharDetalhesBtn");
 const detalhesClienteContent = document.getElementById("detalhesClienteContent");
 
 let clientesCarregados = []; // Para armazenar os clientes e usar no filtro
+let clienteParaInativar = null; // variável global
 
 async function carregarClientes() {
   tbodyClientes.innerHTML = "";
@@ -47,7 +89,7 @@ async function carregarClientes() {
     const res = await fetch("/admin/clientes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
+      body: JSON.stringify({}),
     });
 
     if (!res.ok) throw new Error("Erro ao carregar clientes");
@@ -71,13 +113,23 @@ function renderizarClientes(clientes) {
       <td>${c.nome}</td>
       <td>${c.dataNascimento}</td>
       <td>${c.cpf}</td>
-      <td>${c.telefones.length ? c.telefones[0].ddd + " " + c.telefones[0].numero : ""}</td>
+      <td>${
+        c.telefones.length
+          ? c.telefones[0].ddd + " " + c.telefones[0].numero
+          : ""
+      }</td>
       <td>${c.email}</td>
       <td>${c.status}</td>
       <td>
-        <button class="btn-acao-tabela btn-detalhes" data-id="${c.id}"><i class="fa-solid fa-circle-info"></i></button>
-        <button class="btn-acao-tabela btn-historico" data-id="${c.id}"><i class="fa-solid fa-clock-rotate-left"></i></button>
-        <button class="btn-acao-tabela btn-inativar" data-id="${c.id}"><i class="fa-solid fa-ban"></i></button>
+        <button class="btn-acao-tabela btn-detalhes" data-id="${
+          c.id
+        }"><i class="fa-solid fa-circle-info"></i></button>
+        <button class="btn-acao-tabela btn-historico" data-id="${
+          c.id
+        }"><i class="fa-solid fa-clock-rotate-left"></i></button>
+        <button class="btn-acao-tabela btn-inativar" data-id="${
+          c.id
+        }"><i class="fa-solid fa-ban"></i></button>
       </td>
     `;
     tbodyClientes.appendChild(tr);
@@ -91,13 +143,27 @@ function renderizarClientes(clientes) {
         if (!res.ok) throw new Error("Erro ao carregar cliente");
         const data = await res.json();
 
-        const telefones = data.telefones?.map(t => `${t.ddd} ${t.numero}`).join(", ") || "-";
-        const enderecos = data.enderecos?.map(e => `${e.cep}, ${e.logradouro}, ${e.numero}, ${e.cidade}/${e.estado}`).join("<br>") || "-";
-        const cartoes = data.cartoesCredito?.map(cc => {
-          const numero = cc.numeroCartao ? `**** **** **** ${cc.numeroCartao.slice(-4)}` : "Número indisponível";
-          const titular = cc.nomeImpresso || "-";
-          return `${numero}, ${titular}`;
-        }).join("<br>") || "-";
+        const telefones =
+          data.telefones
+            ?.map((t) => `${t.ddd} ${t.numero}`)
+            .join(", ") || "-";
+        const enderecos =
+          data.enderecos
+            ?.map(
+              (e) =>
+                `${e.cep}, ${e.logradouro}, ${e.numero}, ${e.cidade}/${e.estado}`
+            )
+            .join("<br>") || "-";
+        const cartoes =
+          data.cartoesCredito
+            ?.map((cc) => {
+              const numero = cc.numeroCartao
+                ? `**** **** **** ${cc.numeroCartao.slice(-4)}`
+                : "Número indisponível";
+              const titular = cc.nomeImpresso || "-";
+              return `${numero}, ${titular}`;
+            })
+            .join("<br>") || "-";
 
         detalhesClienteContent.innerHTML = `
           <p><strong>Nome:</strong> ${data.nome}</p>
@@ -118,11 +184,32 @@ function renderizarClientes(clientes) {
       }
     });
 
-    // Botões históricos e inativar
-    tr.querySelector(".btn-historico")?.addEventListener("click", async () => {
-      // ... seu código de histórico aqui
+    // Botão histórico
+    tr.querySelector(".btn-historico")?.addEventListener("click", () => {
+      tbodyHistorico.innerHTML = "";
+      const transacoes = historicoTransacoes[c.nome] || [];
+
+      if (transacoes.length === 0) {
+        tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhuma transação encontrada</td></tr>`;
+      } else {
+        transacoes.forEach((t) => {
+          const trHist = document.createElement("tr");
+          trHist.innerHTML = `
+            <td>${t.dataHora}</td>
+            <td>R$ ${t.valor.toFixed(2)}</td>
+            <td>R$ ${t.frete.toFixed(2)}</td>
+            <td>${t.status}</td>
+          `;
+          tbodyHistorico.appendChild(trHist);
+        });
+      }
+
+      modalHistorico.classList.add("active");
     });
-    tr.querySelector(".btn-inativar")?.addEventListener("click", () => {
+
+    // Botão inativar
+    tr.querySelector(".btn-inativar")?.addEventListener("click", (e) => {
+      clienteParaInativar = e.currentTarget.dataset.id;
       inativarModal.style.display = "flex";
     });
   });
@@ -131,19 +218,49 @@ function renderizarClientes(clientes) {
 carregarClientes();
 
 // ======================= MODAIS CLIENTES =======================
-btnFecharHistorico?.addEventListener("click", () => modalHistorico.classList.remove("active"));
-modalHistorico?.addEventListener("click", (e) => { if(e.target===modalHistorico) modalHistorico.classList.remove("active"); });
+btnFecharHistorico?.addEventListener("click", () =>
+  modalHistorico.classList.remove("active")
+);
+modalHistorico?.addEventListener("click", (e) => {
+  if (e.target === modalHistorico) modalHistorico.classList.remove("active");
+});
 
-btnFecharInativar?.addEventListener("click", () => inativarModal.style.display="none");
-btnNao?.addEventListener("click", () => inativarModal.style.display="none");
-btnSim?.addEventListener("click", () => inativarModal.style.display="none");
-window.addEventListener("click", (e) => { if(e.target===inativarModal) inativarModal.style.display="none"; });
+btnFecharInativar?.addEventListener(
+  "click",
+  () => (inativarModal.style.display = "none")
+);
+btnNao?.addEventListener("click", () => (inativarModal.style.display = "none"));
+btnSim?.addEventListener("click", () => (inativarModal.style.display = "none"));
+window.addEventListener("click", (e) => {
+  if (e.target === inativarModal) inativarModal.style.display = "none";
+});
+
+// botão "sim" (inativar)
+btnSim?.addEventListener("click", async () => {
+  if (!clienteParaInativar) return;
+  try {
+    const res = await fetch(
+      `/admin/cliente/${clienteParaInativar}/inativar`,
+      { method: "PATCH" }
+    );
+    if (!res.ok) throw new Error("Erro ao inativar cliente");
+    await carregarClientes();
+    inativarModal.style.display = "none";
+    clienteParaInativar = null;
+  } catch (err) {
+    alert(err.message);
+  }
+});
 
 // ======================= FILTROS =======================
 function criarFiltro(btnAbrir, painel, btnFechar, btnLimpar, formId) {
   btnAbrir?.addEventListener("click", () => painel?.classList.toggle("active"));
-  btnFechar?.addEventListener("click", () => painel?.classList.remove("active"));
-  btnLimpar?.addEventListener("click", () => document.getElementById(formId)?.reset());
+  btnFechar?.addEventListener("click", () =>
+    painel?.classList.remove("active")
+  );
+  btnLimpar?.addEventListener("click", () =>
+    document.getElementById(formId)?.reset()
+  );
 }
 
 document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
@@ -154,17 +271,22 @@ document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
     cpf: form.cpf.value.toLowerCase(),
     genero: form.genero.value.toLowerCase(),
     telefone: form.telefone.value.toLowerCase(),
-    email: form.email.value.toLowerCase()
+    email: form.email.value.toLowerCase(),
   };
 
-  const clientesFiltrados = clientesCarregados.filter(c => {
-    const telefone = c.telefones.length ? c.telefones[0].ddd + " " + c.telefones[0].numero : "";
-    return (!filtros.nome || c.nome.toLowerCase().includes(filtros.nome)) &&
-           (!filtros.dataNascimento || c.dataNascimento === filtros.dataNascimento) &&
-           (!filtros.cpf || c.cpf.toLowerCase().includes(filtros.cpf)) &&
-           (!filtros.genero || (c.genero && c.genero.toLowerCase().includes(filtros.genero))) &&
-           (!filtros.telefone || telefone.toLowerCase().includes(filtros.telefone)) &&
-           (!filtros.email || c.email.toLowerCase().includes(filtros.email));
+  const clientesFiltrados = clientesCarregados.filter((c) => {
+    const telefone = c.telefones.length
+      ? c.telefones[0].ddd + " " + c.telefones[0].numero
+      : "";
+    return (
+      (!filtros.nome || c.nome.toLowerCase().includes(filtros.nome)) &&
+      (!filtros.dataNascimento || c.dataNascimento === filtros.dataNascimento) &&
+      (!filtros.cpf || c.cpf.toLowerCase().includes(filtros.cpf)) &&
+      (!filtros.genero ||
+        (c.genero && c.genero.toLowerCase().includes(filtros.genero))) &&
+      (!filtros.telefone || telefone.toLowerCase().includes(filtros.telefone)) &&
+      (!filtros.email || c.email.toLowerCase().includes(filtros.email))
+    );
   });
 
   renderizarClientes(clientesFiltrados);
@@ -179,6 +301,8 @@ criarFiltro(
 );
 
 // ======================= ESTOQUE =======================
+// ... (resto do estoque, vendas, trocas e detalhes permanece igual)
+
 const estoque = [
   { idLivro: 1, titulo: "Livro A", quantidade: 10, fornecedor: "Fornecedor X", dataEntrada: "2025-08-01", valorCusto: 50.0, status: "Ativo" },
   { idLivro: 2, titulo: "Livro B", quantidade: 0, fornecedor: "Fornecedor Y", dataEntrada: "2025-08-05", valorCusto: 35.0, status: "Ativo" },

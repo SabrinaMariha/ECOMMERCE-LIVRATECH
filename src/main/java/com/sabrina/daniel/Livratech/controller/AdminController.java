@@ -60,4 +60,9 @@ public class AdminController {
         DadosConsultaCliente dto = adminService.findDTOById(id);
         return ResponseEntity.ok(dto);
     }
+    @PatchMapping("/cliente/{id}/inativar")
+    public ResponseEntity<String> inativarPorId(@PathVariable long id) throws Exception {
+        DadosConsultaCliente dto = adminService.inativarPorId(id);
+        return ResponseEntity.ok("Cliente " + dto.nome() + " inativado com sucesso!");
+    }
 }

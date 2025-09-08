@@ -3,6 +3,7 @@ package com.sabrina.daniel.Livratech.service;
 import com.sabrina.daniel.Livratech.daos.ClienteRepository;
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.dtos.FiltroCliente;
+import com.sabrina.daniel.Livratech.enums.Status;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -60,5 +61,12 @@ public class AdminService {
                 List.copyOf(cliente.getEnderecos()),
                 List.copyOf(cliente.getCartoesCredito())
         );
+    }
+
+    public DadosConsultaCliente inativarPorId(long id) {
+        Cliente cliente = clienteRepository.findById(id).orElseThrow();
+        cliente.setStatus(Status.INATIVO);
+        clienteRepository.save(cliente);
+        return toDTO(cliente);
     }
 }
