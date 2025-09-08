@@ -6,6 +6,7 @@ import com.sabrina.daniel.Livratech.model.Carrinho;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,7 @@ public class ClienteService implements IFachada<Cliente> {
 
         rns.put(Cliente.class.getName(), regrasCliente);
 
-        repositories.put(Cliente.class.getName(),  clienteRepository);
+        repositories.put(Cliente.class.getName(), clienteRepository);
     }
 
     @Override
@@ -67,6 +68,12 @@ public class ClienteService implements IFachada<Cliente> {
                 cliente.setCarrinho(new Carrinho());
             }
 
+            // Criptografa a senha antes de salvar
+            if (cliente.getSenha() != null && !cliente.getSenha().isEmpty()) {
+                BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+                cliente.setSenha(encoder.encode(cliente.getSenha()));
+            }
+
             JpaRepository repository = repositories.get(nmClasse);
             repository.save(cliente);
             return "Cliente cadastrado com sucesso!";
@@ -75,45 +82,80 @@ public class ClienteService implements IFachada<Cliente> {
         return sb.toString();
     }
 
-
     @Override
-    public String update(Cliente cliente) {
-        String nmClasse = cliente.getClass().getName();
-        List<IStrategy> rn = rns.get(nmClasse);
-        StringBuilder sb = new StringBuilder();
+    public String update(Long id, DadosConsultaCliente dto) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        for (IStrategy s : rn) {
-            String msg = s.processar(cliente);
-            if (msg != null) {
-                sb.append("\n" + msg);
-            }
+        // Atualiza campos básicos
+        cliente.setNome(dto.nome());
+        cliente.setGenero(dto.genero());
+        cliente.setDataNascimento(dto.dataNascimento());
+        cliente.setCpf(dto.cpf());
+        cliente.setEmail(dto.email());
+        cliente.setStatus(dto.status());
+
+        // Telefones
+        if (dto.telefones() != null) {
+            cliente.getTelefones().clear();
+            dto.telefones().forEach(t -> {
+                t.setCliente(cliente);
+                cliente.getTelefones().add(t);
+            });
         }
-        if (sb.length() == 0) {
-            JpaRepository repository = repositories.get(nmClasse);
-            //repository.update(cliente);
-            return "Cliente atualizado com sucesso!";
+
+        // Endereços
+        if (dto.enderecos() != null) {
+            cliente.getEnderecos().clear();
+            dto.enderecos().forEach(e -> {
+                e.setCliente(cliente);
+                cliente.getEnderecos().add(e);
+            });
         }
-        return sb.toString();
+
+        // Cartões (fazendo manual para evitar erro do orphanRemoval)
+        if (dto.cartoesCredito() != null) {
+            cliente.getCartoesCredito().clear();
+            dto.cartoesCredito().forEach(c -> {
+                c.setCliente(cliente);
+                cliente.getCartoesCredito().add(c);
+            });
+        }
+
+        clienteRepository.save(cliente);
+        return "Cliente atualizado com sucesso!";
     }
 
     @Override
-    public String updateSenha(Cliente cliente) {
-        String nmClasse = cliente.getClass().getName();
-        List<IStrategy> rn = rns.get(nmClasse);
-        StringBuilder sb = new StringBuilder();
+    public String updateSenha(Long id, String senhaAtual, String novaSenha, String confirmarSenha) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        for (IStrategy s : rn) {
-            String msg = s.processar(cliente);
-            if (msg != null) {
-                sb.append("\n" + msg);
-            }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        // Verifica senha atual
+        if (!encoder.matches(senhaAtual, cliente.getSenha())) {
+            throw new RuntimeException("Senha atual incorreta");
         }
-        if (sb.length() == 0) {
-            JpaRepository repository = repositories.get(nmClasse);
-            //repository.updateSenha(cliente);
-            return "Senha atualizada com sucesso!";
+
+        // Verifica se nova senha e confirmação são iguais
+        if (!novaSenha.equals(confirmarSenha)) {
+            throw new RuntimeException("As senhas não coincidem");
         }
-        return sb.toString();
+
+        // Validação da senha forte (RNF0031)
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+        if (!novaSenha.matches(regex)) {
+            throw new RuntimeException(
+                    "A senha deve ter no mínimo 8 caracteres, incluir letras maiúsculas, minúsculas, números e caracteres especiais"
+            );
+        }
+
+        // Atualiza senha criptografada
+        cliente.setSenha(encoder.encode(novaSenha));
+        clienteRepository.save(cliente);
+
+        return "Senha alterada com sucesso!";
     }
 
     @Override

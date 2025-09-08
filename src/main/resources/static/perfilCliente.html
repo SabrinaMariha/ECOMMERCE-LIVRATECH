@@ -11,487 +11,498 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<div id="success-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn close">&times;</span>
-        <p>Salvo com sucesso!</p>
-    </div>
-</div>
-
-<div id="cancel-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn close">&times;</span>
-        <p>Deseja realmente cancelar?</p>
-        <div class="botoes-cancelar">
-            <button type="button" class="btn-principal btn-nao">Não</button>
-            <button type="button" class="btn-principal btn-sim">Sim</button>
-        </div>
-    </div>
-</div>
-
-<div id="senha-modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn close">&times;</span>
-        <form class="formulario-senha" id="formulario-senha">
-            <h2>Alterar Senha</h2>
-            <div class="linha">
-                <div class="coluna-50">
-                    <label for="senha-atual" class="label-campo">Senha Atual</label>
-                    <input type="password" id="senha-atual" class="input-campo" required>
-                </div>
-                <div class="coluna-50">
-                    <label for="nova-senha" class="label-campo">Nova Senha</label>
-                    <input type="password" id="nova-senha" class="input-campo" required>
-                </div>
-                <div class="coluna-50">
-                    <label for="confirmacao-nova-senha" class="label-campo">Confirmação da Nova Senha</label>
-                    <input type="password" id="confirmacao-nova-senha" class="input-campo" required>
-                </div>
-            </div>
-            <div class="linha btn-acao">
-                <button type="button" class="btn-principal btn-cancelar-senha">Cancelar</button>
-                <button type="submit" class="btn-principal btn-salvar-senha">Salvar</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 <body>
-<header id="navbar-container"></header>
+    <header id="navbar-container"></header>
 
-<main class="main">
-    <div class="container">
-        <!-- sidebar menu -->
-        <aside class="sidebar">
-            <button class="menu-btn active" data-section="pedidos" onclick="resetFormularios()"><i class="fas fa-box"></i>
-                Pedidos</button>
-            <button class="menu-btn" data-section="dados" onclick="resetFormularios()"><i
-                    class="fas fa-id-card"></i> Dados Pessoais</button>
-            <button class="menu-btn" data-section="enderecos" onclick="resetFormularios()"><i
-                    class="fas fa-map-marker-alt"></i> Endereços</button>
-            <button class="menu-btn" data-section="cartoes" onclick="resetFormularios()"><i
-                    class="fas fa-credit-card"></i> Cartões de Crédito</button>
-            <button class="menu-btn" data-section="cupons" onclick="resetFormularios()"><i
-                    class="fas fa-ticket-alt"></i> Cupons</button>
-        </aside>
+    <main class="main">
+        <div class="container">
+            <!-- sidebar menu -->
+            <aside class="sidebar">
+                <button class="menu-btn active" data-section="pedidos"><i class="fas fa-box"></i>
+                    Pedidos</button>
+                <button class="menu-btn" data-section="dados"><i class="fas fa-id-card"></i> Dados Pessoais</button>
+                <button class="menu-btn" data-section="enderecos"><i class="fas fa-map-marker-alt"></i>
+                    Endereços</button>
+                <button class="menu-btn" data-section="cartoes"><i class="fas fa-credit-card"></i> Cartões de
+                    Crédito</button>
+                <button class="menu-btn" data-section="cupons"><i class="fas fa-ticket-alt"></i> Cupons</button>
+            </aside>
 
-        <!-- Slidebar do carrinho -->
+            <!-- Slidebar do carrinho -->
 
-        <div id="cartSidebar" class="cart-sidebar"></div>
+            <div id="cartSidebar" class="cart-sidebar"></div>
 
-        <div class="content">
-            <div id="pedidos" class="section active">
-                <div class="secao-pedidos">
-                    <h2>Pedidos</h2>
+            <div class="content">
+                <div id="pedidos" class="section active">
+                    <div class="secao-pedidos">
+                        <h2>Pedidos</h2>
 
-                    <!-- Pedido 1 -->
-                    <div class="pedido-container">
-                        <div class="pedido-card">
-                            <div class="pedido-info">
-                                <p><strong>Pedido:</strong> 12345</p>
-                                <p><strong>Data:</strong> 01/05/2024</p>
-                                <p><strong>Status:</strong> Entregue</p>
-                                <p><strong>Total:</strong> R$ 150,00</p>
-                                <button class="btn-principal btn-detalhes"
+                        <!-- Pedido 1 -->
+                        <div class="pedido-container">
+                            <div class="pedido-card">
+                                <div class="pedido-info">
+                                    <p><strong>Pedido:</strong> 12345</p>
+                                    <p><strong>Data:</strong> 01/05/2024</p>
+                                    <p><strong>Status:</strong> Entregue</p>
+                                    <p><strong>Total:</strong> R$ 150,00</p>
+                                    <button class="btn-principal btn-detalhes"
                                         onclick="toggleDetalhes(this)">Detalhes</button>
-                            </div>
+                                </div>
 
-                            <!-- Detalhes (inicialmente escondidos) -->
-                            <div class="pedido-detalhes" style="display: none;">
-                                <h4>Itens:</h4>
+                                <!-- Detalhes (inicialmente escondidos) -->
+                                <div class="pedido-detalhes" style="display: none;">
+                                    <h4>Itens:</h4>
 
-                                <div class="cart-item">
-                                    <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
-                                         alt="Livro A">
-                                    <div class="item-info">
-                                        <p class="item-name">Livro A</p>
-                                        <p class="item-price">R$ 50,00</p>
-                                        <div class="item-actions">
-                                            <div class="itens-venda">
-                                                <div class="itens-total">
-                                                    <div class="itens-quantidade">
-                                                        <label>Qtd: </label>
-                                                        <input type="number" value="1" min="1" disabled>
+                                    <div class="cart-item">
+                                        <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
+                                            alt="Livro A">
+                                        <div class="item-info">
+                                            <p class="item-name">Livro A</p>
+                                            <p class="item-price">R$ 50,00</p>
+                                            <div class="item-actions">
+                                                <div class="itens-venda">
+                                                    <div class="itens-total">
+                                                        <div class="itens-quantidade">
+                                                            <label>Qtd: </label>
+                                                            <input type="number" value="1" min="1" disabled>
+                                                        </div>
+                                                        <label>Total: R$ 50,00</label>
                                                     </div>
-                                                    <label>Total: R$ 50,00</label>
-                                                </div>
-                                                <button class="btn-principal btn-troca"
+                                                    <button class="btn-principal btn-troca"
                                                         onclick="window.location.href='telaTroca.html'">Trocar</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="cart-item">
-                                    <img src="https://m.media-amazon.com/images/I/81af+MCATTL._SY466_.jpg"
-                                         alt="Livro B">
-                                    <div class="item-info">
-                                        <p class="item-name">Livro B</p>
-                                        <p class="item-price">R$ 100,00</p>
-                                        <div class="item-actions">
-                                            <div class="itens-venda">
-                                                <div class="itens-total">
-                                                    <div class="itens-quantidade">
-                                                        <label>Qtd: </label>
-                                                        <input type="number" value="1" min="1" disabled>
+                                    <div class="cart-item">
+                                        <img src="https://m.media-amazon.com/images/I/81af+MCATTL._SY466_.jpg"
+                                            alt="Livro B">
+                                        <div class="item-info">
+                                            <p class="item-name">Livro B</p>
+                                            <p class="item-price">R$ 100,00</p>
+                                            <div class="item-actions">
+                                                <div class="itens-venda">
+                                                    <div class="itens-total">
+                                                        <div class="itens-quantidade">
+                                                            <label>Qtd: </label>
+                                                            <input type="number" value="1" min="1" disabled>
+                                                        </div>
+                                                        <label>Total: R$ 100,00</label>
                                                     </div>
-                                                    <label>Total: R$ 100,00</label>
-                                                </div>
-                                                <button class="btn-principal btn-troca"
+                                                    <button class="btn-principal btn-troca"
                                                         onclick="window.location.href='telaTroca.html'">Trocar</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <h4>Endereço de Entrega:</h4>
-                                <p>Rua Exemplo, 123, Bairro, Cidade, Estado, CEP</p>
+                                    <h4>Endereço de Entrega:</h4>
+                                    <p>Rua Exemplo, 123, Bairro, Cidade, Estado, CEP</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Outro pedido -->
-                    <div class="pedido-container">
-                        <div class="pedido-card">
-                            <div class="pedido-info">
-                                <p><strong>Pedido:</strong> 12346</p>
-                                <p><strong>Data:</strong> 15/05/2024</p>
-                                <p><strong>Status:</strong> Em Trânsito</p>
-                                <p><strong>Total:</strong> R$ 200,00</p>
-                                <button class="btn-principal btn-detalhes"
+                        <!-- Outro pedido -->
+                        <div class="pedido-container">
+                            <div class="pedido-card">
+                                <div class="pedido-info">
+                                    <p><strong>Pedido:</strong> 12346</p>
+                                    <p><strong>Data:</strong> 15/05/2024</p>
+                                    <p><strong>Status:</strong> Em Trânsito</p>
+                                    <p><strong>Total:</strong> R$ 200,00</p>
+                                    <button class="btn-principal btn-detalhes"
                                         onclick="toggleDetalhes(this)">Detalhes</button>
-                            </div>
-                            <!-- Detalhes (inicialmente escondidos) -->
-                            <div class="pedido-detalhes" style="display: none;">
-                                <h4>Itens:</h4>
+                                </div>
+                                <!-- Detalhes (inicialmente escondidos) -->
+                                <div class="pedido-detalhes" style="display: none;">
+                                    <h4>Itens:</h4>
 
-                                <div class="cart-item">
-                                    <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
-                                         alt="Livro C">
-                                    <div class="item-info">
-                                        <p class="item-name">Livro C</p>
-                                        <p class="item-price">R$ 200,00</p>
-                                        <div class="item-actions">
-                                            <div class="itens-venda">
-                                                <div class="itens-total">
-                                                    <div class="itens-quantidade">
-                                                        <label>Qtd: </label>
-                                                        <input type="number" value="1" min="1" disabled>
+                                    <div class="cart-item">
+                                        <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
+                                            alt="Livro C">
+                                        <div class="item-info">
+                                            <p class="item-name">Livro C</p>
+                                            <p class="item-price">R$ 200,00</p>
+                                            <div class="item-actions">
+                                                <div class="itens-venda">
+                                                    <div class="itens-total">
+                                                        <div class="itens-quantidade">
+                                                            <label>Qtd: </label>
+                                                            <input type="number" value="1" min="1" disabled>
+                                                        </div>
+                                                        <label>Total: R$ 200,00</label>
                                                     </div>
-                                                    <label>Total: R$ 200,00</label>
-                                                </div>
-                                                <button class="btn-principal btn-troca"
+                                                    <button class="btn-principal btn-troca"
                                                         onclick="window.location.href='telaTroca.html'"
                                                         style="display:none;">Trocar</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <h4>Endereço de Entrega:</h4>
-                                <p>Avenida Exemplo, 456, Bairro, Cidade, Estado, CEP</p>
+                                    <h4>Endereço de Entrega:</h4>
+                                    <p>Avenida Exemplo, 456, Bairro, Cidade, Estado, CEP</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
 
-            <div id="dados" class="section">
-                <form class="formulario-dados-pessoais" id="formulario-dados-pessoais">
-                    <h2>Dados Pessoais</h2>
-                    <div class="linha">
-                        <div class="coluna">
-                            <label for="nome" class="label-campo">Nome</label>
-                            <input type="text" id="nome" class="input-campo" disabled>
+                <div id="dados" class="section">
+                    <form class="formulario-dados-pessoais form-cliente" id="formulario-dados-pessoais">
+                        <h2>Dados Pessoais</h2>
+                        <div class="linha">
+                            <div class="coluna">
+                                <label for="nome" class="label-campo">Nome</label>
+                                <input type="text" id="nome" class="input-campo" disabled>
+                            </div>
                         </div>
-                    </div>
-                    <div class="linha">
-                        <div class="coluna-50">
-                            <label for="data-nascimento" class="label-campo">Data de Nascimento</label>
-                            <input type="date" id="data-nascimento" class="input-campo" disabled>
-                        </div>
-                        <div class="coluna-50">
-                            <label for="genero" class="label-campo">Gênero</label>
-                            <select id="genero" class="input-campo" disabled>
-                                <option value="">Escolha...</option>
-                                <option value="MASCULINO">Masculino</option>
-                                <option value="FEMININO">Feminino</option>
-                                <option value="OUTRO">Outro</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="linha">
-                        <div class="coluna-50">
-                            <label for="cpf" class="label-campo">CPF</label>
-                            <input type="text" id="cpf" class="input-campo" disabled>
-                        </div>
-                        <div class="coluna-50">
-                            <label for="email" class="label-campo">E-mail</label>
-                            <input type="email" id="email" class="input-campo" disabled>
-                        </div>
-                    </div>
-
-                    <h2 class="titulo-secao">Contato</h2>
-                    <div id="telefones-container">
-                        <div id="telefone-template" class="linha telefone-container" style="display: none;">
-                            <div class="coluna-25">
-                                <label class="label-campo">Tipo</label>
-                                <select class="input-campo" name="tipo" disabled>
-                                    <option value="">Tipo</option>
-                                    <option value="CELULAR">Celular</option>
-                                    <option value="FIXO">Fixo</option>
-                                    <option value="COMERCIAL">Comercial</option>
+                        <div class="linha">
+                            <div class="coluna-50">
+                                <label for="data-nascimento" class="label-campo">Data de Nascimento</label>
+                                <input type="date" id="data-nascimento" class="input-campo" disabled>
+                            </div>
+                            <div class="coluna-50">
+                                <label for="genero" class="label-campo">Gênero</label>
+                                <select id="genero" class="input-campo" disabled>
+                                    <option value="">Escolha...</option>
+                                    <option value="MASCULINO">Masculino</option>
+                                    <option value="FEMININO">Feminino</option>
+                                    <option value="OUTRO">Outro</option>
                                 </select>
                             </div>
-                            <div class="coluna-25">
-                                <label class="label-campo">DDD</label>
-                                <input class="input-campo" type="text" name="ddd" placeholder="DDD" disabled>
+                        </div>
+                        <div class="linha">
+                            <div class="coluna-50">
+                                <label for="cpf" class="label-campo">CPF</label>
+                                <input type="text" id="cpf" class="input-campo" disabled>
                             </div>
-                            <div class="coluna-50 numero-coluna">
-                                <label class="label-campo">Número</label>
-                                <div class="numero-wrapper">
-                                    <input class="input-campo" type="text" name="numero" placeholder="Número"
-                                           disabled>
-                                    <button type="button" class="remove-btn" title="Remover Telefone"
+                            <div class="coluna-50">
+                                <label for="email" class="label-campo">E-mail</label>
+                                <input type="email" id="email" class="input-campo" disabled>
+                            </div>
+                        </div>
+
+                        <h2 class="titulo-secao">Contato</h2>
+                        <div id="telefones-container">
+                            <div id="telefone-template" class="linha telefone-container" style="display: none;">
+                                <div class="coluna-25">
+                                    <label class="label-campo">Tipo</label>
+                                    <select class="input-campo" name="tipo" disabled>
+                                        <option value="">Tipo</option>
+                                        <option value="CELULAR">Celular</option>
+                                        <option value="FIXO">Fixo</option>
+                                        <option value="COMERCIAL">Comercial</option>
+                                    </select>
+                                </div>
+                                <div class="coluna-25">
+                                    <label class="label-campo">DDD</label>
+                                    <input class="input-campo" type="text" name="ddd" placeholder="DDD" disabled>
+                                </div>
+                                <div class="coluna-50 numero-coluna">
+                                    <label class="label-campo">Número</label>
+                                    <div class="numero-wrapper">
+                                        <input class="input-campo" type="text" name="numero" placeholder="Número"
+                                            disabled>
+                                        <button type="button" class="remove-btn" title="Remover Telefone"
                                             disabled>&times;</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <button type="button" class="btn-principal" onclick="adicionarTelefone()">+ Adicionar
-                        Telefone</button>
-                    <div class="linha btn-acao">
-                        <button type="button" class="btn-principal btn-alterar-senha"
+                        <button type="button" class="btn-principal" onclick="adicionarTelefone()">+ Adicionar
+                            Telefone</button>
+                        <div class="linha btn-acao">
+                            <button type="button" class="btn-principal btn-alterar-senha"
                                 onclick="abrirModalSenha()">Alterar Senha</button>
-                        <button type="button" class="btn-principal btn-alterar"
+                            <button type="button" class="btn-principal btn-alterar"
                                 onclick="toggleCampos(this.closest('form'))"> Alterar Informações</button>
-                        <button type="button" class="btn-principal btn-cancelar"
+                            <button type="button" class="btn-principal btn-cancelar"
                                 style="visibility: hidden">Cancelar</button>
-                        <button type="submit" class="btn-principal btn-salvar"
+                            <button type="submit" class="btn-principal btn-salvar"
                                 style="visibility: hidden">Salvar</button>
-                    </div>
-                </form>
+                        </div>
+                    </form>
 
-            </div>
+                </div>
 
-            <div id="enderecos" class="section">
-                <form class="formulario-enderecos" id="formulario-enderecos">
-                    <h2>Endereços</h2>
-                    <div id="address-container">
-                        <div id="address-template" class="address-container" style="display: none;">
-                            <button type="button" class="remove-btn" title="Remover Endereço">&times;</button>
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <label class="label-campo" for="tipoResidencia">Tipo de Residência</label>
-                                    <select class="input-campo" name="tipoResidencia" disabled>
-                                        <option value="">Selecione</option>
-                                        <option value="CASA">Casa</option>
-                                        <option value="APARTAMENTO">Apartamento</option>
-                                        <option value="KITNET">Kitnet</option>
-                                        <option value="SOBRADO">Sobrados</option>
-                                        <option value="OUTROS">Outros</option>
-                                    </select>
-                                </div>
-                                <div class="coluna-50">
-                                    <label class="label-campo" for="cep">CEP</label>
-                                    <div class="cepInputGroup ">
-                                        <input class="input-campo" type="text" name="cep" maxlength="9" placeholder="00000-000" disabled>
-                                        <button type="button" title="Buscar CEP" class="btnBuscarCep" disabled>
-                                            <i class="fa-solid fa-magnifying-glass"></i>
-                                        </button>
+                <div id="enderecos" class="section">
+                    <form class="formulario-enderecos form-cliente" id="formulario-enderecos">
+                        <h2>Endereços</h2>
+                        <div id="address-container">
+                            <div id="address-template" class="address-container" style="display: none;">
+                                <button type="button" class="remove-btn" title="Remover Endereço">&times;</button>
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <label class="label-campo" for="tipoResidencia">Tipo de Residência</label>
+                                        <select class="input-campo" name="tipoResidencia" disabled>
+                                            <option value="">Selecione</option>
+                                            <option value="CASA">Casa</option>
+                                            <option value="APARTAMENTO">Apartamento</option>
+                                            <option value="KITNET">Kitnet</option>
+                                            <option value="SOBRADO">Sobrados</option>
+                                            <option value="OUTROS">Outros</option>
+                                        </select>
+                                    </div>
+                                    <div class="coluna-50">
+                                        <label class="label-campo" for="cep">CEP</label>
+                                        <div class="cepInputGroup ">
+                                            <input class="input-campo" type="text" name="cep" maxlength="9"
+                                                placeholder="00000-000" disabled>
+                                            <button type="button" title="Buscar CEP" class="btnBuscarCep" disabled>
+                                                <i class="fa-solid fa-magnifying-glass"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="linha">
-                                <div class="coluna-25">
-                                    <label class="label-campo" for="tipoLogradouro">Tipo de Logradouro</label>
-                                    <select class="input-campo" name="tipoLogradouro" disabled>
-                                        <option value="">Selecione</option>
-                                        <option value="RUA">Rua</option>
-                                        <option value="AVENIDA">Avenida</option>
-                                        <option value="TRAVESSA">Travessa</option>
-                                        <option value="ALAMEDA">Alameda</option>
-                                        <option value="ESTRADA">Estrada</option>
-                                        <option value="RODOVIA">Rodovia</option>
-                                        <option value="PRACA">Praça</option>
-                                        <option value="VIELA">Viela</option>
-                                        <option value="LARGO">Largo</option>
-                                    </select>
+                                <div class="linha">
+                                    <div class="coluna-25">
+                                        <label class="label-campo" for="tipoLogradouro">Tipo de Logradouro</label>
+                                        <select class="input-campo" name="tipoLogradouro" disabled>
+                                            <option value="">Selecione</option>
+                                            <option value="RUA">Rua</option>
+                                            <option value="AVENIDA">Avenida</option>
+                                            <option value="TRAVESSA">Travessa</option>
+                                            <option value="ALAMEDA">Alameda</option>
+                                            <option value="ESTRADA">Estrada</option>
+                                            <option value="RODOVIA">Rodovia</option>
+                                            <option value="PRACA">Praça</option>
+                                            <option value="VIELA">Viela</option>
+                                            <option value="LARGO">Largo</option>
+                                        </select>
+                                    </div>
+                                    <div class="coluna-50">
+                                        <label class="label-campo" for="logradouro">Logradouro</label>
+                                        <input class="input-campo" type="text" name="logradouro" disabled>
+                                    </div>
+                                    <div class="coluna-25">
+                                        <label class="label-campo" for="numero">Número</label>
+                                        <input class="input-campo" type="text" name="numero" disabled>
+                                    </div>
                                 </div>
-                                <div class="coluna-50">
-                                    <label class="label-campo" for="logradouro">Logradouro</label>
-                                    <input class="input-campo" type="text" name="logradouro"
-                                           disabled>
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <label class="label-campo" for="bairro">Bairro</label>
+                                        <input class="input-campo" type="text" name="bairro" disabled>
+                                    </div>
+                                    <div class="coluna-50">
+                                        <label class="label-campo" for="cidade">Cidade</label>
+                                        <input class="input-campo" type="text" name="cidade" disabled>
+                                    </div>
                                 </div>
-                                <div class="coluna-25">
-                                    <label class="label-campo" for="numero">Número</label>
-                                    <input class="input-campo" type="text" name="numero" disabled>
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <label class="label-campo" for="estado">Estado</label>
+                                        <input class="input-campo" type="text" name="estado" disabled>
+                                    </div>
+                                    <div class="coluna-50">
+                                        <label class="label-campo" for="pais">País</label>
+                                        <input class="input-campo" type="text" name="pais" disabled>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <label class="label-campo" for="bairro">Bairro</label>
-                                    <input class="input-campo" type="text" name="bairro" disabled>
+                                <div class="linha">
+                                    <div class="coluna">
+                                        <label class="label-campo">Observações</label>
+                                        <textarea class="input-campo" name="observacoes" disabled></textarea>
+                                    </div>
                                 </div>
-                                <div class="coluna-50">
-                                    <label class="label-campo" for="cidade">Cidade</label>
-                                    <input class="input-campo" type="text" name="cidade" disabled>
-                                </div>
-                            </div>
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <label class="label-campo" for="estado">Estado</label>
-                                    <input class="input-campo" type="text" name="estado" disabled>
-                                </div>
-                                <div class="coluna-50">
-                                    <label class="label-campo" for="pais">País</label>
-                                    <input class="input-campo" type="text" name="pais" disabled>
-                                </div>
-                            </div>
-                            <div class="linha">
-                                <div class="coluna">
-                                    <label class="label-campo">Observações</label>
-                                    <textarea class="input-campo" name="observacoes" disabled></textarea>
-                                </div>
-                            </div>
-                            <div class="linha">
-                                <div class="coluna">
-                                    <div class="checkbox-group">
-                                        <label><input type="checkbox" name="endereco-entrega" disabled> Endereço de
-                                            Entrega</label>
-                                        <label><input type="checkbox" name="endereco-cobranca" disabled> Endereço de
-                                            Cobrança</label>
+                                <div class="linha">
+                                    <div class="coluna">
+                                        <div class="checkbox-group">
+                                            <label><input type="checkbox" name="endereco-entrega" disabled> Endereço de
+                                                Entrega</label>
+                                            <label><input type="checkbox" name="endereco-cobranca" disabled> Endereço de
+                                                Cobrança</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <button type="button" class="btn-principal" onclick="addAddress()">Adicionar Endereço</button>
-                    <div class="linha btn-acao">
-                        <button type="button" class="btn-principal btn-alterar"
+                        <button type="button" class="btn-principal" onclick="addAddress()">Adicionar Endereço</button>
+                        <div class="linha btn-acao">
+                            <button type="button" class="btn-principal btn-alterar"
                                 onclick="toggleCampos(this.closest('form'))"> Alterar Informações</button>
-                        <button type="button" class="btn-principal btn-cancelar"
+                            <button type="button" class="btn-principal btn-cancelar"
                                 style="visibility: hidden">Cancelar</button>
-                        <button type="submit" class="btn-principal btn-salvar"
+                            <button type="submit" class="btn-principal btn-salvar"
                                 style="visibility: hidden">Salvar</button>
-                    </div>
-                </form>
-            </div>
+                        </div>
+                    </form>
+                </div>
 
-            <div id="cartoes" class="section">
-                <form class="formulario-cartoes" id="formulario-cartoes">
-                    <h2>Cartões de Crédito</h2>
-                    <div id="card-container">
-                        <div id="card-template" class="card-container" style="display: none;">
-                            <button type="button" class="remove-btn" title="Remover cartão">&times;</button>
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <label class="label-campo">Número do Cartão</label>
-                                    <input type="text" class="input-campo" name="numero-cartao" disabled>
+                <div id="cartoes" class="section">
+                    <form class="formulario-cartoes form-cliente" id="formulario-cartoes">
+                        <h2>Cartões de Crédito</h2>
+                        <div id="card-container">
+                            <div id="card-template" class="card-container" style="display: none;">
+                                <button type="button" class="remove-btn" title="Remover cartão">&times;</button>
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <label class="label-campo">Número do Cartão</label>
+                                        <input type="text" class="input-campo" name="numero-cartao" disabled>
+                                    </div>
+                                    <div class="coluna-25">
+                                        <label class="label-campo">Bandeira</label>
+                                        <select class="input-campo" name="bandeira" disabled>
+                                            <option selected>Escolha...</option>
+                                            <option value="VISA">Visa</option>
+                                            <option value="MASTERCARD">MasterCard</option>
+                                            <option value="ELO">ELO</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="coluna-25">
-                                    <label class="label-campo">Bandeira</label>
-                                    <select class="input-campo" name="bandeira" disabled>
-                                        <option selected>Escolha...</option>
-                                        <option value="VISA">Visa</option>
-                                        <option value="MASTERCARD">MasterCard</option>
-                                        <option value="ELO">ELO</option>
-                                    </select>
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <label class="label-campo">Nome no Cartão</label>
+                                        <input type="text" class="input-campo" name="nome-titular" disabled>
+                                    </div>
+                                    <div class="coluna-25">
+                                        <label class="label-campo">Código de Segurança</label>
+                                        <input type="text" class="input-campo" name="cvv" disabled>
+                                    </div>
+                                    <div class="coluna-25">
+                                        <label class="label-campo">Validade</label>
+                                        <input type="text" class="input-campo" name="validade" placeholder="MM/AA"
+                                            disabled>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <label class="label-campo">Nome no Cartão</label>
-                                    <input type="text" class="input-campo" name="nome-titular" disabled>
-                                </div>
-                                <div class="coluna-25">
-                                    <label class="label-campo">Código de Segurança</label>
-                                    <input type="text" class="input-campo" name="cvv" disabled>
-                                </div>
-                                <div class="coluna-25">
-                                    <label class="label-campo">Validade</label>
-                                    <input type="text" class="input-campo" name="validade" placeholder="MM/AA"
-                                           disabled>
-                                </div>
-                            </div>
-                            <div class="linha">
-                                <div class="coluna">
-                                    <label class="label-campo">
-                                        <input type="radio" name="cartao-preferencial" disabled> Cartão Preferencial
-                                    </label>
+                                <div class="linha">
+                                    <div class="coluna">
+                                        <label class="label-campo">
+                                            <input type="radio" name="cartao-preferencial" disabled> Cartão Preferencial
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <button type="button" class="btn-principal" onclick="addCard()">Adicionar Cartão</button>
-                    <div class="linha btn-acao">
-                        <button type="button" class="btn-principal btn-alterar"
+                        <button type="button" class="btn-principal" onclick="addCard()">Adicionar Cartão</button>
+                        <div class="linha btn-acao">
+                            <button type="button" class="btn-principal btn-alterar"
                                 onclick="toggleCampos(this.closest('form'))"> Alterar Informações</button>
-                        <button type="button" class="btn-principal btn-cancelar"
+                            <button type="button" class="btn-principal btn-cancelar"
                                 style="visibility: hidden">Cancelar</button>
-                        <button type="submit" class="btn-principal btn-salvar"
+                            <button type="submit" class="btn-principal btn-salvar"
                                 style="visibility: hidden">Salvar</button>
-                    </div>
-                </form>
-            </div>
+                        </div>
+                    </form>
+                </div>
 
-            <div id="cupons" class="section">
-                <div class="secao-cupons">
-                    <h2>Cupons</h2>
-                    <div id="cupons-container">
-                        <div class="card-container">
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <div class="cupom">
-                                        <p>🎟️ CUPOM DE TROCA</p>
-                                        <p>R$ 50,00</p>
-                                        <p>Código: SH50500 </p>
+                <div id="cupons" class="section">
+                    <div class="secao-cupons">
+                        <h2>Cupons</h2>
+                        <div id="cupons-container">
+                            <div class="card-container">
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <div class="cupom">
+                                            <p>🎟️ CUPOM DE TROCA</p>
+                                            <p>R$ 50,00</p>
+                                            <p>Código: SH50500 </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-container">
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <div class="cupom">
-                                        <p>🎟️ CUPOM DE TROCA</p>
-                                        <p>R$ 10,00</p>
-                                        <p>Código: SH10500 </p>
+                            <div class="card-container">
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <div class="cupom">
+                                            <p>🎟️ CUPOM DE TROCA</p>
+                                            <p>R$ 10,00</p>
+                                            <p>Código: SH10500 </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="card-container">
-                            <div class="linha">
-                                <div class="coluna-50">
-                                    <div class="cupom">
-                                        <p>🎟️ CUPOM DE TROCA</p>
-                                        <p>R$ 5,00</p>
-                                        <p>Código: SH05500 </p>
+                            <div class="card-container">
+                                <div class="linha">
+                                    <div class="coluna-50">
+                                        <div class="cupom">
+                                            <p>🎟️ CUPOM DE TROCA</p>
+                                            <p>R$ 5,00</p>
+                                            <p>Código: SH05500 </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
             </div>
+        </div>
+    </main>
 
+    <!-- Chatbot -->
+    <div id="chatbot-container"></div>
 
+    <footer class="footer">
+        <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
+    </footer>
+
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close">&times;</span>
+            <p>Salvo com sucesso!</p>
         </div>
     </div>
-</main>
 
-<!-- Chatbot -->
-<div id="chatbot-container"></div>
+    <div id="cancel-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close">&times;</span>
+            <p>Deseja realmente cancelar?</p>
+            <div class="botoes-cancelar">
+                <button type="button" class="btn-principal btn-nao">Não</button>
+                <button type="button" class="btn-principal btn-sim">Sim</button>
+            </div>
+        </div>
+    </div>
 
-<footer class="footer">
-    <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
-</footer>
-<script src="scripts/MenuPerfilCliente.js"></script>
-<script src="scripts/AlterarCliente.js"></script>
-<script src="API/consultarClienteIdAPI.js"></script>
-<script src="scripts/Script.js"></script>
-<script src="scripts/Chatbot.js"></script>
+    <div id="senha-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn close">&times;</span>
+            <form class="formulario-senha" id="formulario-senha">
+                <h2>Alterar Senha</h2>
+                <div class="linha">
+                    <div class="coluna-50">
+                        <label for="senha-atual" class="label-campo">Senha Atual</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="senha-atual" class="input-campo" required>
+                            <i class="fa-solid fa-eye toggle-password" data-target="senha-atual"></i>
+                        </div>
+                    </div>
+                    <div class="coluna-50">
+                        <label for="nova-senha" class="label-campo">Nova Senha</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="nova-senha" class="input-campo" required>
+                            <i class="fa-solid fa-eye toggle-password" data-target="nova-senha"></i>
+                        </div>
+                    </div>
+
+                    <div class="coluna-50">
+                        <label for="confirmacao-nova-senha" class="label-campo">Confirmação da Nova Senha</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirmacao-nova-senha" class="input-campo" required>
+                            <i class="fa-solid fa-eye toggle-password" data-target="confirmacao-nova-senha"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="linha btn-acao">
+                    <button type="button" class="btn-principal btn-cancelar-senha">Cancelar</button>
+                    <button type="submit" class="btn-principal btn-salvar-senha">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="scripts/MenuPerfilCliente.js"></script>
+    <script src="scripts/AlterarCliente.js"></script>
+    <script src="API/consultarClienteIdAPI.js"></script>
+    <script src="API/alterarClienteAPI.js"></script>
+    <script src="API/alterarSenhaClienteAPI.js"></script>
+    <script src="API/cepAPI.js"></script>
+    <script src="scripts/Script.js"></script>
+    <script src="scripts/Chatbot.js"></script>
 
 </body>
 
