@@ -223,13 +223,13 @@
   display: flex;
 }
 
-#tabelaHistorico th, #tabelaHistorico td {
+#tabelaHistorico th, #tabelaHistorico td, .detalhes-tabela th, .detalhes-tabela td {
   padding: 10px;
   text-align: center;
   border-bottom: 1px solid #ddd;
 }
 
-#tabelaHistorico th {
+#tabelaHistorico th, .detalhes-tabela th {
   background-color: var(--cor-botao);
   color: white;
 }
@@ -247,7 +247,7 @@
   background-color: rgba(0,0,0,0.5); 
 }
 
-#inativar-modal .botoes-inativar {
+#inativar-modal .botoes-inativar{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -297,7 +297,7 @@
   background-color: rgba(0,0,0,0.5); 
 }
 
-#modalEditarEstoque .btn-acao {
+#modalEditarEstoque .btn-acao{
   display: flex;
   width: 100%;
   justify-content: center;
@@ -333,9 +333,6 @@
   display: block;
 }
 
-#modalDetalhesCliente.active{
-  display: flex;
-}
 
 /* RELATORIOS */
 .header-relatorios {
@@ -389,7 +386,7 @@
 }
 
 #modalStatusVenda,
-#modalStatusTroca {
+#modalStatusTroca{
   display: none;
   justify-content: center;
   align-items: center;
@@ -425,4 +422,82 @@
 
 .modal-content form{
   width:90%;
+}
+
+/* ==========================
+   MODAL DETALHES CLIENTE
+   ========================== */
+#modalDetalhesCliente {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#modalDetalhesCliente.active {
+  display: flex;
+}
+
+#modalDetalhesCliente .modal-conteudo {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 1300px;   /* aumentei de 800px para 1000px */
+  width: 95%;          /* mais próximo da tela */
+  max-height: 90vh;    /* aumenta altura máxima */
+  overflow-y: auto;    /* mantém scroll vertical */
+}
+
+
+#modalDetalhesCliente .modal-conteudo h3 {
+  padding: 10px 0;
+  margin: 0;
+}
+
+/* Tabela dentro do modal detalhes cliente */
+#modalDetalhesCliente .detalhes-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+}
+
+#modalDetalhesCliente .detalhes-tabela th,
+#modalDetalhesCliente .detalhes-tabela td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+#modalDetalhesCliente .detalhes-tabela th {
+  background-color: var(--cor-botao);
+  color: white;
+  font-weight: bold;
+}
+
+/* Botão de fechar (igual ao modalHistorico) */
+#modalDetalhesCliente .btn-acao {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+#modalDetalhesCliente #btnFecharDetalhes {
+  width: 20%;           /* mesmo tamanho do botão do modalHistorico */
+  background: red;
+}
+
+#modalDetalhesCliente #btnFecharDetalhes:hover {
+  background: darkred;
+}
+
+/* Ajuste para evitar que regras globais quebrem o modal */
+#modalDetalhesCliente .btn-acao button {
+  width: auto;          /* sobrescreve regra genérica */
 }
