@@ -14,7 +14,7 @@ import java.util.*;
 
 @Service
 @Transactional
-public class ClienteService implements IFachada<Cliente> {
+public class ClienteService  {
 
     Map<String, List<IStrategy>> rns = new HashMap<String, List<IStrategy>>();
 
@@ -36,7 +36,7 @@ public class ClienteService implements IFachada<Cliente> {
         repositories.put(Cliente.class.getName(), clienteRepository);
     }
 
-    @Override
+
     public String save(Cliente cliente) {
         String nmClasse = cliente.getClass().getName();
         List<IStrategy> rn = rns.get(nmClasse);
@@ -82,7 +82,6 @@ public class ClienteService implements IFachada<Cliente> {
         return sb.toString();
     }
 
-    @Override
     public String update(Long id, DadosConsultaCliente dto) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
@@ -126,7 +125,7 @@ public class ClienteService implements IFachada<Cliente> {
         return "Cliente atualizado com sucesso!";
     }
 
-    @Override
+
     public String updateSenha(Long id, String senhaAtual, String novaSenha, String confirmarSenha) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
@@ -158,7 +157,6 @@ public class ClienteService implements IFachada<Cliente> {
         return "Senha alterada com sucesso!";
     }
 
-    @Override
     public String delete(Cliente cliente) {
         String nmClasse = cliente.getClass().getName();
         JpaRepository repository = repositories.get(nmClasse);
@@ -166,18 +164,9 @@ public class ClienteService implements IFachada<Cliente> {
         return "Cliente deletado com sucesso!";
     }
 
-    @Override
-    public List<Cliente> findAll(Cliente cliente) {
-        return List.of();
-    }
 
-//    @Override
-//    public List<Cliente> findAll(Cliente clienteASerConsultado) {
-//        List<Cliente> clientes = clienteRepository.findAll(clienteASerConsultado);
-//        return clientes;
-//    }
 
-    @Override
+
     public DadosConsultaCliente findDTOById(Long id) throws Exception {
         Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new Exception("Cliente não encontrado"));
         return toDTO(cliente);

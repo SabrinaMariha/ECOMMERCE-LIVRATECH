@@ -280,6 +280,8 @@
 #painelFiltroEstoque.active {
   display: block;
 }
+
+
 /* MODAL ESTOQUE */
 /* ==========================
    Modal Editar Estoque
@@ -329,6 +331,10 @@
 
 #painelFiltroVendas.active {
   display: block;
+}
+
+#modalDetalhesCliente.active{
+  display: flex;
 }
 
 /* RELATORIOS */
@@ -418,5 +424,5 @@
 }
 
 .modal-content form{
-  width:90%
+  width:90%;
 }

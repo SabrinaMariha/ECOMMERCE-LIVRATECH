@@ -70,7 +70,7 @@
                 </div>
               </div>
               <div class="linha btn-acao">
-                <button type="button" class="btn-principal">Filtrar</button>
+                <button type="button" class="btn-principal" id="btnFiltrarClientes">Filtrar</button>
                 <button type="button" class="btn-principal" id="btnLimpar">Limpar</button>
                 <button type="button" class="btn-principal btnFechar" id="btnFecharFiltro">Fechar</button>
               </div>
@@ -121,10 +121,23 @@
           <div id="inativar-modal" class="modal">
             <div class="modal-content">
               <span class="close-btn close">&times;</span>
-              <p>Deseja realmente invativar cliente?</p>
+              <p>Deseja realmente inativar cliente?</p>
               <div class="botoes-inativar">
                 <button type="button" class="btn-principal btn-nao btnFechar">Não</button>
                 <button type="button" class="btn-principal btn-sim">Sim</button>
+              </div>
+            </div>
+          </div>
+          <!-- Modal Detalhes Cliente -->
+          <div id="modalDetalhesCliente" class="modal">
+            <div class="modal-content">
+              <span class="close-btn" id="btnFecharDetalhes">&times;</span>
+              <h3>Detalhes do Cliente</h3>
+              <div id="detalhesClienteContent">
+                <!-- Informações preenchidas via JS -->
+              </div>
+              <div class="linha btn-acao">
+                <button type="button" class="btn-principal btnFechar" id="btnFecharDetalhesBtn">Fechar</button>
               </div>
             </div>
           </div>
