@@ -213,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("ID gerado:", clienteSalvo.id);
 
         // Se precisar guardar pra usar depois:
+        localStorage.setItem("clienteName", clienteSalvo.nome);
         localStorage.setItem("clienteId", clienteSalvo.id);
         
         abrirModal(modalSucesso);
