@@ -165,22 +165,39 @@ function renderizarClientes(clientes) {
             })
             .join("<br>") || "-";
 
-        detalhesClienteContent.innerHTML = `
-          <p><strong>Nome:</strong> ${data.nome}</p>
-          <p><strong>Gênero:</strong> ${data.genero || "-"}</p>
-          <p><strong>Data de Nascimento:</strong> ${data.dataNascimento}</p>
-          <p><strong>CPF:</strong> ${data.cpf}</p>
-          <p><strong>Telefones:</strong> ${telefones}</p>
-          <p><strong>E-mail:</strong> ${data.email}</p>
-          <p><strong>Status:</strong> ${data.status}</p>
-          <p><strong>Endereços:</strong><br> ${enderecos}</p>
-          <p><strong>Cartões de Crédito:</strong><br> ${cartoes}</p>
-        `;
+       detalhesClienteContent.innerHTML = `
+         <table class="detalhes-tabela">
+           <tr>
+             <th>Nome</th>
+             <th>Gênero</th>
+             <th>Data de Nascimento</th>
+             <th>CPF</th>
+             <th>Telefones</th>
+             <th>E-mail</th>
+             <th>Status</th>
+             <th>Endereços</th>
+             <th>Cartões de Crédito</th>
+           </tr>
+           <tr>
+             <td>${data.nome}</td>
+             <td>${data.genero || "-"}</td>
+             <td>${data.dataNascimento}</td>
+             <td>${data.cpf}</td>
+             <td>${telefones}</td>
+             <td>${data.email}</td>
+             <td>${data.status}</td>
+             <td>${enderecos}</td>
+             <td>${cartoes}</td>
+           </tr>
+         </table>
+       `;
 
+        modalDetalhes.style.display = "flex";
         modalDetalhes.classList.add("active");
       } catch (err) {
         detalhesClienteContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
         modalDetalhes.classList.add("active");
+        modalDetalhes.style.display = "flex";
       }
     });
 
@@ -411,10 +428,8 @@ btnCancelarStatus?.addEventListener("click", () => modalStatusTroca.classList.re
 window.addEventListener("click", (e) => { if(e.target===modalStatusTroca) modalStatusTroca.classList.remove("active"); });
 
 // ======================= DETALHES CLIENTE =======================
-[btnFecharDetalhes, btnFecharDetalhesBtn].forEach(btn =>
-  btn.addEventListener("click", () => modalDetalhes.classList.remove("active"))
-);
-
-window.addEventListener("click", (e) => {
-  if(e.target === modalDetalhes) modalDetalhes.classList.remove("active");
-});
+btnFecharDetalhes?.addEventListener("click", () => modalDetalhes.style.display = "none");
+ btnFecharDetalhesBtn?.addEventListener("click", () => modalDetalhes.style.display = "none");
+ window.addEventListener("click", (e) => {
+   if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
+ });
