@@ -36,7 +36,6 @@ public class ClienteService  {
         repositories.put(Cliente.class.getName(), clienteRepository);
     }
 
-
     public Cliente save(Cliente cliente) {
         String nmClasse = cliente.getClass().getName();
         List<IStrategy> rn = rns.get(nmClasse);
@@ -75,11 +74,10 @@ public class ClienteService  {
             }
 
             JpaRepository repository = repositories.get(nmClasse);
-            repository.save(cliente);
-            return "Cliente cadastrado com sucesso!";
+            return (Cliente) repository.save(cliente); // retorna o cliente com ID gerado
         }
 
-        return sb.toString();
+        throw new RuntimeException("Erro ao salvar cliente: " + sb.toString());
     }
 
     public String update(Long id, DadosConsultaCliente dto) {
