@@ -2,10 +2,7 @@ package com.sabrina.daniel.Livratech.selenium;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -105,4 +102,37 @@ class CadastroClienteTest {
         // Pausa final para visualização
         Thread.sleep(5000);
     }
+    @Test
+    void naoDeveCadastrarClienteSemNome() throws InterruptedException {
+        driver.get("http://localhost:8080/cadastroCliente.html");
+
+        // ----------- Campos básicos (sem preencher o nome) -----------
+        // driver.findElement(By.id("nome")).sendKeys("Maria Teste"); // omitido intencionalmente
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("document.getElementById('data-nascimento').value = '1995-09-19'");
+
+        driver.findElement(By.id("genero")).sendKeys("FEMININO");
+        driver.findElement(By.id("cpf")).sendKeys("12345678901");
+        driver.findElement(By.id("email")).sendKeys("teste@example.com");
+        driver.findElement(By.id("senha")).sendKeys("Senha@123");
+        driver.findElement(By.id("confirmacao-senha")).sendKeys("Senha@123");
+
+        // ----------- Clicar em salvar -----------
+        WebElement salvarBtn = driver.findElement(By.cssSelector(".btn-salvar"));
+        salvarBtn.click();
+        Thread.sleep(5000);
+
+        // Esperar o alert
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+
+        // Verificar o texto do alert
+        assertTrue(alert.getText().contains("Erro"), "Deveria mostrar alert de erro");
+
+        // Fechar o alert
+        alert.accept();
+
+    }
+
 }
