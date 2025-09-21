@@ -5,6 +5,10 @@ import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.model.Carrinho;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarDadosObrigatoriosCadastro;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarSenha;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarTelefone;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarTiposEndereco;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,10 +30,10 @@ public class ClienteService  {
 
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
-//        regrasCliente.add(new ValidarDadosObrigatoriosCadastro());
-//        regrasCliente.add(new ValidarTelefone());
-//        regrasCliente.add(new ValidarTiposEndereco());
-//        regrasCliente.add(new ValidarSenha());
+        regrasCliente.add(new ValidarDadosObrigatoriosCadastro());
+        regrasCliente.add(new ValidarTelefone());
+        regrasCliente.add(new ValidarTiposEndereco());
+        regrasCliente.add(new ValidarSenha());
 
         rns.put(Cliente.class.getName(), regrasCliente);
 
