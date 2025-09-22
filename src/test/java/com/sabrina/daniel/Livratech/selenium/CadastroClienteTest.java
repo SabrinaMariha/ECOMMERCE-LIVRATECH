@@ -34,10 +34,8 @@ class CadastroClienteTest {
     void deveCadastrarClienteComSucesso() throws InterruptedException {
         driver.get("http://localhost:8080/cadastroCliente.html");
 
-        // ----------- Campos básicos -----------
         driver.findElement(By.id("nome")).sendKeys("Maria Teste");
 
-        // Preenche a data de nascimento de forma segura
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("document.getElementById('data-nascimento').value = '1995-09-19'");
 
@@ -47,18 +45,12 @@ class CadastroClienteTest {
         driver.findElement(By.id("senha")).sendKeys("Senha@123");
         driver.findElement(By.id("confirmacao-senha")).sendKeys("Senha@123");
 
-        // Pausa para visualizar
-        Thread.sleep(3000);
 
-        // ----------- Telefone -----------
         WebElement telefone = driver.findElement(By.cssSelector(".telefone-clone"));
         new Select(telefone.findElement(By.name("tipo"))).selectByVisibleText("Celular");
         telefone.findElement(By.name("ddd")).sendKeys("11");
         telefone.findElement(By.name("numero")).sendKeys("912345678");
 
-        Thread.sleep(3000);
-
-        // ----------- Endereço -----------
         WebElement endereco = driver.findElement(By.cssSelector(".address-clone"));
         new Select(endereco.findElement(By.name("tipoResidencia"))).selectByVisibleText("Apartamento");
         new Select(endereco.findElement(By.name("tipoLogradouro"))).selectByVisibleText("Rua");
@@ -69,14 +61,9 @@ class CadastroClienteTest {
         endereco.findElement(By.name("cidade")).sendKeys("São Paulo");
         endereco.findElement(By.name("estado")).sendKeys("SP");
         endereco.findElement(By.name("pais")).sendKeys("Brasil");
-
-        // Clica nos radios de entrega e cobrança
         endereco.findElement(By.name("endereco-entrega")).click();
         endereco.findElement(By.name("endereco-cobranca")).click();
 
-        Thread.sleep(3000);
-
-        // ----------- Cartão de Crédito -----------
         WebElement cartao = driver.findElement(By.cssSelector(".card-clone"));
         new Select(cartao.findElement(By.name("bandeira"))).selectByVisibleText("Visa");
         cartao.findElement(By.name("numero-cartao")).sendKeys("4111111111111111");
@@ -86,27 +73,20 @@ class CadastroClienteTest {
         WebElement preferencial = cartao.findElement(By.name("cartao-preferencial"));
         preferencial.click();
 
-        Thread.sleep(3000);
 
-        // ----------- Clicar em salvar -----------
         WebElement salvarBtn = driver.findElement(By.cssSelector(".btn-salvar"));
         salvarBtn.click();
 
-        // ----------- Esperar modal aparecer -----------
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("success-modal")));
 
-        // Valida se o modal de sucesso apareceu
         assertTrue(modal.isDisplayed(), "O modal de sucesso deveria aparecer");
 
-        // Pausa final para visualização
-        Thread.sleep(5000);
     }
     @Test
     void naoDeveCadastrarClienteSemNome() throws InterruptedException {
         driver.get("http://localhost:8080/cadastroCliente.html");
 
-        // ----------- Campos básicos (sem preencher o nome) -----------
         // driver.findElement(By.id("nome")).sendKeys("Maria Teste"); // omitido intencionalmente
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -118,21 +98,15 @@ class CadastroClienteTest {
         driver.findElement(By.id("senha")).sendKeys("Senha@123");
         driver.findElement(By.id("confirmacao-senha")).sendKeys("Senha@123");
 
-        // ----------- Clicar em salvar -----------
         WebElement salvarBtn = driver.findElement(By.cssSelector(".btn-salvar"));
         salvarBtn.click();
-        Thread.sleep(5000);
 
-        // Esperar o alert
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
 
-        // Verificar o texto do alert
         assertTrue(alert.getText().contains("Erro"), "Deveria mostrar alert de erro");
 
-        // Fechar o alert
         alert.accept();
-
     }
 
 }

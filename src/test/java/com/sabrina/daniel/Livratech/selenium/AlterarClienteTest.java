@@ -30,7 +30,6 @@ public class AlterarClienteTest {
 
     @BeforeEach
     public void setUp() {
-        // Resetar a senha do cliente para garantir que o teste funcione
         Cliente user = userRepository.findById(5L).orElseThrow();
         user.setSenha(passwordEncoder.encode("123"));
         userRepository.save(user);
@@ -39,19 +38,15 @@ public class AlterarClienteTest {
         driver.manage().window().maximize();
         driver.get("http://localhost:8080/perfilCliente.html");
 
-        // Espera o alerta aparecer por até 5 segundos
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
             wait.until(ExpectedConditions.alertIsPresent());
             driver.switchTo().alert().accept();
-        } catch (Exception e) {
-            // Nenhum alerta apareceu, segue
+        } catch (Exception ignored) {
         }
 
-        // Agora seta localStorage
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("localStorage.setItem('clienteId', '5');");
-
         driver.navigate().refresh();
     }
 
@@ -104,7 +99,6 @@ public class AlterarClienteTest {
         WebElement inputNovaSenha = modalSenha.findElement(By.id("nova-senha"));
         WebElement inputConfirmacao = modalSenha.findElement(By.id("confirmacao-nova-senha"));
 
-        // Usando a senha que definimos no @BeforeEach
         inputSenhaAtual.sendKeys("123");
         inputNovaSenha.sendKeys("NovaSenha123!");
         inputConfirmacao.sendKeys("NovaSenha123!");
@@ -117,8 +111,7 @@ public class AlterarClienteTest {
             Alert alert = waitAlert.until(ExpectedConditions.alertIsPresent());
             System.out.println("Alerta detectado: " + alert.getText());
             alert.accept();
-        } catch (TimeoutException e) {
-            // Nenhum alerta aberto
+        } catch (TimeoutException ignored) {
         }
 
         WebElement modalSucesso = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("success-modal")));
