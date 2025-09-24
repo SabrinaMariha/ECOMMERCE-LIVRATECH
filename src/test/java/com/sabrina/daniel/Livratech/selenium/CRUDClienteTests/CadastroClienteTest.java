@@ -203,7 +203,6 @@ public class CadastroClienteTest {
     void naoDeveCadastrarClienteSemEndereco() throws InterruptedException {
         driver.get("http://localhost:8080/cadastroCliente.html");
 
-        driver.findElement(By.id("nome")).sendKeys("Maria Teste");
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("document.getElementById('data-nascimento').value = '1995-09-19'");
