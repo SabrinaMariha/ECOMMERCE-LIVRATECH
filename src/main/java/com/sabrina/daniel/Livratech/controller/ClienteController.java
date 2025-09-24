@@ -22,10 +22,18 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @PostMapping("/")
-    @Transactional
-    public ResponseEntity<Cliente> cadastrar(@RequestBody Cliente cliente) {
-        Cliente clienteSalvo = clienteService.save(cliente);
-        return ResponseEntity.ok(clienteSalvo);
+    public ResponseEntity<?> cadastrar(@RequestBody Cliente cliente) {
+        try {
+            Cliente clienteSalvo = clienteService.save(cliente);
+            return ResponseEntity.ok(clienteSalvo);
+        } catch (RuntimeException e) {
+            // Retorna status 400 (Bad Request) com a mensagem da exceção
+            System.out.println("mensagem de erro do back:"+ e.getMessage());
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+
+        }
     }
 
     @GetMapping("/{id}")

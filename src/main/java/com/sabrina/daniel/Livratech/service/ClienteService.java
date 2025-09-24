@@ -1,10 +1,15 @@
 package com.sabrina.daniel.Livratech.service;
 
+import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
 import com.sabrina.daniel.Livratech.daos.ClienteRepository;
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.model.Carrinho;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarDadosObrigatoriosCadastro;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarSenha;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarTelefone;
+import com.sabrina.daniel.Livratech.validadoresCadCliente.ValidarTiposEndereco;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,16 +31,16 @@ public class ClienteService  {
 
     public ClienteService(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;
-//        regrasCliente.add(new ValidarDadosObrigatoriosCadastro());
-//        regrasCliente.add(new ValidarTelefone());
-//        regrasCliente.add(new ValidarTiposEndereco());
-//        regrasCliente.add(new ValidarSenha());
+        regrasCliente.add(new ValidarDadosObrigatoriosCadastro());
+        regrasCliente.add(new ValidarTelefone());
+        regrasCliente.add(new ValidarTiposEndereco());
+        regrasCliente.add(new ValidarSenha());
 
         rns.put(Cliente.class.getName(), regrasCliente);
 
         repositories.put(Cliente.class.getName(), clienteRepository);
     }
-
+    @Transactional(noRollbackFor = ValidacaoException.class)
     public Cliente save(Cliente cliente) {
         String nmClasse = cliente.getClass().getName();
         List<IStrategy> rn = rns.get(nmClasse);
@@ -76,8 +81,7 @@ public class ClienteService  {
             JpaRepository repository = repositories.get(nmClasse);
             return (Cliente) repository.save(cliente); // retorna o cliente com ID gerado
         }
-
-        throw new RuntimeException("Erro ao salvar cliente: " + sb.toString());
+        throw new ValidacaoException(sb.toString());
     }
 
     public String update(Long id, DadosConsultaCliente dto) {
