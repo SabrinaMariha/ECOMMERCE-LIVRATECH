@@ -1,5 +1,6 @@
 package com.sabrina.daniel.Livratech.service;
 
+import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
 import com.sabrina.daniel.Livratech.daos.ClienteRepository;
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.model.Carrinho;
@@ -39,7 +40,7 @@ public class ClienteService  {
 
         repositories.put(Cliente.class.getName(), clienteRepository);
     }
-
+    @Transactional(noRollbackFor = ValidacaoException.class)
     public Cliente save(Cliente cliente) {
         String nmClasse = cliente.getClass().getName();
         List<IStrategy> rn = rns.get(nmClasse);
@@ -80,8 +81,7 @@ public class ClienteService  {
             JpaRepository repository = repositories.get(nmClasse);
             return (Cliente) repository.save(cliente); // retorna o cliente com ID gerado
         }
-
-        throw new RuntimeException("Erro ao salvar cliente: " + sb.toString());
+        throw new ValidacaoException(sb.toString());
     }
 
     public String update(Long id, DadosConsultaCliente dto) {

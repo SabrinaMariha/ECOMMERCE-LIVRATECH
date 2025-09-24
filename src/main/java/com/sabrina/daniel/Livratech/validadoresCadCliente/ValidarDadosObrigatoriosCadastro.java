@@ -8,35 +8,35 @@ public class ValidarDadosObrigatoriosCadastro implements IStrategy<Cliente> {
 
     @Override
     public String processar(Cliente cliente) {
-        System.out.println("Cliente recebido para validação: " + cliente);
-        System.out.println("Endereços: " + cliente.getEnderecos());
+        StringBuilder erros = new StringBuilder();
+
         if (cliente.getNome() == null || cliente.getNome().isEmpty()) {
-            return "O nome do cliente é obrigatório.";
+            erros.append("O nome do cliente é obrigatório.\n");
         }
         if (cliente.getEmail() == null || cliente.getEmail().isEmpty()) {
-            return "O email do cliente é obrigatório.";
+            erros.append("O email do cliente é obrigatório.\n");
         }
         if (cliente.getCpf() == null || cliente.getCpf().isEmpty()) {
-            return "O CPF do cliente é obrigatório.";
+            erros.append("O CPF do cliente é obrigatório.\n");
         }
         if (cliente.getDataNascimento() == null) {
-            return "A data de nascimento do cliente é obrigatória.";
+            erros.append("A data de nascimento do cliente é obrigatória.\n");
         }
-        if (cliente.getTelefones() == null || cliente.getTelefones().isEmpty()) {
-            return "O telefone do cliente é obrigatório.";
-        }
+//        if (cliente.getTelefones() == null || cliente.getTelefones().isEmpty()) {
+//            erros.append("O telefone do cliente é obrigatório.\n");
+//        }
         if (cliente.getEnderecos() == null || cliente.getEnderecos().isEmpty()) {
-            return "O cliente deve ter pelo menos um endereço cadastrado.";
+            erros.append("O cliente deve ter pelo menos um endereço cadastrado.\n");
         }
 
         // Validar detalhes dos endereços
         String erroEndereco = new ValidarDadosObrigatoriosEnderecos().processar(cliente);
-        if (erroEndereco != null) return erroEndereco;
+        if (erroEndereco != null) erros.append(erroEndereco).append("\n");
 
         // Validar detalhes dos cartões
         String erroCartao = new ValidarDadosObrigatoriosCartoes().processar(cliente);
-        if (erroCartao != null) return erroCartao;
+        if (erroCartao != null) erros.append(erroCartao).append("\n");
 
-        return null;
+        return erros.length() > 0 ? erros.toString().trim() : null;
     }
 }

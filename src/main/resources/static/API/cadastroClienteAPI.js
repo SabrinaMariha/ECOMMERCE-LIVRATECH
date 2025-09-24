@@ -220,6 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         const text = await response.text();
         alert("Erro: " + text);
+        console.error("Erro na resposta:", response.status, text);
       }
     } catch (error) {
       console.error("Erro no cadastro:", error);

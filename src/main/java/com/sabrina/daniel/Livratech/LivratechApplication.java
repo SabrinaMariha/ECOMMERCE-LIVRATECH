@@ -24,13 +24,7 @@ public class LivratechApplication {
 	@Bean
 	CommandLineRunner init(ClienteRepository userRepository, PasswordEncoder passwordEncoder) {
 		return args -> {
-			if (!userRepository.existsById(5L)) {
-				Cliente user = new Cliente();
-				user.setId(5L);
-				user.setNome("teste");
-				user.setSenha(passwordEncoder.encode("123"));
-				userRepository.save(user);
-			}
+
 		};
 	}
 }

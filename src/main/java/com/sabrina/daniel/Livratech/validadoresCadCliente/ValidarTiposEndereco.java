@@ -9,14 +9,15 @@ public class ValidarTiposEndereco implements IStrategy<Cliente> {
 
     @Override
     public String processar(Cliente cliente) {
+        StringBuilder erros = new StringBuilder();
         for (Endereco endereco : cliente.getEnderecos()) {
-//            if (endereco.get().equals("Nao")) {
-//                return "Todo cliente deve ter pelo menos um endereço de cobrança.";
-//            }
-//            if (endereco.getEntrega().equals("Nao")) {
-//                return "Todo cliente deve ter pelo menos um endereço de entrega.";
-//            }
+
+            if (endereco.getTipoEndereco() == null ) {
+                erros.append( "Todo cliente deve ter pelo menos um endereço de cobrança e de entrega.\n");
+            }
+
         }
-        return null;
+        return erros.length() > 0 ? erros.toString().trim() : null;
+
     }
 }

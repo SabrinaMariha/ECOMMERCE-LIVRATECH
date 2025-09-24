@@ -9,30 +9,42 @@ public class ValidarDadosObrigatoriosCartoes implements IStrategy<Cliente> {
 
     @Override
     public String processar(Cliente cliente) {
-    if (cliente.getCartoesCredito()!= null || cliente.getCartoesCredito().isEmpty()){
-            int preferencial=0;
+        StringBuilder erros = new StringBuilder();
+
+        if (cliente.getCartoesCredito() != null && !cliente.getCartoesCredito().isEmpty()) {
+            int preferencial = 0;
+
             for (CartaoDeCredito cartao : cliente.getCartoesCredito()) {
                 if (cartao.getNumeroCartao() == null || cartao.getNumeroCartao().isEmpty()) {
-                    return "O número do cartão é obrigatório.";
+                    erros.append("O número do cartão é obrigatório.\n");
                 }
                 if (cartao.getNomeImpresso() == null || cartao.getNomeImpresso().isEmpty()) {
-                    return "O nome impresso no cartão é obrigatório.";
+                    erros.append("O nome impresso no cartão é obrigatório.\n");
                 }
-                if (cartao.getBandeira() == null ) {
-                    return "A bandeira do cartão é obrigatória.";
+                if (cartao.getBandeira() == null) {
+                    erros.append("A bandeira do cartão é obrigatória.\n");
                 }
                 if (cartao.getCodigoSeguranca() == null || cartao.getCodigoSeguranca().isEmpty()) {
-                    return "O código de segurança do cartão é obrigatório.";
+                    erros.append("O código de segurança do cartão é obrigatório.\n");
                 }
-                if(cartao.getPreferencial()== true || cartao.getPreferencial().equals("true")){
+                if (Boolean.TRUE.equals(cartao.getPreferencial())) {
                     preferencial++;
                 }
-
             }
 
-            new ValidarBandeiraCartao().processar(cliente);
-        if(preferencial==0) return "É obrigatório que algum cartão seja preferencial.";
+            // Valida bandeira
+            String erroBandeira = new ValidarBandeiraCartao().processar(cliente);
+            if (erroBandeira != null && !erroBandeira.isEmpty()) {
+                erros.append(erroBandeira).append("\n");
+            }
+
+            // Verifica se existe pelo menos um preferencial
+            if (preferencial == 0) {
+                erros.append("É obrigatório que algum cartão seja preferencial.\n");
+            }
         }
-        return null;
+
+        return erros.length() > 0 ? erros.toString().trim() : null;
     }
 }
+
