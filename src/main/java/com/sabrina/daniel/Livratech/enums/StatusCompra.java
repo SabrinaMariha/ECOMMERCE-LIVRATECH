@@ -1,5 +1,5 @@
 package com.sabrina.daniel.Livratech.enums;
 
-public enum TipoStatus {
+public enum StatusCompra {
     EM_PROCESSAMENTO, APROVADA, REPROVADA
 }

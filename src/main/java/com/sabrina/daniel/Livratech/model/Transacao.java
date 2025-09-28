@@ -1,7 +1,7 @@
 package com.sabrina.daniel.Livratech.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sabrina.daniel.Livratech.enums.TipoStatus;
+import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +31,7 @@ public class Transacao extends DomainEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private TipoStatus status;
+    private StatusCompra status;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
