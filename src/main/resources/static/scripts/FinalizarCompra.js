@@ -28,17 +28,17 @@ async function salvarNovoEndereco(clienteId) {
     if (!checkbox.checked) return null;
 
     const endereco = {
-        tipoResidencia: form.tipoResidencia.value,
-        cep: form.cep.value,
-        tipoLogradouro: form.tipoLogradouro.value,
-        logradouro: form.logradouro.value,
-        numero: form.numero.value,
-        bairro: form.bairro.value,
-        cidade: form.cidade.value,
-        estado: form.estado.value,
-        pais: form.pais.value,
-        observacoes: form.observacoes.value,
-        tipoEndereco : "ENTREGA",
+        tipoResidencia: form.querySelector("select[name='tipoResidencia']").value,
+        cep: form.querySelector("input[name='cep']").value,
+        tipoLogradouro: form.querySelector("select[name='tipoLogradouro']").value,
+        logradouro: form.querySelector("input[name='logradouro']").value,
+        numero: form.querySelector("input[name='numero']").value,
+        bairro: form.querySelector("input[name='bairro']").value,
+        cidade: form.querySelector("input[name='cidade']").value,
+        estado: form.querySelector("input[name='estado']").value,
+        pais: form.querySelector("input[name='pais']").value,
+        observacoes: form.querySelector("textarea[name='observacoes']").value,
+        tipoEndereco: "ENTREGA"
     };
 
     try {
