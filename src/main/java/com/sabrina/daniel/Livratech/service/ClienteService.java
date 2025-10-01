@@ -188,4 +188,8 @@ public class ClienteService  {
                 List.copyOf(cliente.getCartoesCredito())
         );
     }
+
+    public Cliente findById(Long id) {
+        return clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+    }
 }
