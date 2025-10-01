@@ -2,7 +2,9 @@ package com.sabrina.daniel.Livratech.controller;
 
 
 import com.sabrina.daniel.Livratech.dtos.AlterarSenhaCliente;
+import com.sabrina.daniel.Livratech.dtos.DadosClienteResponse;
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
+import com.sabrina.daniel.Livratech.model.CartaoDeCredito;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.model.Endereco;
 import com.sabrina.daniel.Livratech.service.ClienteService;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -26,10 +29,10 @@ import java.util.Optional;
     private ClienteService clienteService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<Endereco>> buscarPorId(@PathVariable long id) throws Exception {
+    public ResponseEntity< DadosClienteResponse> buscarPorId(@PathVariable long id) throws Exception {
         DadosConsultaCliente dto = clienteService.findDTOById(id);
-        List<Endereco> enderecos= dto.enderecos();
-        return ResponseEntity.ok(enderecos);
+        DadosClienteResponse response = new DadosClienteResponse(dto.enderecos(), dto.cartoesCredito());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/{id}/endereco")
@@ -37,6 +40,16 @@ import java.util.Optional;
         try {
             Endereco enderecoSalvo = vendaService.salvarEndereco(id, endereco);
             return ResponseEntity.ok(enderecoSalvo);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/cartao")
+    public ResponseEntity<?> cadastrarNovoCartao(@PathVariable Long id, @RequestBody CartaoDeCredito cartao) {
+        try {
+            CartaoDeCredito cartaoSalvo = vendaService.salvarCartao(id, cartao);
+            return ResponseEntity.ok(cartaoSalvo);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

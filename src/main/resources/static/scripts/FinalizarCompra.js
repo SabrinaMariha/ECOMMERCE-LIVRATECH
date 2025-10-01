@@ -6,7 +6,11 @@ async function carregarDadosCliente(clienteId) {
         const response = await fetch(`http://localhost:8080/cliente/${clienteId}`);
         if (!response.ok) throw new Error("Erro ao buscar dados do cliente");
 
-        const enderecos = await response.json();
+        const dados = await response.json();
+        const enderecos = dados.enderecos;
+        const cartoes = dados.cartoes;
+        // ---------- ENDEREÇOS ----------
+
         const selectEnderecos = document.querySelector("select[name='enderecos']");
         selectEnderecos.innerHTML = "";
 
@@ -16,10 +20,25 @@ async function carregarDadosCliente(clienteId) {
             option.textContent = endereco.fraseIdentificadora;
             selectEnderecos.appendChild(option);
         });
+
+        // ---------- CARTÕES ----------
+                const selectCartoes = document.querySelector("select[name='cartoes']");
+                selectCartoes.innerHTML = "";
+                    console.log(cartoes);
+                cartoes.forEach(cartao => {
+                    const option = document.createElement("option");
+                    option.value = cartao.id;
+                    // Exibir só os 4 últimos dígitos do número do cartão
+                    const ultimosDigitos = cartao.numeroCartao.slice(-4);
+                    option.textContent = `${cartao.bandeira} **** ${ultimosDigitos}`;
+                    selectCartoes.appendChild(option);
+                });
     } catch (error) {
         console.error("Erro ao carregar dados do cliente:", error);
     }
 }
+
+
 
 async function salvarNovoEndereco(clienteId) {
     const form = document.getElementById("formulario-endereco-novo-entrega");
@@ -67,6 +86,55 @@ async function salvarNovoEndereco(clienteId) {
     }
 }
 
+
+async function salvarTodosCartoes(clienteId) {
+    const container = document.getElementById('card-container-cartoes');
+    const cards = container.querySelectorAll('.card-container');
+    const cartoesSalvos = [];
+
+    for (const card of cards) {
+        if (card.id === 'card-template-cartao') continue;
+
+        const checkbox = card.querySelector("input[name='salvar-cartao']");
+        if (!checkbox.checked) continue;
+
+        const numeroCartao = card.querySelector("input[name='numero-cartao']").value.trim();
+        const nomeImpresso = card.querySelector("input[name='nome-titular']").value.trim();
+        const codigoSeguranca = card.querySelector("input[name='cvv']").value.trim();
+        const bandeira = card.querySelector("select[name='bandeira']").value.trim().toUpperCase();
+
+        if (!numeroCartao || !nomeImpresso || !codigoSeguranca || !bandeira) continue;
+
+        const cartao = { numeroCartao, nomeImpresso, codigoSeguranca, bandeira, preferencial: true };
+
+        try {
+            const response = await fetch(`http://localhost:8080/cliente/${clienteId}/cartao`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(cartao)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || "Erro ao salvar cartão");
+            }
+
+            const data = await response.json();
+            console.log("Cartão salvo com sucesso:", data);
+            cartoesSalvos.push(data);
+
+            // desmarca o checkbox apenas depois de salvar
+            checkbox.checked = false;
+        } catch (error) {
+            console.error("Erro ao salvar cartão:", error);
+        }
+    }
+
+
+    return cartoesSalvos;
+}
+
+
 async function finalizarCompra(clienteId) {
     console.log("Finalizando compra para cliente:", clienteId);
     // aqui depois você envia a venda/pedido para o backend
@@ -98,23 +166,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-     addCard('cartao');
      addCard('cupom');
 
     window.addCard = addCard;
-    function atualizarTotais() {
-        document.querySelectorAll('.cart-item').forEach(item => {
-            const precoTexto = item.querySelector('.item-price').textContent.replace('R$', '').replace(',', '.').trim();
-            const preco = parseFloat(precoTexto);
+async function atualizarTotais() {
+    let totalItens = 0;
 
-            const quantidade = parseInt(item.querySelector('.itemQuantidade').value) || 1;
+    document.querySelectorAll('.cart-item').forEach(item => {
+        const precoEl = item.querySelector('.item-price');
+        const qtdEl = item.querySelector('.itemQuantidade');
+        const totalEl = item.querySelector('.valorTotal');
 
-            const total = preco * quantidade;
+        if (!precoEl || !qtdEl || !totalEl) return;
 
-            item.querySelector('.valorTotal').textContent =
-                `R$ ${total.toFixed(2).replace('.', ',')}`;
-        });
-    }
+        const precoTexto = precoEl.textContent.replace('R$', '').replace(',', '.').trim();
+        const preco = parseFloat(precoTexto);
+        const quantidade = parseInt(qtdEl.value) || 1;
+        const total = preco * quantidade;
+        totalEl.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+        totalItens += total;
+    });
+
+    const freteTexto = document.getElementById('valorFreteResumo').textContent
+        .replace('R$', '').replace(',', '.').trim();
+    const frete = parseFloat(freteTexto) || 0;
+
+    const cupons = 15.00; // futuramente pode vir da API
+    const totalGeral = totalItens + frete - cupons;
+
+    // Atualiza no console
+    console.log("Total do pedido + frete:", totalGeral.toFixed(2));
+
+    // Atualiza no HTML
+    document.getElementById("valorItens").textContent = `R$ ${totalItens.toFixed(2).replace('.', ',')}`;
+    document.getElementById("valorFreteResumo").textContent = `R$ ${frete.toFixed(2).replace('.', ',')}`;
+    document.getElementById("valorCupons").textContent = `- R$ ${cupons.toFixed(2).replace('.', ',')}`;
+    document.getElementById("valorTotal").textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+}
 
     // Atualiza quando o usuário mudar a quantidade
     document.addEventListener('input', (e) => {
@@ -126,14 +214,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Atualiza no carregamento inicial
     atualizarTotais();
 
+    document.getElementById("btnFinalizar").addEventListener("click", async () => {
+        const enderecoSalvo = await salvarNovoEndereco(clienteId);
+        const cartoesSalvos = await salvarTodosCartoes(clienteId);
+
+        if (cartoesSalvos.length > 0) {
+            console.log("Cartões salvos:", JSON.stringify(cartoesSalvos));
+        } else {
+            console.log("Nenhum cartão novo foi salvo.");
+        }
+
+        finalizarCompra(clienteId);
+    });
 
 });
-document.getElementById("btnFinalizar").addEventListener("click", async () => {
 
-    // tenta salvar novo endereço, se checkbox marcada
-    await salvarNovoEndereco(clienteId);
-
-    // depois segue com o fluxo da compra normalmente (ex: enviar pedido)
-    finalizarCompra(clienteId);
-});
 

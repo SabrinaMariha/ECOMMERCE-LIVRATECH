@@ -144,7 +144,7 @@
                         <div id="card-template-frete" class="card-container" >
                                     <div class=" linha">
                             <div class="coluna">
-                                <label class="label-campo"> Total do frete: <span id="valorFrete">R$ 15,00</span>
+                                <label class="label-campo"> Total do frete: <span id="valorFreteResumo">R$ 0,00</span>
                                 </label>
                             </div>
                         </div>
@@ -209,20 +209,18 @@
                 <h2 class="pagamento">Forma de Pagamento</h2>
 
                 <form class="formulario-outra-forma-pag" id="formulario-outra-forma-pag">
+                    <label class="label-campo">Cartões Cadastrados</label>
+                    <select class="input-campo" name="cartoes" id="select-cartoes"></select>
+
 
                     <!-- Cartões -->
                     <div id="card-container-cartoes">
 
-                        <div id="card-template-cartao" class="card-container" style="display:none;">
+                        <div id="card-template-cartao" class="card-container" >
 
                             <button type="button" class="remove-btn" title="Remover cartão">&times;</button>
 
-                            <label class="label-campo">Cartões Cadastrados</label>
-                            <select class="input-campo" name="cartoes">
-                                <option selected>Visa **** 1234</option>
-                                <option>MasterCard **** 5678</option>
-                                <option>American Express **** 9012</option>
-                            </select>
+
 
                             <label class="label-campo"> Novo Cartão de Crédito </label>
                             <div class="linha">
@@ -295,14 +293,14 @@
                 </form>
 
                 <div id="card-container-total">
-                    <div id="card-template-total" class="card-container" ">
-                                    <label class=" label-campo"> A pagar </label>
+                    <div id="card-template-total" class="card-container">
+                        <label class="label-campo"> A pagar </label>
                         <div class="linha">
                             <div class="coluna">
-                                <p> Itens: R$ 131,80 </p>
-                                <p> Frete: R$ 15,00 </p>
-                                <p> Cupons:- R$ 15,00 </p>
-                                <p> Total: 131,80 </p>
+                                <p> Itens: <span id="valorItens">R$ 0,00</span></p>
+                                <p> Frete: <span id="valorFrete">R$ 0,00</span></p>
+                                <p> Cupons: <span id="valorCupons">- R$ 0,00</span></p>
+                                <p>Total: <span id="valorTotal">R$ 0,00</span></p>
                             </div>
                         </div>
                         <div class="acoes-compra">
@@ -311,8 +309,9 @@
                             </button>
                         </div>
                     </div>
-
                 </div>
+
+            </div>
 
             </div>
 
