@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(clone);
     }
 
-    
+
      addCard('cartao');
      addCard('cupom');
 
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const total = preco * quantidade;
 
-            item.querySelector('.valorTotal').textContent = 
+            item.querySelector('.valorTotal').textContent =
                 `R$ ${total.toFixed(2).replace('.', ',')}`;
         });
     }
@@ -136,3 +136,4 @@ document.getElementById("btnFinalizar").addEventListener("click", async () => {
     // depois segue com o fluxo da compra normalmente (ex: enviar pedido)
     finalizarCompra(clienteId);
 });
+

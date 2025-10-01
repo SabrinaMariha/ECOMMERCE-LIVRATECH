@@ -46,4 +46,46 @@ document.addEventListener("click", async (e) => {
             alert("Erro ao buscar o CEP.");
         }
     }
+
+  calcularFrete();
+  atualizarTotais();
+
 });
+  async function calcularFrete(uf) {
+        let frete = 0;
+        switch (uf) {
+            case "SP":
+            case "RJ":
+            case "MG":
+                frete = 25; // R$ 15,00
+                break;
+            case "RS":
+            case "PR":
+            case "SC":
+                frete = 20; // R$ 20,00
+                break;
+            default:
+                frete = 30; // R$ 30,00 para outros estados
+        }
+        // Atualiza na tela
+        document.getElementById('valorFrete').textContent = `R$ ${frete.toFixed(2).replace('.', ',')}`;
+        return frete;
+    }
+
+    async function atualizarTotais() {
+        let totalItens = 0;
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const precoTexto = item.querySelector('.item-price').textContent.replace('R$', '').replace(',', '.').trim();
+            const preco = parseFloat(precoTexto);
+            const quantidade = parseInt(item.querySelector('.itemQuantidade').value) || 1;
+            const total = preco * quantidade;
+            item.querySelector('.valorTotal').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+            totalItens += total;
+        });
+
+        const freteTexto = document.getElementById('valorFrete').textContent.replace('R$', '').replace(',', '.').trim();
+        const frete = parseFloat(freteTexto) || 0;
+
+        const totalGeral = totalItens + frete;
+        console.log("Total do pedido + frete:", totalGeral.toFixed(2));
+    }
