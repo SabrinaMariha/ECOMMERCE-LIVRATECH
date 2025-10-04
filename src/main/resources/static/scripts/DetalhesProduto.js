@@ -4,10 +4,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const id = params.get('id');
 
     if(id){
-        await carregarProduto(id);
+        await carregarProduto(id);7
+        configurarCarrinho(id);
     }
-
-    configurarCarrinho();
 });
 
 // As funções openCart(), closeCart() e removeItem() continuam as mesmas.
@@ -44,45 +43,13 @@ async function carregarProduto(id){
     }
 }
 
-// Ccnfigurar o carrinho
-function configurarCarrinho() {
+// Configura botão do carrinho para chamar função centralizada
+function configurarCarrinho(produtoId) {
     const btnAdicionarCarrinho = document.querySelector('.btn-adicionar-carrinho');
-    const cartItemsContainer = document.getElementById('cart-active-items'); // container correto
+    if (!btnAdicionarCarrinho || !produtoId) return;
 
     btnAdicionarCarrinho.addEventListener('click', () => {
-        const nomeProduto = document.querySelector('.nome-livro').textContent;
-        const descricaoProduto = document.querySelector('.descricao').textContent;
-        const precoProduto = document.querySelector('.preco-atual').textContent;
-        const imagemProduto = document.querySelector('.imagem-principal img').src;
-
-        // Verifica se o item já existe no carrinho
-        const itens = Array.from(cartItemsContainer.querySelectorAll('.cart-item .item-name'));
-        const itemExistente = itens.find(i => i.textContent === nomeProduto);
-
-        if (itemExistente) {
-            const inputQuantidade = itemExistente.closest('.cart-item').querySelector('input[type="number"]');
-            inputQuantidade.value = parseInt(inputQuantidade.value, 10) + 1;
-        } else {
-            const novoItemHTML = `
-                <div class="cart-item">
-                    <img src="${imagemProduto}" alt="${nomeProduto}">
-                    <div class="item-info">
-                        <p class="item-name">${nomeProduto}</p>
-                        <p class="item-descricao">${descricaoProduto}</p>
-                        <p class="item-price">${precoProduto}</p>
-                        <div class="item-actions">
-                            <input type="number" value="1" min="1">
-                            <button class="trash-btn" onclick="removeItem(this)">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-            cartItemsContainer.insertAdjacentHTML('beforeend', novoItemHTML);
-        }
-
-        // Abre o carrinho
+        adicionarItemAoCarrinho(parseInt(produtoId), 1);
         openCart();
     });
 }
