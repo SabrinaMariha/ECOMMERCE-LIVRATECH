@@ -1,10 +1,11 @@
 function carregarCarrinhoDoCliente(clienteId) {
-    fetch(`http:localhost:8080/carrinho/${clienteId}`)
-        .then((response) => response.json())
-        .then((carrinho) => {
+    fetch(`http://localhost:8080/carrinho/${clienteId}`)
+        .then(response => response.json())
+        .then(carrinho => {
             const cartContainer = document.getElementById("cart-active-items");
+            cartContainer.innerHTML = ""; // limpa itens antigos
 
-            carrinho.itens.forEach((item) => {
+            carrinho.itens.forEach(item => {
                 const itemHTML = `
                 <div class="cart-item">
                     <img src="${item.imagemProduto}" alt="${item.nomeProduto}">
@@ -48,5 +49,5 @@ function atualizarQuantidade(clienteId, itemId, quantidade) {
         method: "PUT"
     })
     .then(() => carregarCarrinhoDoCliente(clienteId))
-    .catch(err => console.error(err));
+    .catch(err => console.error("Erro ao atualizar quantidade:", err));
 }

@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Carrega navbar
   fetch("navbar.html")
     .then((response) => response.text())
     .then((data) => {
@@ -33,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const userTextDiv = document.querySelector(".user-box .user-text");
 
       if (clienteName && clienteId && perfilIcon && userTextDiv && perfilLink) {
-        // Exibe ícone de perfil
+        // Exibe ícone de perfil e carrinho
         perfilIcon.style.display = "inline-block";
         cartIcon.style.display = "inline-block";
 
@@ -53,6 +54,10 @@ document.addEventListener("DOMContentLoaded", function () {
           localStorage.removeItem("clienteId");
           window.location.href = "index.html";
         });
+
+        // Carrega itens do carrinho
+        carregarCarrinhoSidebar(clienteId);
+
       } else if (perfilIcon) {
         // Oculta ícone se não há cliente logado
         perfilIcon.style.display = "none";
@@ -62,18 +67,18 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // -------------------------
-// Funções do carrinho
+// Funções do carrinho sidebar
 // -------------------------
-function carregarCarrinhoSidebar() {
+function carregarCarrinhoSidebar(clienteId) {
   fetch("carrinhoCompra.html")
     .then((response) => response.text())
     .then((html) => {
       document.getElementById("cartSidebar").innerHTML = html;
+      if (clienteId) {
+        carregarCarrinhoDoCliente(clienteId);
+      }
     });
 }
-
-// Chame essa função quando a página carregar
-document.addEventListener("DOMContentLoaded", carregarCarrinhoSidebar);
 
 function openCart() {
   document.getElementById("cartSidebar").classList.add("active");
@@ -81,11 +86,6 @@ function openCart() {
 
 function closeCart() {
   document.getElementById("cartSidebar").classList.remove("active");
-}
-
-function removeItem(button) {
-  const item = button.closest(".cart-item");
-  item.remove();
 }
 
 function toggleExpired() {
@@ -102,20 +102,27 @@ function toggleExpired() {
 }
 
 function expireItem(itemElement) {
-  document.getElementById("cart-active-items").removeChild(itemElement);
+  const activeContainer = document.getElementById("cart-active-items");
+  const expiredContainer = document.getElementById("cart-expired-items");
+
+  activeContainer.removeChild(itemElement);
   itemElement.classList.add("expired");
 
   const actions = itemElement.querySelector(".item-actions");
   actions.innerHTML = `
       <button onclick="reactivateItem(this)" class="btn-adicionar-novamente">Adicionar novamente ao carrinho</button>
   `;
-  document.getElementById("cart-expired-items").appendChild(itemElement);
+
+  expiredContainer.appendChild(itemElement);
   document.querySelector(".checkout-btn").disabled = true;
 }
 
 function reactivateItem(button) {
   const itemElement = button.closest(".cart-item");
-  document.getElementById("cart-expired-items").removeChild(itemElement);
+  const activeContainer = document.getElementById("cart-active-items");
+  const expiredContainer = document.getElementById("cart-expired-items");
+
+  expiredContainer.removeChild(itemElement);
   itemElement.classList.remove("expired");
 
   itemElement.querySelector(".item-actions").innerHTML = `
@@ -124,17 +131,10 @@ function reactivateItem(button) {
           <i class="fa-solid fa-trash-can"></i>
       </button>
   `;
-  document.getElementById("cart-active-items").appendChild(itemElement);
 
-  if (document.getElementById("cart-expired-items").children.length === 1) {
+  activeContainer.appendChild(itemElement);
+
+  if (expiredContainer.children.length === 0) {
     document.querySelector(".checkout-btn").disabled = false;
   }
 }
-
-// Expira automaticamente o primeiro item em 20 segundos (exemplo)
-setTimeout(() => {
-  const firstItem = document.querySelector("#cart-active-items .cart-item");
-  if (firstItem) {
-    expireItem(firstItem);
-  }
-}, 20000);
