@@ -1,5 +1,6 @@
 package com.sabrina.daniel.Livratech.controller;
 
+import com.sabrina.daniel.Livratech.dtos.EstoqueDTO;
 import com.sabrina.daniel.Livratech.model.Produto;
 import com.sabrina.daniel.Livratech.service.ProdutoService;
 import lombok.Getter;
@@ -29,9 +30,9 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}/estoque")
-    public ResponseEntity<Produto> atualizarEstoque(@PathVariable Long id, @RequestBody Integer quantidade){
+    public ResponseEntity<Produto> atualizarEstoque(@PathVariable Long id, @RequestBody EstoqueDTO dto){
         try{
-            Produto atualizado =  produtoService.atualizarEstoque(id, quantidade);
+            Produto atualizado =  produtoService.atualizarEstoque(id, dto.quantidade());
             return ResponseEntity.ok(atualizado);
         } catch (RuntimeException e){
             return ResponseEntity.notFound().build();
