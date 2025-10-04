@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // -------------------------
       const clienteName = localStorage.getItem("clienteName");
       const clienteId = localStorage.getItem("clienteId");
+      const cartIcon = document.querySelector(".cart-icon.fas.fa-shopping-cart");
 
       const perfilLink = document.querySelector(".user-box > a"); // <a href="perfilCliente.html">
       const perfilIcon = perfilLink?.querySelector(".fa-circle-user");
@@ -34,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (clienteName && clienteId && perfilIcon && userTextDiv && perfilLink) {
         // Exibe ícone de perfil
         perfilIcon.style.display = "inline-block";
+        cartIcon.style.display = "inline-block";
 
         // Substitui "Entre / Cadastre-se" pelo nome e link de logout
         userTextDiv.innerHTML = `
@@ -54,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (perfilIcon) {
         // Oculta ícone se não há cliente logado
         perfilIcon.style.display = "none";
+        cartIcon.style.display = "none";
       }
     });
 });
