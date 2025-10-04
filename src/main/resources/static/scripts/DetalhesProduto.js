@@ -46,28 +46,29 @@ async function carregarProduto(id){
 
 // Ccnfigurar o carrinho
 function configurarCarrinho() {
-     const btnAdicionarCarrinho = document.querySelector('.btn-adicionar-carrinho');
-    const cartItemsContainer = document.querySelector('.cart-items');
+    const btnAdicionarCarrinho = document.querySelector('.btn-adicionar-carrinho');
+    const cartItemsContainer = document.getElementById('cart-active-items'); // container correto
 
     btnAdicionarCarrinho.addEventListener('click', () => {
         const nomeProduto = document.querySelector('.nome-livro').textContent;
+        const descricaoProduto = document.querySelector('.descricao').textContent;
         const precoProduto = document.querySelector('.preco-atual').textContent;
         const imagemProduto = document.querySelector('.imagem-principal img').src;
 
-        // Tenta encontrar um item existente no carrinho com o mesmo nome
-        const itemExistente = document.querySelector(`.cart-item .item-name`);
+        // Verifica se o item já existe no carrinho
+        const itens = Array.from(cartItemsContainer.querySelectorAll('.cart-item .item-name'));
+        const itemExistente = itens.find(i => i.textContent === nomeProduto);
 
-        if (itemExistente && itemExistente.textContent === nomeProduto) {
-            // Se o item já existe, encontre o input e aumente a quantidade
+        if (itemExistente) {
             const inputQuantidade = itemExistente.closest('.cart-item').querySelector('input[type="number"]');
-            inputQuantidade.value = parseInt(inputQuantidade.value) + 1;
+            inputQuantidade.value = parseInt(inputQuantidade.value, 10) + 1;
         } else {
-            // Se o item não existe, crie e adicione um novo item ao carrinho
             const novoItemHTML = `
                 <div class="cart-item">
                     <img src="${imagemProduto}" alt="${nomeProduto}">
                     <div class="item-info">
                         <p class="item-name">${nomeProduto}</p>
+                        <p class="item-descricao">${descricaoProduto}</p>
                         <p class="item-price">${precoProduto}</p>
                         <div class="item-actions">
                             <input type="number" value="1" min="1">
@@ -81,7 +82,8 @@ function configurarCarrinho() {
             cartItemsContainer.insertAdjacentHTML('beforeend', novoItemHTML);
         }
 
-        // Abre o carrinho para o usuário ver a alteração
+        // Abre o carrinho
         openCart();
     });
 }
+
