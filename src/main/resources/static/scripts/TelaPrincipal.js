@@ -30,16 +30,33 @@ setInterval(() => {
 showSlide(0);
 
 // Livros
-const books = Array.from({ length: 100 }, (_, i) => ({
-  id: i + 1,
-  title: `Livro ${i + 1}`,
-  autor: `Autor ${i + 1}`,
-  price: (Math.random() * 100 + 20).toFixed(2),
-  img: "https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
-}));
+// const books = Array.from({ length: 100 }, (_, i) => ({
+//   id: i + 1,
+//   title: `Livro ${i + 1}`,
+//   autor: `Autor ${i + 1}`,
+//   price: (Math.random() * 100 + 20).toFixed(2),
+//   img: "https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
+// }));
 
+let books = [];
 const booksPerPage = 20;
 let currentPage = 1;
+
+async function fetchBooks() {
+  try{
+    const response = await fetch("http://localhost:8080/produtos");
+    if (!response.ok) {
+      throw new Error("Erro ao buscar livros");
+    }
+    const data = await response.json();
+    books = data;
+    renderBooks(currentPage);
+    renderPagination();
+  }catch(error){
+    console.error("Erro ao buscar livros:", error);
+    document.getElementById("books-container").innerHTML = "<p>Erro ao carregar livros. Tente novamente mais tarde.</p>";
+  }
+}
 
 function renderBooks(page) {
   const start = (page - 1) * booksPerPage;
@@ -54,11 +71,11 @@ function renderBooks(page) {
     card.classList.add("book-card");
 
     card.innerHTML = `
-      <img src="${book.img}" alt="${book.title}">
+      <img src="${book.imagemUrl}" alt="${book.nome}">
       <div class="book-info">
-        <p><strong>${book.title}</strong></p>
+        <p class = "book-name"><strong>${book.nome}</strong></p>
         <p>${book.autor}</p>
-        <p class="preco-card">R$ ${book.price}</p>
+        <p class="preco-card">R$ ${book.preco.toFixed(2)}</p>
         <button class="comprar-btn">Comprar</button>
       </div>
     `;
@@ -67,7 +84,7 @@ function renderBooks(page) {
     card.addEventListener("click", () => {
       // aqui você pode decidir: abrir modal, redirecionar ou trocar de página
      // window.location.href = `/E-COMMERCE_LIVRARIA/detalhesProduto.html`; // ?id=${book.id}
-          window.location.href = './detalhesProduto.html'
+          window.location.href = './detalhesProduto.html?id=' + book.id;
 
     });
 
@@ -112,5 +129,4 @@ function changePage(page) {
 }
 
 // Inicialização dos card dos livros e paginação
-renderBooks(currentPage);
-renderPagination();
+fetchBooks();

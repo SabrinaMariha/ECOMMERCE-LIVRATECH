@@ -173,6 +173,10 @@
   padding: 20px;
 }
 
+.book-name{
+  height: 35px;
+}
+
 .preco-card{
     font-size: 16px;
     color: var(--cor-botao);
