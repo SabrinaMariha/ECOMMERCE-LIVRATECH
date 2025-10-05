@@ -78,8 +78,21 @@ function renderBooks(page) {
 
     // Clica na imagem ou botão abre detalhes
     card.querySelector('.comprar-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      window.location.href = `./detalhesProduto.html?id=${book.id}`;
+      e.stopPropagation(); // impede abrir detalhes
+      const produtoId = book.id;
+
+      // Limpa qualquer compra anterior ou carrinho temporário
+      localStorage.removeItem("compraDireta");
+      localStorage.removeItem("itensCarrinhoTemp");
+
+      // Salva o produto e quantidade (padrão = 1)
+      localStorage.setItem("compraDireta", JSON.stringify({
+        produtoId: produtoId,
+        quantidade: 1
+      }));
+
+      // Redireciona para a página de finalização
+      window.location.href = "./finalizarCompra.html";
     });
 
     container.appendChild(card);
