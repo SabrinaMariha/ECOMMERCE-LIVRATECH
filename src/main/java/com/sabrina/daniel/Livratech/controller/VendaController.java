@@ -7,6 +7,7 @@ import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.model.CartaoDeCredito;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.model.Endereco;
+import com.sabrina.daniel.Livratech.model.Pedido;
 import com.sabrina.daniel.Livratech.service.ClienteService;
 import com.sabrina.daniel.Livratech.service.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,4 +55,27 @@ import java.util.Optional;
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @PostMapping("/{id}/finalizar-compra")
+    public ResponseEntity<?> finalizarCompra(@PathVariable Long id, @RequestBody Pedido pedido) {
+        try {
+            Cliente cliente = clienteService.findById(id);
+
+            pedido.setCliente(cliente);
+
+            // Define data da transação
+            pedido.getTransacoes().forEach(t -> {
+                t.setPedido(pedido);
+                t.setData(new java.util.Date());
+            });
+
+            // Associa os itens ao pedido
+            pedido.getItens().forEach(i -> i.setPedido(pedido));
+
+            Pedido pedidoSalvo = vendaService.salvarPedido(pedido); // precisa criar método no service
+            return ResponseEntity.ok(pedidoSalvo);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

@@ -1,5 +1,5 @@
 document.addEventListener("click", async (e) => {
-    // Verifica se clicou em um botão de buscar CEP
+    // Verifica se clicou no botão de buscar CEP
     if (e.target.closest(".btnBuscarCep")) {
         const btn = e.target.closest(".btnBuscarCep");
         const inputCep = btn.closest(".cepInputGroup").querySelector("input[name='cep']");
@@ -35,67 +35,68 @@ document.addEventListener("click", async (e) => {
             // Preenche tipo de logradouro se possível
             const tipoLogradouroSelect = addressContainer.querySelector("select[name='tipoLogradouro']");
             if (tipoLogradouroSelect && data.logradouro) {
-                const tipo = data.logradouro.split(" ")[0].toUpperCase(); // primeira palavra
+                const tipo = data.logradouro.split(" ")[0].toUpperCase();
                 [...tipoLogradouroSelect.options].forEach(opt => {
                     if (opt.value === tipo) tipoLogradouroSelect.value = tipo;
                 });
             }
+
+            // Atualiza o frete baseado no estado retornado
+            const estado = data.uf || "";
+            const frete = calcularFrete(estado);
+
+            atualizarTotaisComFrete(frete); // aqui passa o frete calculado
+
 
         } catch (error) {
             console.error(error);
             alert("Erro ao buscar o CEP.");
         }
     }
-
-  calcularFrete();
-  atualizarTotaisComFrete();
-
 });
-  async function calcularFrete(uf) {
-        let frete = 0;
-        switch (uf) {
-            case "SP":
-            case "RJ":
-            case "MG":
-                frete = 25; // R$ 15,00
-                break;
-            case "RS":
-            case "PR":
-            case "SC":
-                frete = 20; // R$ 20,00
-                break;
-            default:
-                frete = 30; // R$ 30,00 para outros estados
-        }
-        // Atualiza na tela
-        document.getElementById('valorFrete').textContent = `R$ ${frete.toFixed(2).replace('.', ',')}`;
-        return frete;
+
+// ----------------- FRETE -----------------
+function calcularFrete(uf) {
+    let frete = 0;
+    switch (uf) {
+        case "SP":
+        case "RJ":
+        case "MG":
+            frete = 25;
+            break;
+        case "RS":
+        case "PR":
+        case "SC":
+            frete = 20;
+            break;
+        default:
+            frete = 30;
     }
 
-async function atualizarTotaisComFrete() {
+    // Atualiza na tela
+    document.getElementById("valorFreteResumo").textContent = `R$ ${frete.toFixed(2).replace('.', ',')}`;
+    document.getElementById("valorFreteResumoTotal").textContent = `R$ ${frete.toFixed(2).replace('.', ',')}`;
+    return frete;
+}
+
+// ----------------- ATUALIZA TOTAIS -----------------
+function atualizarTotaisComFrete(frete = 0) {
     let totalItens = 0;
+
     document.querySelectorAll('.cart-item').forEach(item => {
         const precoEl = item.querySelector('.item-price');
         const qtdEl = item.querySelector('.itemQuantidade');
         const totalEl = item.querySelector('.valorTotal');
 
-        if (!precoEl || !qtdEl || !totalEl) return; // evita erro
+        if (!precoEl || !qtdEl || !totalEl) return;
 
-        const precoTexto = precoEl.textContent.replace('R$', '').replace(',', '.').trim();
-        const preco = parseFloat(precoTexto);
+        const preco = parseFloat(precoEl.textContent.replace('R$', '').replace(',', '.').trim());
         const quantidade = parseInt(qtdEl.value) || 1;
         const total = preco * quantidade;
         totalEl.textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-        totalItens += total;
+        totalItens += total - 15.00;
     });
 
-    const freteTexto = document.getElementById('valorFrete').textContent.replace('R$', '').replace(',', '.').trim();
-
-    const frete = parseFloat(freteTexto) || 0;
-
     const totalGeral = totalItens + frete;
-    console.log("Total do pedido + frete:", totalGeral.toFixed(2));
-            document.getElementById("valorTotal").textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
-            document.getElementById("valorFreteResumo").textContent = `R$ ${frete.toFixed(2).replace('.', ',')}`;
-
+    document.getElementById("valorTotalResumo").textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
 }
