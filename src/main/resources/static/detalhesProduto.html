@@ -60,32 +60,29 @@
 <body>
     <header id="navbar-container"></header>
 
-
     <main class="main">
         <div id="produto" class="section">
             <div class="produto-container">
                 <div class="galeria-produto">
                     <div class="bloco-fotos">
-                        <div class="miniaturas">
-                            <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg" alt="Miniatura 1">
-                            <img src="https://m.media-amazon.com/images/I/41RfuBLUbWL._SY445_SX342_ControlCacheEqualizer_.jpg"
-                                alt="Miniatura 2">
-                            <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg" alt="Miniatura 3">
-                        </div>
+                        <!-- <div class="miniaturas">
+                            <img src="" alt="Miniatura 1">
+                            <img src="" alt="Miniatura 2">
+                            <img src="" alt="Miniatura 3">
+                        </div> -->
                         <div class="imagem-principal">
-                            <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg" alt="Capa do Livro">
+                            <img src="images/loading.gif" alt="Capa do Livro">
                         </div>
                     </div>
                 </div>
 
                 <div class="detalhes-produto">
-                    <h1 class="nome-livro">Entendendo Algoritmos</h1>
-                    <p class="autor">por Aditya Bhargava</p>
-                    <p class="descricao">Descrição completa do livro, com informações sobre o autor e o conteúdo. Este é
-                        um texto de exemplo para mostrar como a descrição se encaixaria aqui.</p>
+                    <h1 class="nome-livro"></h1>
+                    <p class="autor"></p>
+                    <p class="descricao"></p>
 
                     <div class="preco-info">
-                        <span class="preco-atual">R$ 59,90</span>
+                        <span class="preco-atual"></span>
                     </div>
 
                     <div class="botoes-compra">
@@ -97,28 +94,7 @@
             </div>
             <div class="descricao-detalhada">
                 <h2>Descrição Detalhada</h2>
-                <p> Um guia ilustrado para programadores e outros curiosos. Um algoritmo nada mais é do que um
-                    procedimento passo a passo para a resolução de um problema. Os algoritmos que você mais utilizará
-                    como um programador já foram descobertos, testados e provados. Se você quer entendê-los, mas se
-                    recusa a estudar páginas e mais páginas de provas, este é o livro certo. Este guia cativante e
-                    completamente ilustrado torna simples aprender como utilizar os principais algoritmos nos seus
-                    programas. O livro Entendendo Algoritmos apresenta uma abordagem agradável para esse tópico
-                    essencial da ciência da computação. Nele, você aprenderá como aplicar algoritmos comuns nos
-                    problemas de programação enfrentados diariamente. Você começará com tarefas básicas como a ordenação
-                    e a pesquisa. Com a prática, você enfrentará problemas mais complexos, como a compressão de dados e
-                    a inteligência artificial. Cada exemplo é apresentado em detalhes e inclui diagramas e códigos
-                    completos em Python. Ao final deste livro, você terá dominado algoritmos amplamente aplicáveis e
-                    saberá quando e onde utilizá-los. O que este livro inclui A abordagem de algoritmos de pesquisa,
-                    ordenação e algoritmos gráficos Mais de 400 imagens com descrições detalhadas Comparações de
-                    desempenho entre algoritmos Exemplos de código em Python Este livro de fácil leitura e repleto de
-                    imagens é destinado a programadores autodidatas, engenheiros ou pessoas que gostariam de recordar o
-                    assunto.</p>
-                <ul>
-                    <li>ISBN: 8575225634. </li>
-                    <li>Categoria: Programação de Computadores. </li>
-                    <li>Páginas: 264. </li>
-                    <li>Idioma: Português. </li>
-                </ul>
+                <p></p>
             </div>
         </div>
     </main>
@@ -128,6 +104,11 @@
 
     <!-- Chatbot -->
     <div id="chatbot-container"></div>
+    
+    <!-- Loader -->
+    <div id="page-loader">
+        <div class="spinner"></div>
+    </div>
 
     <footer class="footer">
         <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
@@ -135,6 +116,7 @@
     <script src="scripts/DetalhesProduto.js"></script>
     <script src="scripts/Script.js"></script>
     <script src="scripts/Chatbot.js"></script>
+    <script src="API/carrinhoAPI.js"></script>
 </body>
 
 </html>

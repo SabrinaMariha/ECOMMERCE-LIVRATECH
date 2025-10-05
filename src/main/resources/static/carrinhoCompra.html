@@ -2,40 +2,7 @@
     <h2>Carrinho</h2>
     <button type="button" class="s close-btn-cart" title="Fechar Carrinho" onclick="closeCart()">&times;</button>
 </div>
-<div class="cart-items" id="cart-active-items">
-
-    <!-- Exemplo de item -->
-    <div class="cart-item">
-        <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg" alt="Livro Exemplo">
-        <div class="item-info">
-            <p class="item-name">Entendendo Algoritmos</p>
-            <p class="item-descricao">Livro Exemplo</p>
-            <p class="item-price">R$ 59,90</p>
-            <div class="item-actions">
-                <input type="number" value="1" min="1">
-                <button class="trash-btn" onclick="removeItem(this)">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="cart-item">
-        <img src="https://m.media-amazon.com/images/I/41RfuBLUbWL._SY445_SX342_ControlCacheEqualizer_.jpg"
-            alt="Livro Exemplo">
-        <div class="item-info">
-            <p class="item-name">Algoritmos e Lógica da Programação</p>
-            <p class="item-descricao">Livro Exemplo</p>
-            <p class="item-price">R$ 71,90</p>
-            <div class="item-actions">
-                <input type="number" value="1" min="1">
-                <button class="trash-btn" onclick="removeItem(this)">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-</div>
+<div class="cart-items" id="cart-active-items"></div>
 <!-- Seção de Itens Expirados -->
 <div class="cart-expired-section">
     <div class="expired-header" onclick="toggleExpired()">
@@ -74,7 +41,7 @@
 </div>
 
 <div class="cart-footer">
-    <a href="finalizarCompra.html">
-        <button class="checkout-btn">Finalizar Compra</button>
-    </a>
+    <button class="checkout-btn" id="btnFinalizar">Finalizar Compra</button>
 </div>
+
+<script src="API/carrinhoAPI.js"></script>
