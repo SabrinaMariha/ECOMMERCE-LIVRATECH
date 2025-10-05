@@ -49,15 +49,31 @@ function adicionarItemAoCarrinho(produtoId, quantidade = 1) {
     .catch(err => console.error("Erro ao adicionar item ao carrinho:", err));
 }
 
-// Remove item do carrinho
-function removerItemDoCarrinho(itemId) {
+// Remove item do carrinho e atualiza apenas a seção de itens
+function removerItemDoCarrinho(itemId, button) {
     const clienteId = localStorage.getItem("clienteId");
     if (!clienteId) return;
 
     fetch(`http://localhost:8080/carrinho/${clienteId}/item/${itemId}`, {
         method: "DELETE"
     })
-    .then(() => carregarCarrinhoDoCliente())
+    .then(() => {
+        // 🔹 Remove o item clicado visualmente
+        const cartItem = button.closest(".cart-item");
+        if (cartItem) cartItem.remove();
+
+        // 🔹 Atualiza totais, se existir função
+        if (typeof atualizarTotais === "function") {
+            atualizarTotais();
+        }
+
+        // 🔹 Atualiza o carrinho lateral se ele estiver aberto
+        const cartContainer = document.getElementById("cart-active-items");
+        if (cartContainer) {
+            // Busca todos os itens do carrinho no backend e atualiza apenas os visuais restantes
+            carregarCarrinhoDoCliente(); // mantém a lista sincronizada
+        }
+    })
     .catch(err => console.error("Erro ao remover item do carrinho:", err));
 }
 

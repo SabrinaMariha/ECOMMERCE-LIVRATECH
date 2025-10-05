@@ -92,7 +92,7 @@ function carregarItensFinalizarCompra() {
                                     <input type="number" class="itemQuantidade" 
                                         value="${item.quantidade}" min="1"
                                         onchange="atualizarQuantidade(${item.id}, this.value)">
-                                    <button class="trash-btn" onclick="removerItemDoCarrinho(${item.id})">
+                                    <button class="trash-btn" onclick="removerItemDoCarrinho(${item.id}, this)">
                                         <i class="fa-solid fa-trash-can"></i>
                                     </button>
                                 </div>
