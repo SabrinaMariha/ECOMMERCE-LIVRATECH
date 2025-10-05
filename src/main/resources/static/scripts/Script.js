@@ -138,3 +138,11 @@ function reactivateItem(button) {
     document.querySelector(".checkout-btn").disabled = false;
   }
 }
+
+window.addEventListener('load', () => {
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.add('hidden'); // aplica o fade
+        setTimeout(() => loader.remove(), 300); // remove do DOM
+    }
+});
