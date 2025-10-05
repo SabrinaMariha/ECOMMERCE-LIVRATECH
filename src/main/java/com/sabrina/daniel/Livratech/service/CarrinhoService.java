@@ -34,6 +34,7 @@ public class CarrinhoService {
                         i.getId(),
                         i.getQuantidade(),
                         i.getProduto().getNome(),
+                        i.getProduto().getAutor(),
                         i.getProduto().getPreco(),
                         i.getProduto().getImagemUrl()
                 ))

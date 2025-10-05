@@ -84,6 +84,7 @@ function carregarItensFinalizarCompra() {
                     <img src="${item.imagemProduto}" alt="${item.nomeProduto}">
                     <div class="item-info">
                         <p class="item-name">${item.nomeProduto}</p>
+                        <p class="item-autor">Autor: ${item.autor || "Desconhecido"}</p>
                         <p class="item-descricao">${item.descricaoProduto || ""}</p>
                         <p class="item-price">R$ ${item.precoProduto.toFixed(2)}</p>
                         <div class="item-actions">
