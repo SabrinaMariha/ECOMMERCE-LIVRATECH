@@ -158,53 +158,7 @@
 
             <div class="secao-itens">
                 <h2 class="itens">Itens</h2>
-
-                <!-- Exemplo de item -->
-                <div class="cart-item">
-                    <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg" alt="Livro Exemplo">
-                    <div class="item-info">
-                        <p class="item-name">Entendendo Algoritmos</p>
-                        <p class="item-descricao">Livro Exemplo</p>
-                        <p class="item-price">R$ 59,90</p>
-                        <div class="item-actions">
-                            <div class="itens-venda">
-                                <div class="item-quantidade">
-                                    <input type="number" class="itemQuantidade" value="1" min="1">
-                                    <button class="trash-btn" onclick="removeItem(this)">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
-                                </div>
-                                <div class="itens-total">
-                                    <label class="label-campo">Total: </label>
-                                    <label class="label-campo valorTotal">R$ 0,00</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="cart-item">
-                    <img src="https://m.media-amazon.com/images/I/41RfuBLUbWL._SY445_SX342_ControlCacheEqualizer_.jpg"
-                        alt="Livro Exemplo">
-                    <div class="item-info">
-                        <p class="item-name">Algoritmos e Lógica da Programação</p>
-                        <p class="item-descricao">Livro Exemplo</p>
-                        <p class="item-price">R$ 71,90</p>
-                        <div class="item-actions">
-                            <div class="itens-venda">
-                                <div class="item-quantidade">
-                                    <input type="number" class="itemQuantidade" value="1" min="1">
-                                    <button class="trash-btn" onclick="removeItem(this)">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
-                                </div>
-                                <div class="itens-total">
-                                    <label class="label-campo">Total: </label>
-                                    <label class="label-campo valorTotal">R$ 0,00</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Os itens serão carregados pelo JS -->
             </div>
 
             <div class="secao-pagamento">
@@ -326,6 +280,11 @@
 
     <!-- Slidebar do carrinho -->
     <div id="cartSidebar" class="cart-sidebar"></div>
+    
+    <!-- Loader -->
+    <div id="page-loader">
+        <div class="spinner"></div>
+    </div>
 
     <footer class="footer">
         <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>

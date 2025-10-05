@@ -17,6 +17,7 @@ function carregarCarrinhoDoCliente() {
                     <img src="${item.imagemProduto}" alt="${item.nomeProduto}">
                     <div class="item-info">
                         <p class="item-name">${item.nomeProduto}</p>
+                        <p class="item-autor">Autor: ${item.autor || "Desconhecido"}</p>
                         <p class="item-price">R$ ${item.precoProduto.toFixed(2)}</p>
                         <div class="item-actions">
                             <input type="number" value="${item.quantidade}" min="1" onchange="atualizarQuantidade(${item.id}, this.value)">
@@ -33,7 +34,7 @@ function carregarCarrinhoDoCliente() {
         .catch(err => console.error("Erro ao carregar carrinho:", err));
 }
 
-// Adiciona item ao carrinho (somente se cliente estiver logado)
+// Adiciona item ao carrinho
 function adicionarItemAoCarrinho(produtoId, quantidade = 1) {
     const clienteId = localStorage.getItem("clienteId");
     if (!clienteId) {
@@ -49,7 +50,7 @@ function adicionarItemAoCarrinho(produtoId, quantidade = 1) {
     .catch(err => console.error("Erro ao adicionar item ao carrinho:", err));
 }
 
-// Remove item do carrinho
+// Remove item do carrinho e atualiza apenas a seção de itens
 function removerItemDoCarrinho(itemId, button) {
     const clienteId = localStorage.getItem("clienteId");
     if (!clienteId) return;
@@ -57,7 +58,23 @@ function removerItemDoCarrinho(itemId, button) {
     fetch(`http://localhost:8080/carrinho/${clienteId}/item/${itemId}`, {
         method: "DELETE"
     })
-    .then(() => carregarCarrinhoDoCliente())
+    .then(() => {
+        // 🔹 Remove o item clicado visualmente
+        const cartItem = button.closest(".cart-item");
+        if (cartItem) cartItem.remove();
+
+        // 🔹 Atualiza totais, se existir função
+        if (typeof atualizarTotais === "function") {
+            atualizarTotais();
+        }
+
+        // 🔹 Atualiza o carrinho lateral se ele estiver aberto
+        const cartContainer = document.getElementById("cart-active-items");
+        if (cartContainer) {
+            // Busca todos os itens do carrinho no backend e atualiza apenas os visuais restantes
+            carregarCarrinhoDoCliente(); // mantém a lista sincronizada
+        }
+    })
     .catch(err => console.error("Erro ao remover item do carrinho:", err));
 }
 
@@ -72,3 +89,11 @@ function atualizarQuantidade(itemId, quantidade) {
     .then(() => carregarCarrinhoDoCliente())
     .catch(err => console.error("Erro ao atualizar quantidade:", err));
 }
+
+// Botão "Finalizar Compra"
+document.addEventListener("click", (event) => {
+  if (event.target && event.target.id === "btnFinalizar") {
+    console.log("Botão clicado!");
+    window.location.href = "finalizarCompra.html";
+  }
+});
