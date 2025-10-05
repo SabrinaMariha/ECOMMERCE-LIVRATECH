@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // Carrega os itens do carrinho ao abrir a página
-    carregarItensFinalizarCompra();
+    if (typeof carregarItensFinalizarCompra === "function") {
+        carregarItensFinalizarCompra();
+    } else {
+        console.error("Função carregarItensFinalizarCompra não encontrada!");
+    }
 
     // Funções auxiliares da página
 
@@ -70,14 +74,13 @@ function carregarItensFinalizarCompra() {
             const container = document.querySelector(".secao-itens");
             if (!container) return;
 
-            // Remove apenas os elementos depois do h2
+            // Remove apenas os elementos de itens (mantém o <h2>)
             const itensExistentes = container.querySelectorAll(".cart-item");
             itensExistentes.forEach(item => item.remove());
 
-            // Adiciona os novos itens
             carrinho.itens.forEach(item => {
                 const itemHTML = `
-                <div class="cart-item">
+                <div class="cart-item" data-item-id="${item.id}">
                     <img src="${item.imagemProduto}" alt="${item.nomeProduto}">
                     <div class="item-info">
                         <p class="item-name">${item.nomeProduto}</p>
@@ -86,7 +89,8 @@ function carregarItensFinalizarCompra() {
                         <div class="item-actions">
                             <div class="itens-venda">
                                 <div class="item-quantidade">
-                                    <input type="number" class="itemQuantidade" value="${item.quantidade}" min="1" 
+                                    <input type="number" class="itemQuantidade" 
+                                        value="${item.quantidade}" min="1"
                                         onchange="atualizarQuantidade(${item.id}, this.value)">
                                     <button class="trash-btn" onclick="removerItemDoCarrinho(${item.id})">
                                         <i class="fa-solid fa-trash-can"></i>
@@ -94,7 +98,9 @@ function carregarItensFinalizarCompra() {
                                 </div>
                                 <div class="itens-total">
                                     <label class="label-campo">Total: </label>
-                                    <label class="label-campo valorTotal">R$ ${(item.precoProduto * item.quantidade).toFixed(2)}</label>
+                                    <label class="label-campo valorTotal">
+                                        R$ ${(item.precoProduto * item.quantidade).toFixed(2)}
+                                    </label>
                                 </div>
                             </div>
                         </div>
