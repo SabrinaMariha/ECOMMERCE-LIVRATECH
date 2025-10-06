@@ -4,11 +4,10 @@ package com.sabrina.daniel.Livratech.controller;
 import com.sabrina.daniel.Livratech.dtos.AlterarSenhaCliente;
 import com.sabrina.daniel.Livratech.dtos.DadosClienteResponse;
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
-import com.sabrina.daniel.Livratech.model.CartaoDeCredito;
-import com.sabrina.daniel.Livratech.model.Cliente;
-import com.sabrina.daniel.Livratech.model.Endereco;
-import com.sabrina.daniel.Livratech.model.Pedido;
+import com.sabrina.daniel.Livratech.dtos.PedidoResponse;
+import com.sabrina.daniel.Livratech.model.*;
 import com.sabrina.daniel.Livratech.service.ClienteService;
+import com.sabrina.daniel.Livratech.service.ProdutoService;
 import com.sabrina.daniel.Livratech.service.VendaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,12 +21,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/cliente")
-@CrossOrigin(origins = "*")
     public class VendaController {
     @Autowired
     private VendaService vendaService;
     @Autowired
     private ClienteService clienteService;
+    @Autowired
+    private ProdutoService produtoService;
 
     @GetMapping("/{id}")
     public ResponseEntity< DadosClienteResponse> buscarPorId(@PathVariable long id) throws Exception {
@@ -69,10 +69,20 @@ import java.util.Optional;
             });
 
             // Associa os itens ao pedido
-            pedido.getItens().forEach(i -> i.setPedido(pedido));
+            pedido.getItens().forEach(item -> {
+                Long produtoId = item.getProduto().getId();
+                Produto produto = produtoService.findById(produtoId).orElse(null);
+                item.setProduto(produto);
+            });
 
             Pedido pedidoSalvo = vendaService.salvarPedido(pedido); // precisa criar método no service
-            return ResponseEntity.ok(pedidoSalvo);
+
+            return ResponseEntity.ok(new PedidoResponse(
+                    pedidoSalvo.getId(),
+                    pedidoSalvo.getTransacoes().get(0).getValor(),
+                    pedidoSalvo.getItens()
+            ));
+
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

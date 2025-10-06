@@ -220,17 +220,25 @@ async function finalizarCompra(clienteId) {
             body: JSON.stringify(pedido)
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Erro ao finalizar compra");
-        }
 
         const pedidoSalvo = await response.json();
         alert("Compra finalizada com sucesso! Pedido ID: " + pedidoSalvo.id);
 
-        // Limpa os itens da página após finalizar
-        document.querySelector(".secao-itens").innerHTML = '<h2 class="itens">Itens</h2>';
-        atualizarTotais();
+
+// ------------------ Limpar carrinho ------------------
+const carrinhoResponse = await fetch(`http://localhost:8080/carrinho/${clienteId}/limpar`, {
+    method: "DELETE"
+});
+
+if (!carrinhoResponse.ok) {
+    console.error("Erro ao limpar carrinho:", await carrinhoResponse.text());
+} else {
+    console.log("Carrinho limpo com sucesso!");
+}
+
+// Limpa os itens da página
+document.querySelector(".secao-itens").innerHTML = '<h2 class="itens">Itens</h2>';
+atualizarTotais();
 
     } catch (err) {
         console.error("Erro ao finalizar compra:", err);
@@ -253,7 +261,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.classList.contains('itemQuantidade')) atualizarTotais();
     });
 
-    document.getElementById("btnFinalizar").addEventListener("click", async () => {
-        finalizarCompra(clienteId);
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.id === "btnFinalizar") {
+            finalizarCompra(clienteId);
+        }
     });
+
+
 });
