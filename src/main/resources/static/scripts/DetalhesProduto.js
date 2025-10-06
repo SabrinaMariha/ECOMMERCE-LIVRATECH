@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    const produtoid = params.get('id');
 
     if (id) {
         await carregarProduto(id);

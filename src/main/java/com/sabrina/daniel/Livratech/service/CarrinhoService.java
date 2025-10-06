@@ -32,6 +32,7 @@ public class CarrinhoService {
         List<ItemDTO> itensDTO = carrinho.getItens().stream()
                 .map(i -> new ItemDTO(
                         i.getId(),
+                        i.getProduto().getId(),  // adiciona o id do produto
                         i.getQuantidade(),
                         i.getProduto().getNome(),
                         i.getProduto().getAutor(),
@@ -42,6 +43,7 @@ public class CarrinhoService {
 
         return new CarrinhoDTO(carrinho.getId(), itensDTO);
     }
+
 
     @Transactional
     public CarrinhoDTO listarCarrinho(Long carrinhoId) {

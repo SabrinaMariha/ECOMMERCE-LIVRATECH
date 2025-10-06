@@ -48,6 +48,7 @@ function adicionarItemAoCarrinho(produtoId, quantidade = 1) {
     .then(response => response.json())
     .then(() => carregarCarrinhoDoCliente())
     .catch(err => console.error("Erro ao adicionar item ao carrinho:", err));
+    console.log(produtoId);
 }
 
 // Remove item do carrinho e atualiza apenas a seção de itens

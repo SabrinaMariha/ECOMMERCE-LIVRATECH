@@ -35,9 +35,16 @@ public class Endereco extends DomainEntity {
     private String estado;
     private String pais;
     private String observacoes;
+    private String fraseIdentificadora;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cliente_id")
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
+
+    @PrePersist
+    @PreUpdate
+    private void preencherFraseIdentificadora() {
+        this.fraseIdentificadora = logradouro + " " + numero + " - " + cidade;
+    }
 }

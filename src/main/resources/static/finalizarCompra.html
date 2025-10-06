@@ -44,15 +44,13 @@
                     <div id="enderecos-cadastrados" class="section">
                         <label class="label-campo">Endereços Cadastrados</label>
                         <select class="input-campo" name="enderecos">
-                            <option selected>R. São João 53 - São Paulo</option>
-                            <option>R. da Consolação 123 - São Paulo</option>
-                            <option>Av. Paulista 456 - São Paulo</option>
-                            <option>R. Augusta 789 - São Paulo</option>
+                            <option></option>
+
                         </select>
                     </div>
 
                     <div id="outro-endereco" class="section">
-                        <form class="formulario-endereco-novo-entrega" id="formulario-endereco-novo-entrega">
+                        <form class="formulario-endereco-novo-entrega address-container" id="formulario-endereco-novo-entrega">
                             <label class="label-campo">Novo Endereço</label>
                             <div class="linha">
                                 <div class="coluna">
@@ -70,8 +68,8 @@
                                     <label class="label-campo" for="cep">CEP</label>
                                     <div class="cepInputGroup ">
                                         <input class="input-campo" type="text" id="cep" name="cep" maxlength="9"
-                                            placeholder="00000-000" disabled>
-                                        <button type="button" id="btnBuscarCep" title="Buscar CEP" disabled>
+                                            placeholder="00000-000" >
+                                        <button type="button" id="btnBuscarCep" class="btnBuscarCep" title="Buscar CEP" >
                                             <i class="fa-solid fa-magnifying-glass"></i>
                                         </button>
                                     </div>
@@ -104,32 +102,32 @@
                             <div class="linha">
                                 <div class="coluna">
                                     <label class="label-campo" for="numero">Número</label>
-                                    <input class="input-campo" type="text" id="numero" name="numero" disabled>
+                                    <input class="input-campo" type="text" id="numero" name="numero" >
                                 </div>
                                 <div class="coluna-40">
                                     <label class="label-campo" for="bairro">Bairro</label>
-                                    <input class="input-campo" type="text" id="bairro" name="bairro" disabled>
+                                    <input class="input-campo" type="text" id="bairro" name="bairro" >
                                 </div>
 
                             </div>
                             <div class="linha">
                                 <div class="coluna">
                                     <label class="label-campo" for="cidade">Cidade</label>
-                                    <input class="input-campo" type="text" id="cidade" name="cidade" disabled>
+                                    <input class="input-campo" type="text" id="cidade" name="cidade" >
                                 </div>
                                 <div class="coluna-20">
                                     <label class="label-campo" for="estado">Estado</label>
-                                    <input class="input-campo" type="text" id="estado" name="estado" disabled>
+                                    <input class="input-campo" type="text" id="estado" name="estado" >
                                 </div>
                                 <div class="coluna-20">
                                     <label class="label-campo" for="pais">País</label>
-                                    <input class="input-campo" type="text" id="pais" name="pais" disabled>
+                                    <input class="input-campo" type="text" id="pais" name="pais" >
                                 </div>
                             </div>
                             <div class="linha">
                                 <div class="coluna">
                                     <label class="label-campo">Observações</label>
-                                    <textarea class="input-campo" name="observacoes" disabled></textarea>
+                                    <textarea class="input-campo" name="observacoes" ></textarea>
                                 </div>
                             </div>
                             <div class="linha">
@@ -143,10 +141,10 @@
                         </form>
                     </div>
                     <div id="card-container-frete">
-                        <div id="card-template-frete" class="card-container" ">
+                        <div id="card-template-frete" class="card-container" >
                                     <div class=" linha">
                             <div class="coluna">
-                                <label class="label-campo"> Total do frete: <span id="valorFrete">R$ 15,00</span>
+                                <label class="label-campo"> Total do frete: <span id="valorFreteResumo">R$ 0,00</span>
                                 </label>
                             </div>
                         </div>
@@ -165,20 +163,18 @@
                 <h2 class="pagamento">Forma de Pagamento</h2>
 
                 <form class="formulario-outra-forma-pag" id="formulario-outra-forma-pag">
+                    <label class="label-campo">Cartões Cadastrados</label>
+                    <select class="input-campo" name="cartoes" id="select-cartoes"></select>
+
 
                     <!-- Cartões -->
                     <div id="card-container-cartoes">
 
-                        <div id="card-template-cartao" class="card-container" style="display:none;">
+                        <div id="card-template-cartao" class="card-container" >
 
                             <button type="button" class="remove-btn" title="Remover cartão">&times;</button>
 
-                            <label class="label-campo">Cartões Cadastrados</label>
-                            <select class="input-campo" name="cartoes">
-                                <option selected>Visa **** 1234</option>
-                                <option>MasterCard **** 5678</option>
-                                <option>American Express **** 9012</option>
-                            </select>
+
 
                             <label class="label-campo"> Novo Cartão de Crédito </label>
                             <div class="linha">
@@ -251,24 +247,24 @@
                 </form>
 
                 <div id="card-container-total">
-                    <div id="card-template-total" class="card-container" ">
-                                    <label class=" label-campo"> A pagar </label>
+                    <div id="card-template-total" class="card-container">
+                        <label class="label-campo">A pagar</label>
                         <div class="linha">
                             <div class="coluna">
-                                <p> Itens: R$ 131,80 </p>
-                                <p> Frete: R$ 15,00 </p>
-                                <p> Cupons:- R$ 15,00 </p>
-                                <p> Total: 131,80 </p>
+                                <p>Itens: <span id="valorItensResumo">R$ 0,00</span></p>
+                                <p>Frete: <span id="valorFreteResumoTotal">R$ 0,00</span></p>
+                                <p>Cupons: <span id="valorCuponsResumo">- R$ 0,00</span></p>
+                                <p>Total: <span id="valorTotalResumo">R$ 0,00</span></p>
                             </div>
                         </div>
                         <div class="acoes-compra">
-                            <button type="button" id="btnFinalizar" class="btn-principal">
-                                Finalizar Compra
-                            </button>
+                            <button type="button" id="btnFinalizarPedido" class="btn-principal">Finalizar Compra</button>
                         </div>
                     </div>
-
                 </div>
+
+
+            </div>
 
             </div>
 
@@ -290,6 +286,7 @@
         <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
     </footer>
     <script src="scripts/FinalizarCompra.js"></script>
+    <script src="API/cepAPI.js"></script>
     <script src="scripts/Script.js"></script>
     <script src="API/carrinhoAPI.js"></script>
 </body>
