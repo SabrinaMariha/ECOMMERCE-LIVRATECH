@@ -1,15 +1,15 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    
     const params = new URLSearchParams(window.location.search);
     const produtoid = params.get('id');
 
-    if(produtoid){
-        await carregarProduto(produtoid);7
-        configurarCarrinho(produtoid);
+    if (id) {
+        await carregarProduto(id);
+        configurarCarrinho(id);
+        configurarCompraDireta(id);
     }
 });
 
-// As funções openCart(), closeCart() e removeItem() continuam as mesmas.
+// Funções do carrinho
 function openCart() {
     document.getElementById("cartSidebar").classList.add("active");
 }
@@ -23,27 +23,26 @@ function removeItem(button) {
     item.remove();
 }
 
-// Carrega produto pelo id
-async function carregarProduto(produtoid){
-    try{
-        const response = await fetch(`http://localhost:8080/produtos/${produtoid}`);
+// Carrega produto pelo ID e preenche os campos
+async function carregarProduto(id) {
+    try {
+        const response = await fetch(`http://localhost:8080/produtos/${id}`);
         if (!response.ok) throw new Error("Produto não encontrado");
         const produto = await response.json();
 
-        // Atualizar os campos do HTML com os dados do produto
         document.querySelector('.nome-livro').textContent = produto.nome;
         document.querySelector('.autor').textContent = `por ${produto.autor}`;
         document.querySelector('.descricao').textContent = produto.descricao;
         document.querySelector('.preco-atual').textContent = `R$ ${produto.preco.toFixed(2)}`;
         document.querySelector('.imagem-principal img').src = produto.imagemUrl;
         document.querySelector('.descricao-detalhada p').textContent = produto.descDetalhada;
-    }catch(error){
+    } catch (error) {
         console.error("Erro ao carregar produto:", error);
-        document.getElementById('produto').innerHTML = "<p>Produto não encontrad0</p>";
+        document.getElementById('produto').innerHTML = "<p>Produto não encontrado</p>";
     }
 }
 
-// Configura botão do carrinho para chamar função centralizada
+// Adicionar ao carrinho
 function configurarCarrinho(produtoId) {
     const btnAdicionarCarrinho = document.querySelector('.btn-adicionar-carrinho');
     if (!btnAdicionarCarrinho || !produtoId) return;
@@ -54,3 +53,22 @@ function configurarCarrinho(produtoId) {
     });
 }
 
+// Comprar agora (compra direta)
+function configurarCompraDireta(produtoId) {
+    const btnComprarAgora = document.querySelector('.btn-comprar-agora');
+    if (!btnComprarAgora) return;
+
+    btnComprarAgora.addEventListener('click', () => {
+        // Remove qualquer compra direta anterior
+        localStorage.removeItem("compraDireta");
+
+        // Salva o produto atual como compra direta
+        localStorage.setItem("compraDireta", JSON.stringify({
+            produtoId: parseInt(produtoId),
+            quantidade: 1
+        }));
+
+        // Redireciona para página de finalização
+        window.location.href = "./finalizarCompra.html";
+    });
+}

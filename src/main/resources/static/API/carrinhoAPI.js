@@ -95,6 +95,11 @@ function atualizarQuantidade(itemId, quantidade) {
 document.addEventListener("click", (event) => {
   if (event.target && event.target.id === "btnFinalizar") {
     console.log("Botão clicado!");
+
+    // Limpa qualquer compra direta anterior
+    localStorage.removeItem("compraDireta");
+
+    // Redireciona para a página de finalização
     window.location.href = "finalizarCompra.html";
   }
 });
