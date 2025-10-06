@@ -328,6 +328,7 @@ async function salvarEndereco(clienteId) {
 }
 
 // ----------------- FINALIZAR COMPRA -----------------
+// ----------------- FINALIZAR COMPRA -----------------
 async function finalizarCompra(clienteId) {
   if (!clienteId) {
     alert("Cliente não logado!");
@@ -348,7 +349,24 @@ async function finalizarCompra(clienteId) {
       return;
     }
 
-    // Endereço e cartão
+    // ---------------- Verifica estoque ----------------
+    for (const item of itens) {
+      const response = await fetch(
+        `http://localhost:8080/produtos/${item.produto.id}/quantidade`
+      );
+      if (!response.ok) {
+        throw new Error(`Não foi possível obter o estoque do produto ${item.produto.id}`);
+      }
+      const estoque = await response.json(); // { quantidade: X }
+      if (item.quantidade > estoque.quantidade) {
+        alert(
+          `Não há estoque suficiente para o produto ID ${item.produto.id}. Estoque disponível: ${estoque.quantidade}`
+        );
+        return; // interrompe a finalização
+      }
+    }
+
+    // ----------------- Endereço e cartão -----------------
     let enderecoId =
       parseInt(document.querySelector("select[name='enderecos']")?.value) ||
       null;
@@ -363,7 +381,7 @@ async function finalizarCompra(clienteId) {
     const cartaoId =
       parseInt(document.querySelector("select[name='cartoes']")?.value) || null;
 
-    // Calcula total geral
+    // ----------------- Calcula total -----------------
     const totalItens = itens.reduce((acc, item) => {
       const precoEl = document.querySelector(
         `.cart-item[data-produto-id='${item.produto.id}'] .item-price`
@@ -384,7 +402,6 @@ async function finalizarCompra(clienteId) {
           .replace(",", ".")
       ) || 0;
 
-    // Aplica cupom
     let desconto = 0;
     const selectCupom = document.querySelector("#card-container-cupom select");
     if (
@@ -433,6 +450,7 @@ async function finalizarCompra(clienteId) {
     for (const item of itens) {
       await atualizarEstoque(item.produto.id, item.quantidade);
     }
+
     // Limpa carrinho e cupom
     await fetch(`http://localhost:8080/carrinho/${clienteId}/limpar`, {
       method: "DELETE",
@@ -442,11 +460,13 @@ async function finalizarCompra(clienteId) {
     document.getElementById("card-container-cupom").innerHTML = "";
     atualizarTotais();
     window.location.href = "index.html";
+
   } catch (err) {
     console.error("Erro ao finalizar compra:", err);
     alert("Erro ao finalizar compra: " + err.message);
   }
 }
+
 
 // ----------------- DOM -----------------
 document.addEventListener("DOMContentLoaded", () => {
