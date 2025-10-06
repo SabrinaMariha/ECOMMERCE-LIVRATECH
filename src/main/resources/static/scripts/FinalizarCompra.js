@@ -148,7 +148,9 @@ async function carregarItensFinalizarCompra() {
 
   if (compraDireta) {
     try {
-      const response = await fetch(`http://localhost:8080/produtos/${compraDireta.produtoId}`);
+      const response = await fetch(
+        `http://localhost:8080/produtos/${compraDireta.produtoId}`
+      );
       if (!response.ok) throw new Error("Produto não encontrado");
       const produto = await response.json();
 
@@ -162,11 +164,15 @@ async function carregarItensFinalizarCompra() {
                 <div class="item-actions">
                     <div class="itens-venda">
                         <div class="item-quantidade">
-                            <input type="number" class="itemQuantidade" value="${compraDireta.quantidade}" min="1">
+                            <input type="number" class="itemQuantidade" value="${
+                              compraDireta.quantidade
+                            }" min="1">
                         </div>
                         <div class="itens-total">
                             <label class="label-campo">Total: </label>
-                            <label class="label-campo valorTotal">R$ ${(produto.preco * compraDireta.quantidade).toFixed(2)}</label>
+                            <label class="label-campo valorTotal">R$ ${(
+                              produto.preco * compraDireta.quantidade
+                            ).toFixed(2)}</label>
                         </div>
                     </div>
                 </div>
@@ -181,11 +187,15 @@ async function carregarItensFinalizarCompra() {
   } else {
     if (!clienteId) return;
     try {
-      const response = await fetch(`http://localhost:8080/carrinho/${clienteId}`);
+      const response = await fetch(
+        `http://localhost:8080/carrinho/${clienteId}`
+      );
       const carrinho = await response.json();
       carrinho.itens.forEach((item) => {
         const itemHTML = `
-        <div class="cart-item" data-item-id="${item.id}" data-produto-id="${item.produtoId}">
+        <div class="cart-item" data-item-id="${item.id}" data-produto-id="${
+          item.produtoId
+        }">
             <img src="${item.imagemProduto}" alt="${item.nomeProduto}">
             <div class="item-info">
                 <p class="item-name">${item.nomeProduto}</p>
@@ -195,14 +205,20 @@ async function carregarItensFinalizarCompra() {
                 <div class="item-actions">
                     <div class="itens-venda">
                         <div class="item-quantidade">
-                            <input type="number" class="itemQuantidade" value="${item.quantidade}" min="1">
-                            <button class="trash-btn" onclick="removerItemDoCarrinho(${item.id}, this)">
+                            <input type="number" class="itemQuantidade" value="${
+                              item.quantidade
+                            }" min="1">
+                            <button class="trash-btn" onclick="removerItemDoCarrinho(${
+                              item.id
+                            }, this)">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
                         <div class="itens-total">
                             <label class="label-campo">Total: </label>
-                            <label class="label-campo valorTotal">R$ ${(item.precoProduto * item.quantidade).toFixed(2)}</label>
+                            <label class="label-campo valorTotal">R$ ${(
+                              item.precoProduto * item.quantidade
+                            ).toFixed(2)}</label>
                         </div>
                     </div>
                 </div>
@@ -246,8 +262,12 @@ function addCard(tipo) {
 
 // ----------------- SALVAR NOVO ENDEREÇO -----------------
 async function salvarEndereco(clienteId) {
-  const tipoResidenciaEl = document.querySelector("select[name='tipoResidencia']");
-  const tipoLogradouroEl = document.querySelector("select[name='tipoLogradouro']");
+  const tipoResidenciaEl = document.querySelector(
+    "select[name='tipoResidencia']"
+  );
+  const tipoLogradouroEl = document.querySelector(
+    "select[name='tipoLogradouro']"
+  );
   const logradouroEl = document.querySelector("input[name='logradouro']");
   const numeroEl = document.querySelector("input[name='numero']");
   const bairroEl = document.querySelector("input[name='bairro']");
@@ -257,10 +277,20 @@ async function salvarEndereco(clienteId) {
   const paisEl = document.querySelector("input[name='pais']");
   const observacoesEl = document.querySelector("textarea[name='observacoes']");
 
-  if (!tipoResidenciaEl || !tipoLogradouroEl || !logradouroEl || !numeroEl ||
-      !bairroEl || !cepEl || !cidadeEl || !estadoEl || !paisEl || !observacoesEl) {
-      console.error("Campos do formulário de endereço não encontrados no DOM.");
-      return null;
+  if (
+    !tipoResidenciaEl ||
+    !tipoLogradouroEl ||
+    !logradouroEl ||
+    !numeroEl ||
+    !bairroEl ||
+    !cepEl ||
+    !cidadeEl ||
+    !estadoEl ||
+    !paisEl ||
+    !observacoesEl
+  ) {
+    console.error("Campos do formulário de endereço não encontrados no DOM.");
+    return null;
   }
 
   const endereco = {
@@ -274,15 +304,18 @@ async function salvarEndereco(clienteId) {
     cidade: cidadeEl.value,
     estado: estadoEl.value,
     pais: paisEl.value,
-    observacoes: observacoesEl.value
+    observacoes: observacoesEl.value,
   };
 
   try {
-    const response = await fetch(`http://localhost:8080/cliente/${clienteId}/endereco`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(endereco)
-    });
+    const response = await fetch(
+      `http://localhost:8080/cliente/${clienteId}/endereco`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(endereco),
+      }
+    );
 
     if (!response.ok) throw new Error("Erro ao salvar endereço");
     const enderecoSalvo = await response.json();
@@ -294,7 +327,6 @@ async function salvarEndereco(clienteId) {
   }
 }
 
-
 // ----------------- FINALIZAR COMPRA -----------------
 async function finalizarCompra(clienteId) {
   if (!clienteId) {
@@ -304,9 +336,10 @@ async function finalizarCompra(clienteId) {
 
   try {
     const itens = Array.from(document.querySelectorAll(".cart-item"))
-      .filter(el => el.dataset.produtoId)
-      .map(el => {
-        const quantidade = parseInt(el.querySelector(".itemQuantidade")?.value) || 1;
+      .filter((el) => el.dataset.produtoId)
+      .map((el) => {
+        const quantidade =
+          parseInt(el.querySelector(".itemQuantidade")?.value) || 1;
         return { quantidade, produto: { id: parseInt(el.dataset.produtoId) } };
       });
 
@@ -316,28 +349,49 @@ async function finalizarCompra(clienteId) {
     }
 
     // Endereço e cartão
-    let enderecoId = parseInt(document.querySelector("select[name='enderecos']")?.value) || null;
-    const salvarNovoEnderecoCheckbox = document.querySelector("input[name='salvar-endereco-entrega']")?.checked;
+    let enderecoId =
+      parseInt(document.querySelector("select[name='enderecos']")?.value) ||
+      null;
+    const salvarNovoEnderecoCheckbox = document.querySelector(
+      "input[name='salvar-endereco-entrega']"
+    )?.checked;
     if (salvarNovoEnderecoCheckbox) {
       const novoEnderecoId = await salvarEndereco(clienteId);
       if (novoEnderecoId) enderecoId = novoEnderecoId;
     }
 
-    const cartaoId = parseInt(document.querySelector("select[name='cartoes']")?.value) || null;
+    const cartaoId =
+      parseInt(document.querySelector("select[name='cartoes']")?.value) || null;
 
     // Calcula total geral
     const totalItens = itens.reduce((acc, item) => {
-      const precoEl = document.querySelector(`.cart-item[data-produto-id='${item.produto.id}'] .item-price`);
-      const preco = precoEl ? parseFloat(precoEl.textContent.replace("R$", "").replace(",", ".").trim()) : 0;
+      const precoEl = document.querySelector(
+        `.cart-item[data-produto-id='${item.produto.id}'] .item-price`
+      );
+      const preco = precoEl
+        ? parseFloat(
+            precoEl.textContent.replace("R$", "").replace(",", ".").trim()
+          )
+        : 0;
       return acc + preco * item.quantidade;
     }, 0);
 
-    const frete = parseFloat(document.getElementById("valorFreteResumoTotal")?.textContent.replace("R$", "").replace(",", ".")) || 0;
+    const frete =
+      parseFloat(
+        document
+          .getElementById("valorFreteResumoTotal")
+          ?.textContent.replace("R$", "")
+          .replace(",", ".")
+      ) || 0;
 
     // Aplica cupom
     let desconto = 0;
     const selectCupom = document.querySelector("#card-container-cupom select");
-    if (selectCupom && selectCupom.value && selectCupom.value !== "Escolha...") {
+    if (
+      selectCupom &&
+      selectCupom.value &&
+      selectCupom.value !== "Escolha..."
+    ) {
       const valorCupom = selectCupom.value;
       desconto = valorCupom.endsWith("%")
         ? (totalItens + frete) * (parseFloat(valorCupom.replace("%", "")) / 100)
@@ -350,33 +404,44 @@ async function finalizarCompra(clienteId) {
       itens,
       transacoes: [{ valor: totalGeral, status: "EM_PROCESSAMENTO" }],
       enderecoPedido: enderecoId ? { id: enderecoId } : null,
-      cartaoPedido: cartaoId ? { id: cartaoId } : null
+      cartaoPedido: cartaoId ? { id: cartaoId } : null,
     };
 
     console.log("Pedido enviado (JSON):", JSON.stringify(pedido, null, 2));
 
-    const response = await fetch(`http://localhost:8080/cliente/${clienteId}/finalizar-compra`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(pedido),
-      credentials: "include"
-    });
+    const response = await fetch(
+      `http://localhost:8080/cliente/${clienteId}/finalizar-compra`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pedido),
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) {
       const text = await response.text();
-      throw new Error(`Erro no backend: ${response.status} ${response.statusText}\n${text}`);
+      throw new Error(
+        `Erro no backend: ${response.status} ${response.statusText}\n${text}`
+      );
     }
 
     const pedidoSalvo = await response.json();
     alert(`Compra finalizada com sucesso! Pedido ID: ${pedidoSalvo.id}`);
 
+    // Atualiza o estoque de cada produto
+    for (const item of itens) {
+      await atualizarEstoque(item.produto.id, item.quantidade);
+    }
     // Limpa carrinho e cupom
-    await fetch(`http://localhost:8080/carrinho/${clienteId}/limpar`, { method: "DELETE" });
-    document.querySelector(".secao-itens").innerHTML = '<h2 class="itens">Itens</h2>';
+    await fetch(`http://localhost:8080/carrinho/${clienteId}/limpar`, {
+      method: "DELETE",
+    });
+    document.querySelector(".secao-itens").innerHTML =
+      '<h2 class="itens">Itens</h2>';
     document.getElementById("card-container-cupom").innerHTML = "";
     atualizarTotais();
     window.location.href = "index.html";
-
   } catch (err) {
     console.error("Erro ao finalizar compra:", err);
     alert("Erro ao finalizar compra: " + err.message);
@@ -394,8 +459,51 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("click", (e) => {
-    if (e.target && e.target.id === "btnFinalizarPedido") finalizarCompra(clienteId);
+    if (e.target && e.target.id === "btnFinalizarPedido")
+      finalizarCompra(clienteId);
     if (e.target && e.target.dataset.tipoCard)
       addCard(e.target.dataset.tipoCard);
   });
 });
+
+// ----------------- Atualizar Estoque -----------------
+async function atualizarEstoque(produtoId, quantidadeComprada) {
+  try {
+    // Pega o estoque atual
+    const response = await fetch(
+      `http://localhost:8080/produtos/${produtoId}/quantidade`
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Não foi possível obter o estoque do produto ${produtoId}`
+      );
+    }
+
+    const estoqueAtual = await response.json(); // { quantidade: X }
+    console.log("Estoque atual:", estoqueAtual.quantidade);
+
+    const novaQuantidade = estoqueAtual.quantidade - quantidadeComprada;
+
+    // Atualiza o estoque
+    const updateResponse = await fetch(
+      `http://localhost:8080/produtos/${produtoId}/estoque`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ quantidade: novaQuantidade }),
+      }
+    );
+
+    if (!updateResponse.ok) {
+      const text = await updateResponse.text();
+      throw new Error(`Erro ao atualizar estoque: ${text}`);
+    }
+
+    console.log(
+      `Estoque atualizado do produto ${produtoId}: ${novaQuantidade}`
+    );
+  } catch (err) {
+    console.error("Erro ao atualizar estoque:", err);
+  }
+}

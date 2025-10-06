@@ -39,4 +39,10 @@ public class ProdutoController {
         }
     }
 
+    @GetMapping("/{id}/quantidade")
+    public ResponseEntity<EstoqueDTO> buscarQuantidadeEstoque(@PathVariable Long id) {
+        return produtoService.findById(id)
+                .map(produto -> ResponseEntity.ok(new EstoqueDTO(produto.getEstoque())))
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
