@@ -38,114 +38,6 @@
                     <div class="secao-pedidos">
                         <h2>Pedidos</h2>
 
-                        <!-- Pedido 1 -->
-                        <div class="pedido-container">
-                            <div class="pedido-card">
-                                <div class="pedido-info">
-                                    <p><strong>Pedido:</strong> 12345</p>
-                                    <p><strong>Data:</strong> 01/05/2024</p>
-                                    <p><strong>Status:</strong> Entregue</p>
-                                    <p><strong>Total:</strong> R$ 150,00</p>
-                                    <button class="btn-principal btn-detalhes"
-                                        onclick="toggleDetalhes(this)">Detalhes</button>
-                                </div>
-
-                                <!-- Detalhes (inicialmente escondidos) -->
-                                <div class="pedido-detalhes" style="display: none;">
-                                    <h4>Itens:</h4>
-
-                                    <div class="cart-item">
-                                        <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
-                                            alt="Livro A">
-                                        <div class="item-info">
-                                            <p class="item-name">Livro A</p>
-                                            <p class="item-price">R$ 50,00</p>
-                                            <div class="item-actions">
-                                                <div class="itens-venda">
-                                                    <div class="itens-total">
-                                                        <div class="itens-quantidade">
-                                                            <label>Qtd: </label>
-                                                            <input type="number" value="1" min="1" disabled>
-                                                        </div>
-                                                        <label>Total: R$ 50,00</label>
-                                                    </div>
-                                                    <button class="btn-principal btn-troca"
-                                                        onclick="window.location.href='telaTroca.html'">Trocar</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="cart-item">
-                                        <img src="https://m.media-amazon.com/images/I/81af+MCATTL._SY466_.jpg"
-                                            alt="Livro B">
-                                        <div class="item-info">
-                                            <p class="item-name">Livro B</p>
-                                            <p class="item-price">R$ 100,00</p>
-                                            <div class="item-actions">
-                                                <div class="itens-venda">
-                                                    <div class="itens-total">
-                                                        <div class="itens-quantidade">
-                                                            <label>Qtd: </label>
-                                                            <input type="number" value="1" min="1" disabled>
-                                                        </div>
-                                                        <label>Total: R$ 100,00</label>
-                                                    </div>
-                                                    <button class="btn-principal btn-troca"
-                                                        onclick="window.location.href='telaTroca.html'">Trocar</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <h4>Endereço de Entrega:</h4>
-                                    <p>Rua Exemplo, 123, Bairro, Cidade, Estado, CEP</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Outro pedido -->
-                        <div class="pedido-container">
-                            <div class="pedido-card">
-                                <div class="pedido-info">
-                                    <p><strong>Pedido:</strong> 12346</p>
-                                    <p><strong>Data:</strong> 15/05/2024</p>
-                                    <p><strong>Status:</strong> Em Trânsito</p>
-                                    <p><strong>Total:</strong> R$ 200,00</p>
-                                    <button class="btn-principal btn-detalhes"
-                                        onclick="toggleDetalhes(this)">Detalhes</button>
-                                </div>
-                                <!-- Detalhes (inicialmente escondidos) -->
-                                <div class="pedido-detalhes" style="display: none;">
-                                    <h4>Itens:</h4>
-
-                                    <div class="cart-item">
-                                        <img src="https://m.media-amazon.com/images/I/71Vkg7GfPFL._SY385_.jpg"
-                                            alt="Livro C">
-                                        <div class="item-info">
-                                            <p class="item-name">Livro C</p>
-                                            <p class="item-price">R$ 200,00</p>
-                                            <div class="item-actions">
-                                                <div class="itens-venda">
-                                                    <div class="itens-total">
-                                                        <div class="itens-quantidade">
-                                                            <label>Qtd: </label>
-                                                            <input type="number" value="1" min="1" disabled>
-                                                        </div>
-                                                        <label>Total: R$ 200,00</label>
-                                                    </div>
-                                                    <button class="btn-principal btn-troca"
-                                                        onclick="window.location.href='telaTroca.html'"
-                                                        style="display:none;">Trocar</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <h4>Endereço de Entrega:</h4>
-                                    <p>Avenida Exemplo, 456, Bairro, Cidade, Estado, CEP</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -512,6 +404,7 @@
     <script src="scripts/Script.js"></script>
     <script src="scripts/Chatbot.js"></script>
     <script src="API/carrinhoAPI.js"></script>
+    <script src="API/pedidosClienteAPI.js"></script>
 
 </body>
 
