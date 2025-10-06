@@ -142,14 +142,11 @@ async function carregarItensFinalizarCompra() {
   const container = document.querySelector(".secao-itens");
   if (!container) return;
 
-  // Limpa itens antigos
   container.querySelectorAll(".cart-item").forEach((item) => item.remove());
 
-  // Checa se existe compra direta
   const compraDireta = JSON.parse(localStorage.getItem("compraDireta"));
 
   if (compraDireta) {
-    // Busca os dados do produto no backend
     try {
       const response = await fetch(`http://localhost:8080/produtos/${compraDireta.produtoId}`);
       if (!response.ok) throw new Error("Produto não encontrado");
@@ -177,13 +174,11 @@ async function carregarItensFinalizarCompra() {
         </div>
       `;
       container.insertAdjacentHTML("beforeend", itemHTML);
-
       atualizarTotais();
     } catch (err) {
       console.error("Erro ao carregar produto da compra direta:", err);
     }
   } else {
-    // Se não houver compra direta, carrega o carrinho normalmente
     if (!clienteId) return;
     try {
       const response = await fetch(`http://localhost:8080/carrinho/${clienteId}`);
@@ -222,7 +217,6 @@ async function carregarItensFinalizarCompra() {
   }
 }
 
-
 // ----------------- ADICIONAR CUPOM -----------------
 function addCard(tipo) {
   if (tipo !== "cupom") return;
@@ -250,6 +244,56 @@ function addCard(tipo) {
   });
 }
 
+// ----------------- SALVAR NOVO ENDEREÇO -----------------
+async function salvarEndereco(clienteId) {
+  const tipoResidenciaEl = document.querySelector("select[name='tipoResidencia']");
+  const tipoLogradouroEl = document.querySelector("select[name='tipoLogradouro']");
+  const logradouroEl = document.querySelector("input[name='logradouro']");
+  const numeroEl = document.querySelector("input[name='numero']");
+  const bairroEl = document.querySelector("input[name='bairro']");
+  const cepEl = document.querySelector("input[name='cep']");
+  const cidadeEl = document.querySelector("input[name='cidade']");
+  const estadoEl = document.querySelector("input[name='estado']");
+  const paisEl = document.querySelector("input[name='pais']");
+  const observacoesEl = document.querySelector("textarea[name='observacoes']");
+
+  if (!tipoResidenciaEl || !tipoLogradouroEl || !logradouroEl || !numeroEl ||
+      !bairroEl || !cepEl || !cidadeEl || !estadoEl || !paisEl || !observacoesEl) {
+      console.error("Campos do formulário de endereço não encontrados no DOM.");
+      return null;
+  }
+
+  const endereco = {
+    tipoResidencia: tipoResidenciaEl.value,
+    tipoLogradouro: tipoLogradouroEl.value,
+    logradouro: logradouroEl.value,
+    numero: numeroEl.value,
+    bairro: bairroEl.value,
+    cep: cepEl.value,
+    cidade: cidadeEl.value,
+    estado: estadoEl.value,
+    pais: paisEl.value,
+    observacoes: observacoesEl.value
+  };
+
+  try {
+    const response = await fetch(`http://localhost:8080/cliente/${clienteId}/endereco`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(endereco)
+    });
+
+    if (!response.ok) throw new Error("Erro ao salvar endereço");
+    const enderecoSalvo = await response.json();
+    return enderecoSalvo.id;
+  } catch (err) {
+    console.error("Erro ao salvar endereço:", err);
+    alert("Erro ao salvar endereço: " + err.message);
+    return null;
+  }
+}
+
+
 // ----------------- FINALIZAR COMPRA -----------------
 async function finalizarCompra(clienteId) {
   if (!clienteId) {
@@ -258,7 +302,6 @@ async function finalizarCompra(clienteId) {
   }
 
   try {
-    // Pega itens do carrinho
     const itens = Array.from(document.querySelectorAll(".cart-item"))
       .filter(el => el.dataset.produtoId)
       .map(el => {
@@ -272,7 +315,13 @@ async function finalizarCompra(clienteId) {
     }
 
     // Endereço e cartão
-    const enderecoId = parseInt(document.querySelector("select[name='enderecos']")?.value) || null;
+    let enderecoId = parseInt(document.querySelector("select[name='enderecos']")?.value) || null;
+    const salvarNovoEnderecoCheckbox = document.querySelector("input[name='salvar-endereco-entrega']")?.checked;
+    if (salvarNovoEnderecoCheckbox) {
+      const novoEnderecoId = await salvarEndereco(clienteId);
+      if (novoEnderecoId) enderecoId = novoEnderecoId;
+    }
+
     const cartaoId = parseInt(document.querySelector("select[name='cartoes']")?.value) || null;
 
     // Calcula total geral
@@ -296,7 +345,6 @@ async function finalizarCompra(clienteId) {
 
     const totalGeral = totalItens + frete - desconto;
 
-    // Monta pedido
     const pedido = {
       itens,
       transacoes: [{ valor: totalGeral, status: "EM_PROCESSAMENTO" }],
@@ -319,7 +367,6 @@ async function finalizarCompra(clienteId) {
     }
 
     const pedidoSalvo = await response.json();
-
     alert(`Compra finalizada com sucesso! Pedido ID: ${pedidoSalvo.id}`);
 
     // Limpa carrinho e cupom

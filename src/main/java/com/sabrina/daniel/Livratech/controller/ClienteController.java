@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/clientes")
-@CrossOrigin(origins = "http://localhost:8080")
 public class ClienteController {
 
     @Autowired
