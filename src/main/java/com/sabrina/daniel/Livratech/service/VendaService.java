@@ -54,4 +54,8 @@ public class VendaService {
         return cartaoRepository.save(cartaoNovo);
     }
 
+    public List<Pedido> listarTodosPedidos() {
+        return pedidoRepository.findAll();
+    }
+
 }

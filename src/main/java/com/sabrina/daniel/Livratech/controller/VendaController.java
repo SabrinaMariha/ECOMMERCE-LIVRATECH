@@ -88,4 +88,25 @@ import java.util.Optional;
         }
     }
 
+    @GetMapping("/{id}/pedidos")
+    public ResponseEntity<?> listarPedidosPorCliente(@PathVariable Long id) {
+        try {
+            Cliente cliente = clienteService.findById(id);
+            List<Pedido> pedidos = cliente.getPedidos();
+            return ResponseEntity.ok(pedidos);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/pedidos")
+    public ResponseEntity<?> listarTodosPedidos() {
+        try {
+            List<Pedido> pedidos = vendaService.listarTodosPedidos();
+            return ResponseEntity.ok(pedidos);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }
