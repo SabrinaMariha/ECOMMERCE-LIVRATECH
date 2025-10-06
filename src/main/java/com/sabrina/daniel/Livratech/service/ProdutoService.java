@@ -16,7 +16,7 @@ public class ProdutoService {
 
     //Busca todos os produtos
     public List<Produto> findAll(){
-        return produtoRepository.findAll();
+        return produtoRepository.findAllByOrderByIdAsc();
     }
 
     // Buscar produto por id
