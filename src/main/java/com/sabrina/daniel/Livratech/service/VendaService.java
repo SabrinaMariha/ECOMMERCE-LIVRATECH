@@ -117,6 +117,7 @@ public class VendaService {
         List<ItemDTO> itensDTO = pedidoSalvo.getItens().stream()
                 .map(item -> new ItemDTO(
                         item.getId(),
+                        item.getProduto().getId(),
                         item.getQuantidade(),
                         item.getProduto().getNome(),
                         item.getProduto().getAutor(),
@@ -171,6 +172,7 @@ public class VendaService {
             List<ItemDTO> itensDTO = pedido.getItens().stream()
                     .map(item -> new ItemDTO(
                             item.getId(),
+                            item.getProduto().getId(),
                             item.getQuantidade(),
                             item.getProduto().getNome(),
                             item.getProduto().getAutor(),

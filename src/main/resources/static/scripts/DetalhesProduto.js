@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     
     const params = new URLSearchParams(window.location.search);
-    const id = params.get('id');
+    const produtoid = params.get('id');
 
-    if(id){
-        await carregarProduto(id);7
-        configurarCarrinho(id);
+    if(produtoid){
+        await carregarProduto(produtoid);7
+        configurarCarrinho(produtoid);
     }
 });
 
@@ -24,9 +24,9 @@ function removeItem(button) {
 }
 
 // Carrega produto pelo id
-async function carregarProduto(id){
+async function carregarProduto(produtoid){
     try{
-        const response = await fetch(`http://localhost:8080/produtos/${id}`);
+        const response = await fetch(`http://localhost:8080/produtos/${produtoid}`);
         if (!response.ok) throw new Error("Produto não encontrado");
         const produto = await response.json();
 

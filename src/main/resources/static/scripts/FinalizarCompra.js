@@ -150,41 +150,29 @@ async function carregarItensFinalizarCompra() {
 
     carrinho.itens.forEach((item) => {
       const itemHTML = `
-                <div class="cart-item" data-item-id="${item.id}">
-                    <img src="${item.imagemProduto}" alt="${item.nomeProduto}">
-                    <div class="item-info">
-                        <p class="item-name">${item.nomeProduto}</p>
-                        <p class="item-autor">Autor: ${
-                          item.autor || "Desconhecido"
-                        }</p>
-                        <p class="item-descricao">${
-                          item.descricaoProduto || ""
-                        }</p>
-                        <p class="item-price">R$ ${item.precoProduto.toFixed(
-                          2
-                        )}</p>
-                        <div class="item-actions">
-                            <div class="itens-venda">
-                                <div class="item-quantidade">
-                                    <input type="number" class="itemQuantidade" value="${
-                                      item.quantidade
-                                    }" min="1">
-                                    <button class="trash-btn" onclick="removerItemDoCarrinho(${
-                                      item.id
-                                    }, this)">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                    </button>
-                                </div>
-                                <div class="itens-total">
-                                    <label class="label-campo">Total: </label>
-                                    <label class="label-campo valorTotal">R$ ${(
-                                      item.precoProduto * item.quantidade
-                                    ).toFixed(2)}</label>
-                                </div>
-                            </div>
+        <div class="cart-item" data-item-id="${item.id}" data-produto-id="${item.produtoId}">
+            <img src="${item.imagemProduto}" alt="${item.nomeProduto}">
+            <div class="item-info">
+                <p class="item-name">${item.nomeProduto}</p>
+                <p class="item-autor">Autor: ${item.autor || "Desconhecido"}</p>
+                <p class="item-descricao">${item.descricaoProduto || ""}</p>
+                <p class="item-price">R$ ${item.precoProduto.toFixed(2)}</p>
+                <div class="item-actions">
+                    <div class="itens-venda">
+                        <div class="item-quantidade">
+                            <input type="number" class="itemQuantidade" value="${item.quantidade}" min="1">
+                            <button class="trash-btn" onclick="removerItemDoCarrinho(${item.id}, this)">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                        <div class="itens-total">
+                            <label class="label-campo">Total: </label>
+                            <label class="label-campo valorTotal">R$ ${(item.precoProduto * item.quantidade).toFixed(2)}</label>
                         </div>
                     </div>
-                </div>`;
+                </div>
+            </div>
+        </div>`;
       container.insertAdjacentHTML("beforeend", itemHTML);
     });
 
@@ -207,14 +195,12 @@ function addCard(tipo) {
   container.appendChild(clone);
   descontoAtivo = 0;
 
-  // botão remover
   clone.querySelector(".remove-btn").addEventListener("click", () => {
     descontoAtivo = 0;
     clone.remove();
     atualizarTotais();
   });
 
-  // detectar mudança no select do cupom
   const selectCupom = clone.querySelector("select[name='bandeira']");
   selectCupom.addEventListener("change", (e) => {
     const valor = parseFloat(e.target.value.replace("%", "")) || 0;
@@ -230,18 +216,13 @@ async function finalizarCompra(clienteId) {
     return;
   }
 
-  // Aguarda a página carregar completamente
-  if (document.readyState !== "complete") {
-    await new Promise(resolve => window.addEventListener("load", resolve));
-  }
-
   try {
-    // 1️⃣ Pega os itens do carrinho
+    // Pega itens do carrinho
     const itens = Array.from(document.querySelectorAll(".cart-item"))
-      .filter(el => el.dataset.itemId)
+      .filter(el => el.dataset.produtoId)
       .map(el => {
         const quantidade = parseInt(el.querySelector(".itemQuantidade")?.value) || 1;
-        return { quantidade, produto: { id: parseInt(el.dataset.itemId) } };
+        return { quantidade, produto: { id: parseInt(el.dataset.produtoId) } };
       });
 
     if (itens.length === 0) {
@@ -249,20 +230,20 @@ async function finalizarCompra(clienteId) {
       return;
     }
 
-    // 2️⃣ Pega endereço e cartão selecionado
+    // Endereço e cartão
     const enderecoId = parseInt(document.querySelector("select[name='enderecos']")?.value) || null;
     const cartaoId = parseInt(document.querySelector("select[name='cartoes']")?.value) || null;
 
-    // 3️⃣ Calcula total geral
+    // Calcula total geral
     const totalItens = itens.reduce((acc, item) => {
-      const precoEl = document.querySelector(`.cart-item[data-item-id='${item.produto.id}'] .item-price`);
+      const precoEl = document.querySelector(`.cart-item[data-produto-id='${item.produto.id}'] .item-price`);
       const preco = precoEl ? parseFloat(precoEl.textContent.replace("R$", "").replace(",", ".").trim()) : 0;
       return acc + preco * item.quantidade;
     }, 0);
 
     const frete = parseFloat(document.getElementById("valorFreteResumoTotal")?.textContent.replace("R$", "").replace(",", ".")) || 0;
 
-    // 4️⃣ Aplica cupom
+    // Aplica cupom
     let desconto = 0;
     const selectCupom = document.querySelector("#card-container-cupom select");
     if (selectCupom && selectCupom.value && selectCupom.value !== "Escolha...") {
@@ -274,7 +255,7 @@ async function finalizarCompra(clienteId) {
 
     const totalGeral = totalItens + frete - desconto;
 
-    // 5️⃣ Monta pedido compatível com backend
+    // Monta pedido
     const pedido = {
       itens,
       transacoes: [{ valor: totalGeral, status: "EM_PROCESSAMENTO" }],
@@ -284,7 +265,6 @@ async function finalizarCompra(clienteId) {
 
     console.log("Pedido enviado (JSON):", JSON.stringify(pedido, null, 2));
 
-    // 6️⃣ Envia para o backend e aguarda resposta completa
     const response = await fetch(`http://localhost:8080/cliente/${clienteId}/finalizar-compra`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -297,16 +277,11 @@ async function finalizarCompra(clienteId) {
       throw new Error(`Erro no backend: ${response.status} ${response.statusText}\n${text}`);
     }
 
-    // 7️⃣ Processa resposta JSON
-    const contentType = response.headers.get("content-type") || "";
-    const pedidoSalvo = contentType.includes("application/json") 
-      ? await response.json() 
-      : JSON.parse(await response.text());
+    const pedidoSalvo = await response.json();
 
-    // 8️⃣ Sucesso
     alert(`Compra finalizada com sucesso! Pedido ID: ${pedidoSalvo.id}`);
 
-    // 9️⃣ Limpa carrinho e cupom
+    // Limpa carrinho e cupom
     await fetch(`http://localhost:8080/carrinho/${clienteId}/limpar`, { method: "DELETE" });
     document.querySelector(".secao-itens").innerHTML = '<h2 class="itens">Itens</h2>';
     document.getElementById("card-container-cupom").innerHTML = "";
