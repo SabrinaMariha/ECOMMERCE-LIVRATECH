@@ -266,6 +266,7 @@ async function salvarEndereco(clienteId) {
   const endereco = {
     tipoResidencia: tipoResidenciaEl.value,
     tipoLogradouro: tipoLogradouroEl.value,
+    tipoEndereco: "ENTREGA",
     logradouro: logradouroEl.value,
     numero: numeroEl.value,
     bairro: bairroEl.value,
