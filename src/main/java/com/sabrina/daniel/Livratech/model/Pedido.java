@@ -9,13 +9,14 @@ import lombok.Setter;
 
 import java.util.List;
 
+@Entity
+@Table(name = "pedido")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Entity
-@Table(name = "pedido")
 public class Pedido {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,4 +32,12 @@ public class Pedido {
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "endereco_id")
+    private Endereco enderecoPedido;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cartao_id")
+    private CartaoDeCredito cartaoPedido;
 }
+
