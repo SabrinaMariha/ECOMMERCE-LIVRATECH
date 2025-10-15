@@ -38,4 +38,8 @@ public class Transacao extends DomainEntity {
     @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cartao_id")
+    private CartaoDeCredito cartao;
+
 }

@@ -45,10 +45,18 @@ public class VendaController {
     }
 
     // ------------------ CARTÕES ------------------
+//    @PostMapping("/{id}/cartao")
+//    public ResponseEntity<CartaoDeCredito> cadastrarCartao(@PathVariable Long id, @RequestBody CartaoDeCredito cartao) {
+//        return ResponseEntity.ok(vendaService.salvarCartao(id, cartao));
+//    }
     @PostMapping("/{id}/cartao")
-    public ResponseEntity<CartaoDeCredito> cadastrarCartao(@PathVariable Long id, @RequestBody CartaoDeCredito cartao) {
-        return ResponseEntity.ok(vendaService.salvarCartao(id, cartao));
+    public ResponseEntity<List<CartaoDeCredito>> cadastrarCartoes(
+            @PathVariable Long id,
+            @RequestBody List<CartaoDeCredito> cartoes
+    ) {
+        return ResponseEntity.ok(vendaService.salvarCartoes(id, cartoes));
     }
+
 
     @GetMapping("/{id}/cartoes")
     public ResponseEntity<List<CartaoDeCredito>> listarCartoes(@PathVariable Long id) {
