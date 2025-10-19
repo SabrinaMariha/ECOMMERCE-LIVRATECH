@@ -1,42 +1,3 @@
-const historicoTransacoes = {
-  "Daniel Almeida Andrade": [
-    {
-      dataHora: "20/08/2025 10:15",
-      valor: 150.0,
-      frete: 10.0,
-      status: "Concluída",
-    },
-    {
-      dataHora: "15/07/2025 14:40",
-      valor: 200.0,
-      frete: 15.0,
-      status: "Pendente",
-    },
-  ],
-  "Stella Dias Andrade": [
-    {
-      dataHora: "10/08/2025 12:30",
-      valor: 300.0,
-      frete: 20.0,
-      status: "Concluída",
-    },
-  ],
-  "Beatriz da Costa Santos Dias Andrade": [
-    {
-      dataHora: "01/08/2025 09:00",
-      valor: 120.0,
-      frete: 8.0,
-      status: "Concluída",
-    },
-    {
-      dataHora: "05/08/2025 16:45",
-      valor: 250.0,
-      frete: 12.0,
-      status: "Pendente",
-    },
-  ],
-};
-
 // ======================= CONTROLE DE ABAS =======================
 const buttons = document.querySelectorAll(".menu-btn");
 const sections = document.querySelectorAll(".section");
@@ -51,9 +12,9 @@ buttons.forEach((btn) => {
     if (section) section.classList.add("active");
 
     // Fechar todos os modais que usam a classe 'active'
-    document.querySelectorAll(".modal.active").forEach((modal) =>
-      modal.classList.remove("active")
-    );
+    document
+      .querySelectorAll(".modal.active")
+      .forEach((modal) => modal.classList.remove("active"));
 
     // Fechar modais que usam style.display
     ["inativar-modal", "modalEditarEstoque"].forEach((id) => {
@@ -77,7 +38,9 @@ const btnSim = inativarModal?.querySelector(".btn-sim");
 const modalDetalhes = document.getElementById("modalDetalhesCliente");
 const btnFecharDetalhes = document.getElementById("btnFecharDetalhes");
 const btnFecharDetalhesBtn = document.getElementById("btnFecharDetalhesBtn");
-const detalhesClienteContent = document.getElementById("detalhesClienteContent");
+const detalhesClienteContent = document.getElementById(
+  "detalhesClienteContent"
+);
 
 let clientesCarregados = []; // Para armazenar os clientes e usar no filtro
 let clienteParaInativar = null; // variável global
@@ -144,9 +107,7 @@ function renderizarClientes(clientes) {
         const data = await res.json();
 
         const telefones =
-          data.telefones
-            ?.map((t) => `${t.ddd} ${t.numero}`)
-            .join(", ") || "-";
+          data.telefones?.map((t) => `${t.ddd} ${t.numero}`).join(", ") || "-";
         const enderecos =
           data.enderecos
             ?.map(
@@ -165,7 +126,7 @@ function renderizarClientes(clientes) {
             })
             .join("<br>") || "-";
 
-       detalhesClienteContent.innerHTML = `
+        detalhesClienteContent.innerHTML = `
          <table class="detalhes-tabela">
            <tr>
              <th>Nome</th>
@@ -201,28 +162,61 @@ function renderizarClientes(clientes) {
       }
     });
 
-    // Botão histórico
-    tr.querySelector(".btn-historico")?.addEventListener("click", () => {
-      tbodyHistorico.innerHTML = "";
-      const transacoes = historicoTransacoes[c.nome] || [];
+    // Botão histórico - MODIFICADO para usar fetch
+    const btnHistorico = tr.querySelector(".btn-historico");
+    if (btnHistorico) {
+      btnHistorico.addEventListener("click", async (e) => {
+        const clienteId = e.currentTarget.dataset.id;
+        tbodyHistorico.innerHTML =
+          '<tr><td colspan="4" style="text-align:center;">Carregando histórico...</td></tr>'; // Feedback visual
+        modalHistorico.classList.add("active"); // Abre o modal antes de carregar
 
-      if (transacoes.length === 0) {
-        tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhuma transação encontrada</td></tr>`;
-      } else {
-        transacoes.forEach((t) => {
-          const trHist = document.createElement("tr");
-          trHist.innerHTML = `
-            <td>${t.dataHora}</td>
-            <td>R$ ${t.valor.toFixed(2)}</td>
-            <td>R$ ${t.frete.toFixed(2)}</td>
-            <td>${t.status}</td>
-          `;
-          tbodyHistorico.appendChild(trHist);
-        });
-      }
+        try {
+          // Faz a chamada para o endpoint GET /cliente/{id}/pedidos
+          const res = await fetch(`/cliente/${clienteId}/pedidos`); // Usa o endpoint correto
+          if (!res.ok) {
+            throw new Error(`Erro ao buscar pedidos: ${res.statusText}`);
+          }
+          const pedidos = await res.json(); // Array de PedidoDTO
 
-      modalHistorico.classList.add("active");
-    });
+          tbodyHistorico.innerHTML = ""; // Limpa o "Carregando..." ou dados antigos
+
+          if (pedidos.length === 0) {
+            tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum pedido encontrado para este cliente.</td></tr>`;
+          } else {
+            pedidos.forEach((pedido) => {
+              const trHist = document.createElement("tr");
+              // Formata a data (DD/MM/YYYY) e o valor (R$ XX,XX)
+              const dataFormatada = new Date(pedido.data).toLocaleDateString(
+                "pt-BR",
+                {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }
+              ); // Adiciona hora
+              const valorFormatado = pedido.valorTotal.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              });
+
+              trHist.innerHTML = `
+                <td>${pedido.id}</td> 
+                <td>${dataFormatada}</td>
+                <td>${valorFormatado}</td> 
+                <td>${pedido.status || "N/A"}</td> 
+              `;
+              tbodyHistorico.appendChild(trHist);
+            });
+          }
+        } catch (err) {
+          console.error("Erro ao carregar histórico:", err);
+          tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Erro ao carregar histórico: ${err.message}</td></tr>`;
+        }
+      });
+    }
 
     // Botão inativar
     tr.querySelector(".btn-inativar")?.addEventListener("click", (e) => {
@@ -242,10 +236,7 @@ modalHistorico?.addEventListener("click", (e) => {
   if (e.target === modalHistorico) modalHistorico.classList.remove("active");
 });
 
-btnFecharInativar?.addEventListener(
-  "click",
-  () => (inativarModal.style.display = "none")
-);
+btnFecharInativar?.addEventListener("click", () => (inativarModal.style.display = "none"));
 btnNao?.addEventListener("click", () => (inativarModal.style.display = "none"));
 btnSim?.addEventListener("click", () => (inativarModal.style.display = "none"));
 window.addEventListener("click", (e) => {
@@ -256,10 +247,9 @@ window.addEventListener("click", (e) => {
 btnSim?.addEventListener("click", async () => {
   if (!clienteParaInativar) return;
   try {
-    const res = await fetch(
-      `/admin/cliente/${clienteParaInativar}/inativar`,
-      { method: "PATCH" }
-    );
+    const res = await fetch(`/admin/cliente/${clienteParaInativar}/inativar`, {
+      method: "PATCH",
+    });
     if (!res.ok) throw new Error("Erro ao inativar cliente");
     await carregarClientes();
     inativarModal.style.display = "none";
@@ -297,11 +287,13 @@ document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
       : "";
     return (
       (!filtros.nome || c.nome.toLowerCase().includes(filtros.nome)) &&
-      (!filtros.dataNascimento || c.dataNascimento === filtros.dataNascimento) &&
+      (!filtros.dataNascimento ||
+        c.dataNascimento === filtros.dataNascimento) &&
       (!filtros.cpf || c.cpf.toLowerCase().includes(filtros.cpf)) &&
       (!filtros.genero ||
         (c.genero && c.genero.toLowerCase().includes(filtros.genero))) &&
-      (!filtros.telefone || telefone.toLowerCase().includes(filtros.telefone)) &&
+      (!filtros.telefone ||
+        telefone.toLowerCase().includes(filtros.telefone)) &&
       (!filtros.email || c.email.toLowerCase().includes(filtros.email))
     );
   });
@@ -321,9 +313,33 @@ criarFiltro(
 // ... (resto do estoque, vendas, trocas e detalhes permanece igual)
 
 const estoque = [
-  { idLivro: 1, titulo: "Livro A", quantidade: 10, fornecedor: "Fornecedor X", dataEntrada: "2025-08-01", valorCusto: 50.0, status: "Ativo" },
-  { idLivro: 2, titulo: "Livro B", quantidade: 0, fornecedor: "Fornecedor Y", dataEntrada: "2025-08-05", valorCusto: 35.0, status: "Ativo" },
-  { idLivro: 3, titulo: "Livro C", quantidade: 5, fornecedor: "Fornecedor Z", dataEntrada: "2025-08-10", valorCusto: 42.5, status: "Ativo" }
+  {
+    idLivro: 1,
+    titulo: "Livro A",
+    quantidade: 10,
+    fornecedor: "Fornecedor X",
+    dataEntrada: "2025-08-01",
+    valorCusto: 50.0,
+    status: "Ativo",
+  },
+  {
+    idLivro: 2,
+    titulo: "Livro B",
+    quantidade: 0,
+    fornecedor: "Fornecedor Y",
+    dataEntrada: "2025-08-05",
+    valorCusto: 35.0,
+    status: "Ativo",
+  },
+  {
+    idLivro: 3,
+    titulo: "Livro C",
+    quantidade: 5,
+    fornecedor: "Fornecedor Z",
+    dataEntrada: "2025-08-10",
+    valorCusto: 42.5,
+    status: "Ativo",
+  },
 ];
 
 const tbodyEstoque = document.getElementById("estoque-tbody");
@@ -349,24 +365,56 @@ estoque.forEach((item) => {
 });
 
 document.querySelectorAll(".btnEditarEstoque").forEach((btn) => {
-  btn.addEventListener("click", () => modalEditarEstoque.style.display="flex");
+  btn.addEventListener(
+    "click",
+    () => (modalEditarEstoque.style.display = "flex")
+  );
 });
 
-btnFecharModalEstoque?.addEventListener("click", () => modalEditarEstoque.style.display="none");
-btnCancelarEditar?.addEventListener("click", () => modalEditarEstoque.style.display="none");
-window.addEventListener("click", (e) => { if(e.target===modalEditarEstoque) modalEditarEstoque.style.display="none"; });
+btnFecharModalEstoque?.addEventListener(
+  "click",
+  () => (modalEditarEstoque.style.display = "none")
+);
+btnCancelarEditar?.addEventListener(
+  "click",
+  () => (modalEditarEstoque.style.display = "none")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalEditarEstoque)
+    modalEditarEstoque.style.display = "none";
+});
 
 // ======================= VENDAS =======================
 const vendas = [
-  { idVenda:101, cliente:"Ana Maria", data:"2025-08-01", total:150.5, status:"Concluída" },
-  { idVenda:102, cliente:"Bruno Silva", data:"2025-08-05", total:320.0, status:"Pendente" },
-  { idVenda:103, cliente:"Carla Souza", data:"2025-08-10", total:75.25, status:"Cancelada" }
+  {
+    idVenda: 101,
+    cliente: "Ana Maria",
+    data: "2025-08-01",
+    total: 150.5,
+    status: "Concluída",
+  },
+  {
+    idVenda: 102,
+    cliente: "Bruno Silva",
+    data: "2025-08-05",
+    total: 320.0,
+    status: "Pendente",
+  },
+  {
+    idVenda: 103,
+    cliente: "Carla Souza",
+    data: "2025-08-10",
+    total: 75.25,
+    status: "Cancelada",
+  },
 ];
 
 const tbodyVendas = document.getElementById("vendas-tbody");
 const modalStatusVenda = document.getElementById("modalStatusVenda");
 const btnFecharStatusVenda = document.getElementById("btnFecharStatusVenda");
-const btnCancelarStatusVenda = document.getElementById("btnCancelarStatusVenda");
+const btnCancelarStatusVenda = document.getElementById(
+  "btnCancelarStatusVenda"
+);
 
 vendas.forEach((item) => {
   const tr = document.createElement("tr");
@@ -387,15 +435,43 @@ document.querySelectorAll(".btnAlterarStatusVenda").forEach((btn) => {
   btn.addEventListener("click", () => modalStatusVenda.classList.add("active"));
 });
 
-btnFecharStatusVenda?.addEventListener("click", () => modalStatusVenda.classList.remove("active"));
-btnCancelarStatusVenda?.addEventListener("click", () => modalStatusVenda.classList.remove("active"));
-window.addEventListener("click", (e) => { if(e.target===modalStatusVenda) modalStatusVenda.classList.remove("active"); });
+btnFecharStatusVenda?.addEventListener("click", () =>
+  modalStatusVenda.classList.remove("active")
+);
+btnCancelarStatusVenda?.addEventListener("click", () =>
+  modalStatusVenda.classList.remove("active")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalStatusVenda)
+    modalStatusVenda.classList.remove("active");
+});
 
 // ======================= TROCAS/DEVOLUÇÕES =======================
 const trocas = [
-  { idPedido:1, cliente:"Ana Maria", produto:"Livro A", dataSolicitacao:"2025-08-15", motivo:"Defeito na impressão", status:"Pendente" },
-  { idPedido:2, cliente:"Carlos Souza", produto:"Livro B", dataSolicitacao:"2025-08-18", motivo:"Troca por outro título", status:"Aprovada" },
-  { idPedido:3, cliente:"Fernanda Lima", produto:"Livro C", dataSolicitacao:"2025-08-20", motivo:"Devolução por arrependimento", status:"Recusada" }
+  {
+    idPedido: 1,
+    cliente: "Ana Maria",
+    produto: "Livro A",
+    dataSolicitacao: "2025-08-15",
+    motivo: "Defeito na impressão",
+    status: "Pendente",
+  },
+  {
+    idPedido: 2,
+    cliente: "Carlos Souza",
+    produto: "Livro B",
+    dataSolicitacao: "2025-08-18",
+    motivo: "Troca por outro título",
+    status: "Aprovada",
+  },
+  {
+    idPedido: 3,
+    cliente: "Fernanda Lima",
+    produto: "Livro C",
+    dataSolicitacao: "2025-08-20",
+    motivo: "Devolução por arrependimento",
+    status: "Recusada",
+  },
 ];
 
 const tbodyTrocas = document.getElementById("trocas-tbody");
@@ -423,13 +499,26 @@ document.querySelectorAll(".btnAlterarStatusTroca").forEach((btn) => {
   btn.addEventListener("click", () => modalStatusTroca.classList.add("active"));
 });
 
-btnFecharStatus?.addEventListener("click", () => modalStatusTroca.classList.remove("active"));
-btnCancelarStatus?.addEventListener("click", () => modalStatusTroca.classList.remove("active"));
-window.addEventListener("click", (e) => { if(e.target===modalStatusTroca) modalStatusTroca.classList.remove("active"); });
+btnFecharStatus?.addEventListener("click", () =>
+  modalStatusTroca.classList.remove("active")
+);
+btnCancelarStatus?.addEventListener("click", () =>
+  modalStatusTroca.classList.remove("active")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalStatusTroca)
+    modalStatusTroca.classList.remove("active");
+});
 
 // ======================= DETALHES CLIENTE =======================
-btnFecharDetalhes?.addEventListener("click", () => modalDetalhes.style.display = "none");
- btnFecharDetalhesBtn?.addEventListener("click", () => modalDetalhes.style.display = "none");
- window.addEventListener("click", (e) => {
-   if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
- });
+btnFecharDetalhes?.addEventListener(
+  "click",
+  () => (modalDetalhes.style.display = "none")
+);
+btnFecharDetalhesBtn?.addEventListener(
+  "click",
+  () => (modalDetalhes.style.display = "none")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
+});
