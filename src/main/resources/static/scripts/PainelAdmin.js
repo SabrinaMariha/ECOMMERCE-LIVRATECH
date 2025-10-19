@@ -46,7 +46,8 @@ let clientesCarregados = []; // Para armazenar os clientes e usar no filtro
 let clienteParaInativar = null; // variável global
 
 async function carregarClientes() {
-  tbodyClientes.innerHTML = "";
+  tbodyClientes.innerHTML =
+    '<tr><td colspan="8" style="text-align:center;">Carregando clientes...</td></tr>';
 
   try {
     const res = await fetch("/admin/clientes", {
@@ -60,29 +61,44 @@ async function carregarClientes() {
     const data = await res.json();
     clientesCarregados = data.clientes || [];
 
+    // Ordenar por ID antes de renderizar
+    clientesCarregados.sort((a, b) => a.id - b.id);
+
     renderizarClientes(clientesCarregados);
   } catch (err) {
-    tbodyClientes.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">${err.message}</td></tr>`;
+    tbodyClientes.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">${err.message}</td></tr>`;
   }
 }
 
 function renderizarClientes(clientes) {
-  tbodyClientes.innerHTML = "";
+  tbodyClientes.innerHTML = ""; // Limpa a tabela
+
+  if (clientes.length === 0) {
+    // Ajustado colspan para 8
+    tbodyClientes.innerHTML =
+      '<tr><td colspan="8" style="text-align:center;">Nenhum cliente encontrado.</td></tr>';
+    return;
+  }
 
   clientes.forEach((c) => {
     const tr = document.createElement("tr");
-    tr.dataset.clienteId = c.id;
+    tr.dataset.clienteId = c.id; // Mantém o dataset se precisar
     tr.innerHTML = `
-      <td>${c.nome}</td>
-      <td>${c.dataNascimento}</td>
-      <td>${c.cpf}</td>
+      <td>${c.id}</td>
+      <td>${c.nome || "-"}</td>
       <td>${
-        c.telefones.length
-          ? c.telefones[0].ddd + " " + c.telefones[0].numero
-          : ""
+        c.dataNascimento
+          ? new Date(c.dataNascimento).toLocaleDateString("pt-BR")
+          : "-"
       }</td>
-      <td>${c.email}</td>
-      <td>${c.status}</td>
+      <td>${c.cpf || "-"}</td>
+      <td>${
+        c.telefones && c.telefones.length > 0
+          ? `(${c.telefones[0].ddd}) ${c.telefones[0].numero}`
+          : "-"
+      }</td>
+      <td>${c.email || "-"}</td>
+      <td>${c.status || "-"}</td>
       <td>
         <button class="btn-acao-tabela btn-detalhes" data-id="${
           c.id
@@ -97,134 +113,126 @@ function renderizarClientes(clientes) {
     `;
     tbodyClientes.appendChild(tr);
 
-    // Botão detalhes
+    // --- Adiciona os event listeners novamente ---
+    // Botão detalhes (código existente)
     const btnDetalhes = tr.querySelector(".btn-detalhes");
-    btnDetalhes?.addEventListener("click", async (e) => {
-      try {
-        const clienteId = e.currentTarget.dataset.id;
-        const res = await fetch(`admin/cliente/${clienteId}`);
-        if (!res.ok) throw new Error("Erro ao carregar cliente");
-        const data = await res.json();
+    // ... (seu código existente para o event listener de detalhes) ...
+    if (btnDetalhes) {
+      btnDetalhes.addEventListener("click", async (e) => {
+        // Seu código para buscar e exibir detalhes aqui...
+        try {
+          const clienteId = e.currentTarget.dataset.id;
+          const res = await fetch(`admin/cliente/${clienteId}`);
+          if (!res.ok) throw new Error("Erro ao carregar cliente");
+          const data = await res.json();
 
-        const telefones =
-          data.telefones?.map((t) => `${t.ddd} ${t.numero}`).join(", ") || "-";
-        const enderecos =
-          data.enderecos
-            ?.map(
-              (e) =>
-                `${e.cep}, ${e.logradouro}, ${e.numero}, ${e.cidade}/${e.estado}`
-            )
-            .join("<br>") || "-";
-        const cartoes =
-          data.cartoesCredito
-            ?.map((cc) => {
-              const numero = cc.numeroCartao
-                ? `**** **** **** ${cc.numeroCartao.slice(-4)}`
-                : "Número indisponível";
-              const titular = cc.nomeImpresso || "-";
-              return `${numero}, ${titular}`;
-            })
-            .join("<br>") || "-";
+          // ... (código para formatar telefones, endereços, cartões) ...
+          const telefones =
+            data.telefones?.map((t) => `(${t.ddd}) ${t.numero}`).join(", ") ||
+            "-";
+          const enderecos =
+            data.enderecos
+              ?.map(
+                (e) => `${e.logradouro}, ${e.numero} - ${e.cidade}/${e.estado}`
+              )
+              .join("<br>") || "-";
+          const cartoes =
+            data.cartoesCredito
+              ?.map(
+                (cc) =>
+                  `**** **** **** ${cc.numeroCartao.slice(-4)} (${cc.bandeira})`
+              )
+              .join("<br>") || "-";
 
-        detalhesClienteContent.innerHTML = `
-         <table class="detalhes-tabela">
-           <tr>
-             <th>Nome</th>
-             <th>Gênero</th>
-             <th>Data de Nascimento</th>
-             <th>CPF</th>
-             <th>Telefones</th>
-             <th>E-mail</th>
-             <th>Status</th>
-             <th>Endereços</th>
-             <th>Cartões de Crédito</th>
-           </tr>
-           <tr>
-             <td>${data.nome}</td>
-             <td>${data.genero || "-"}</td>
-             <td>${data.dataNascimento}</td>
-             <td>${data.cpf}</td>
-             <td>${telefones}</td>
-             <td>${data.email}</td>
-             <td>${data.status}</td>
-             <td>${enderecos}</td>
-             <td>${cartoes}</td>
-           </tr>
-         </table>
-       `;
+          detalhesClienteContent.innerHTML = `
+              <table class="detalhes-tabela">
+                <tr><th>ID</th><th>Nome</th><th>Gênero</th><th>Nascimento</th><th>CPF</th><th>Telefones</th><th>E-mail</th><th>Status</th><th>Endereços</th><th>Cartões</th></tr>
+                <tr>
+                    <td>${data.id}</td>
+                    <td>${data.nome}</td>
+                    <td>${data.genero || "-"}</td>
+                    <td>${
+                      data.dataNascimento
+                        ? new Date(data.dataNascimento).toLocaleDateString(
+                            "pt-BR"
+                          )
+                        : "-"
+                    }</td>
+                    <td>${data.cpf}</td>
+                    <td>${telefones}</td>
+                    <td>${data.email}</td>
+                    <td>${data.status}</td>
+                    <td>${enderecos}</td>
+                    <td>${cartoes}</td>
+                </tr>
+              </table>
+            `;
+          modalDetalhes.style.display = "flex";
+          modalDetalhes.classList.add("active");
+        } catch (err) {
+          detalhesClienteContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
+          modalDetalhes.classList.add("active");
+          modalDetalhes.style.display = "flex";
+        }
+      });
+    }
 
-        modalDetalhes.style.display = "flex";
-        modalDetalhes.classList.add("active");
-      } catch (err) {
-        detalhesClienteContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
-        modalDetalhes.classList.add("active");
-        modalDetalhes.style.display = "flex";
-      }
-    });
-
-    // Botão histórico - MODIFICADO para usar fetch
+    // Botão histórico (código modificado no passo 1)
     const btnHistorico = tr.querySelector(".btn-historico");
+    // ... (seu código modificado para o event listener de histórico) ...
     if (btnHistorico) {
       btnHistorico.addEventListener("click", async (e) => {
         const clienteId = e.currentTarget.dataset.id;
         tbodyHistorico.innerHTML =
-          '<tr><td colspan="4" style="text-align:center;">Carregando histórico...</td></tr>'; // Feedback visual
-        modalHistorico.classList.add("active"); // Abre o modal antes de carregar
+          '<tr><td colspan="4" style="text-align:center;">Carregando histórico...</td></tr>';
+        modalHistorico.classList.add("active");
 
         try {
-          // Faz a chamada para o endpoint GET /cliente/{id}/pedidos
-          const res = await fetch(`/cliente/${clienteId}/pedidos`); // Usa o endpoint correto
-          if (!res.ok) {
+          const res = await fetch(`/cliente/${clienteId}/pedidos`);
+          if (!res.ok)
             throw new Error(`Erro ao buscar pedidos: ${res.statusText}`);
-          }
-          const pedidos = await res.json(); // Array de PedidoDTO
-
-          tbodyHistorico.innerHTML = ""; // Limpa o "Carregando..." ou dados antigos
+          const pedidos = await res.json();
+          tbodyHistorico.innerHTML = "";
 
           if (pedidos.length === 0) {
-            tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum pedido encontrado para este cliente.</td></tr>`;
+            tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum pedido encontrado.</td></tr>`;
           } else {
             pedidos.forEach((pedido) => {
               const trHist = document.createElement("tr");
-              // Formata a data (DD/MM/YYYY) e o valor (R$ XX,XX)
               const dataFormatada = new Date(pedido.data).toLocaleDateString(
-                "pt-BR",
-                {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }
-              ); // Adiciona hora
+                "pt-BR"
+              );
               const valorFormatado = pedido.valorTotal.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               });
-
               trHist.innerHTML = `
-                <td>${pedido.id}</td> 
-                <td>${dataFormatada}</td>
-                <td>${valorFormatado}</td> 
-                <td>${pedido.status || "N/A"}</td> 
-              `;
+                            <td>${pedido.id}</td>
+                            <td>${dataFormatada}</td>
+                            <td>${valorFormatado}</td>
+                            <td>${pedido.status || "N/A"}</td>
+                        `;
               tbodyHistorico.appendChild(trHist);
             });
           }
         } catch (err) {
           console.error("Erro ao carregar histórico:", err);
-          tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Erro ao carregar histórico: ${err.message}</td></tr>`;
+          tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Erro: ${err.message}</td></tr>`;
         }
       });
     }
 
-    // Botão inativar
-    tr.querySelector(".btn-inativar")?.addEventListener("click", (e) => {
-      clienteParaInativar = e.currentTarget.dataset.id;
-      inativarModal.style.display = "flex";
-    });
-  });
-}
+    // Botão inativar (código existente)
+    const btnInativar = tr.querySelector(".btn-inativar");
+    // ... (seu código existente para o event listener de inativar) ...
+    if (btnInativar) {
+      btnInativar.addEventListener("click", (e) => {
+        clienteParaInativar = e.currentTarget.dataset.id;
+        inativarModal.style.display = "flex";
+      });
+    }
+  }); // Fim do forEach
+} // Fim da função renderizarClientes
 
 carregarClientes();
 
@@ -236,7 +244,10 @@ modalHistorico?.addEventListener("click", (e) => {
   if (e.target === modalHistorico) modalHistorico.classList.remove("active");
 });
 
-btnFecharInativar?.addEventListener("click", () => (inativarModal.style.display = "none"));
+btnFecharInativar?.addEventListener(
+  "click",
+  () => (inativarModal.style.display = "none")
+);
 btnNao?.addEventListener("click", () => (inativarModal.style.display = "none"));
 btnSim?.addEventListener("click", () => (inativarModal.style.display = "none"));
 window.addEventListener("click", (e) => {
