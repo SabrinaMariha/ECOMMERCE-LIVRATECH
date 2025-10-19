@@ -1,42 +1,3 @@
-const historicoTransacoes = {
-  "Daniel Almeida Andrade": [
-    {
-      dataHora: "20/08/2025 10:15",
-      valor: 150.0,
-      frete: 10.0,
-      status: "Concluída",
-    },
-    {
-      dataHora: "15/07/2025 14:40",
-      valor: 200.0,
-      frete: 15.0,
-      status: "Pendente",
-    },
-  ],
-  "Stella Dias Andrade": [
-    {
-      dataHora: "10/08/2025 12:30",
-      valor: 300.0,
-      frete: 20.0,
-      status: "Concluída",
-    },
-  ],
-  "Beatriz da Costa Santos Dias Andrade": [
-    {
-      dataHora: "01/08/2025 09:00",
-      valor: 120.0,
-      frete: 8.0,
-      status: "Concluída",
-    },
-    {
-      dataHora: "05/08/2025 16:45",
-      valor: 250.0,
-      frete: 12.0,
-      status: "Pendente",
-    },
-  ],
-};
-
 // ======================= CONTROLE DE ABAS =======================
 const buttons = document.querySelectorAll(".menu-btn");
 const sections = document.querySelectorAll(".section");
@@ -51,9 +12,9 @@ buttons.forEach((btn) => {
     if (section) section.classList.add("active");
 
     // Fechar todos os modais que usam a classe 'active'
-    document.querySelectorAll(".modal.active").forEach((modal) =>
-      modal.classList.remove("active")
-    );
+    document
+      .querySelectorAll(".modal.active")
+      .forEach((modal) => modal.classList.remove("active"));
 
     // Fechar modais que usam style.display
     ["inativar-modal", "modalEditarEstoque"].forEach((id) => {
@@ -77,13 +38,16 @@ const btnSim = inativarModal?.querySelector(".btn-sim");
 const modalDetalhes = document.getElementById("modalDetalhesCliente");
 const btnFecharDetalhes = document.getElementById("btnFecharDetalhes");
 const btnFecharDetalhesBtn = document.getElementById("btnFecharDetalhesBtn");
-const detalhesClienteContent = document.getElementById("detalhesClienteContent");
+const detalhesClienteContent = document.getElementById(
+  "detalhesClienteContent"
+);
 
 let clientesCarregados = []; // Para armazenar os clientes e usar no filtro
 let clienteParaInativar = null; // variável global
 
 async function carregarClientes() {
-  tbodyClientes.innerHTML = "";
+  tbodyClientes.innerHTML =
+    '<tr><td colspan="8" style="text-align:center;">Carregando clientes...</td></tr>';
 
   try {
     const res = await fetch("/admin/clientes", {
@@ -97,29 +61,44 @@ async function carregarClientes() {
     const data = await res.json();
     clientesCarregados = data.clientes || [];
 
+    // Ordenar por ID antes de renderizar
+    clientesCarregados.sort((a, b) => a.id - b.id);
+
     renderizarClientes(clientesCarregados);
   } catch (err) {
-    tbodyClientes.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">${err.message}</td></tr>`;
+    tbodyClientes.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">${err.message}</td></tr>`;
   }
 }
 
 function renderizarClientes(clientes) {
-  tbodyClientes.innerHTML = "";
+  tbodyClientes.innerHTML = ""; // Limpa a tabela
+
+  if (clientes.length === 0) {
+    // Ajustado colspan para 8
+    tbodyClientes.innerHTML =
+      '<tr><td colspan="8" style="text-align:center;">Nenhum cliente encontrado.</td></tr>';
+    return;
+  }
 
   clientes.forEach((c) => {
     const tr = document.createElement("tr");
-    tr.dataset.clienteId = c.id;
+    tr.dataset.clienteId = c.id; // Mantém o dataset se precisar
     tr.innerHTML = `
-      <td>${c.nome}</td>
-      <td>${c.dataNascimento}</td>
-      <td>${c.cpf}</td>
+      <td>${c.id}</td>
+      <td>${c.nome || "-"}</td>
       <td>${
-        c.telefones.length
-          ? c.telefones[0].ddd + " " + c.telefones[0].numero
-          : ""
+        c.dataNascimento
+          ? new Date(c.dataNascimento).toLocaleDateString("pt-BR")
+          : "-"
       }</td>
-      <td>${c.email}</td>
-      <td>${c.status}</td>
+      <td>${c.cpf || "-"}</td>
+      <td>${
+        c.telefones && c.telefones.length > 0
+          ? `(${c.telefones[0].ddd}) ${c.telefones[0].numero}`
+          : "-"
+      }</td>
+      <td>${c.email || "-"}</td>
+      <td>${c.status || "-"}</td>
       <td>
         <button class="btn-acao-tabela btn-detalhes" data-id="${
           c.id
@@ -134,103 +113,126 @@ function renderizarClientes(clientes) {
     `;
     tbodyClientes.appendChild(tr);
 
-    // Botão detalhes
+    // --- Adiciona os event listeners novamente ---
+    // Botão detalhes (código existente)
     const btnDetalhes = tr.querySelector(".btn-detalhes");
-    btnDetalhes?.addEventListener("click", async (e) => {
-      try {
+    // ... (seu código existente para o event listener de detalhes) ...
+    if (btnDetalhes) {
+      btnDetalhes.addEventListener("click", async (e) => {
+        // Seu código para buscar e exibir detalhes aqui...
+        try {
+          const clienteId = e.currentTarget.dataset.id;
+          const res = await fetch(`admin/cliente/${clienteId}`);
+          if (!res.ok) throw new Error("Erro ao carregar cliente");
+          const data = await res.json();
+
+          // ... (código para formatar telefones, endereços, cartões) ...
+          const telefones =
+            data.telefones?.map((t) => `(${t.ddd}) ${t.numero}`).join(", ") ||
+            "-";
+          const enderecos =
+            data.enderecos
+              ?.map(
+                (e) => `${e.logradouro}, ${e.numero} - ${e.cidade}/${e.estado}`
+              )
+              .join("<br>") || "-";
+          const cartoes =
+            data.cartoesCredito
+              ?.map(
+                (cc) =>
+                  `**** **** **** ${cc.numeroCartao.slice(-4)} (${cc.bandeira})`
+              )
+              .join("<br>") || "-";
+
+          detalhesClienteContent.innerHTML = `
+              <table class="detalhes-tabela">
+                <tr><th>ID</th><th>Nome</th><th>Gênero</th><th>Nascimento</th><th>CPF</th><th>Telefones</th><th>E-mail</th><th>Status</th><th>Endereços</th><th>Cartões</th></tr>
+                <tr>
+                    <td>${data.id}</td>
+                    <td>${data.nome}</td>
+                    <td>${data.genero || "-"}</td>
+                    <td>${
+                      data.dataNascimento
+                        ? new Date(data.dataNascimento).toLocaleDateString(
+                            "pt-BR"
+                          )
+                        : "-"
+                    }</td>
+                    <td>${data.cpf}</td>
+                    <td>${telefones}</td>
+                    <td>${data.email}</td>
+                    <td>${data.status}</td>
+                    <td>${enderecos}</td>
+                    <td>${cartoes}</td>
+                </tr>
+              </table>
+            `;
+          modalDetalhes.style.display = "flex";
+          modalDetalhes.classList.add("active");
+        } catch (err) {
+          detalhesClienteContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
+          modalDetalhes.classList.add("active");
+          modalDetalhes.style.display = "flex";
+        }
+      });
+    }
+
+    // Botão histórico (código modificado no passo 1)
+    const btnHistorico = tr.querySelector(".btn-historico");
+    // ... (seu código modificado para o event listener de histórico) ...
+    if (btnHistorico) {
+      btnHistorico.addEventListener("click", async (e) => {
         const clienteId = e.currentTarget.dataset.id;
-        const res = await fetch(`admin/cliente/${clienteId}`);
-        if (!res.ok) throw new Error("Erro ao carregar cliente");
-        const data = await res.json();
+        tbodyHistorico.innerHTML =
+          '<tr><td colspan="4" style="text-align:center;">Carregando histórico...</td></tr>';
+        modalHistorico.classList.add("active");
 
-        const telefones =
-          data.telefones
-            ?.map((t) => `${t.ddd} ${t.numero}`)
-            .join(", ") || "-";
-        const enderecos =
-          data.enderecos
-            ?.map(
-              (e) =>
-                `${e.cep}, ${e.logradouro}, ${e.numero}, ${e.cidade}/${e.estado}`
-            )
-            .join("<br>") || "-";
-        const cartoes =
-          data.cartoesCredito
-            ?.map((cc) => {
-              const numero = cc.numeroCartao
-                ? `**** **** **** ${cc.numeroCartao.slice(-4)}`
-                : "Número indisponível";
-              const titular = cc.nomeImpresso || "-";
-              return `${numero}, ${titular}`;
-            })
-            .join("<br>") || "-";
+        try {
+          const res = await fetch(`/cliente/${clienteId}/pedidos`);
+          if (!res.ok)
+            throw new Error(`Erro ao buscar pedidos: ${res.statusText}`);
+          const pedidos = await res.json();
+          tbodyHistorico.innerHTML = "";
 
-       detalhesClienteContent.innerHTML = `
-         <table class="detalhes-tabela">
-           <tr>
-             <th>Nome</th>
-             <th>Gênero</th>
-             <th>Data de Nascimento</th>
-             <th>CPF</th>
-             <th>Telefones</th>
-             <th>E-mail</th>
-             <th>Status</th>
-             <th>Endereços</th>
-             <th>Cartões de Crédito</th>
-           </tr>
-           <tr>
-             <td>${data.nome}</td>
-             <td>${data.genero || "-"}</td>
-             <td>${data.dataNascimento}</td>
-             <td>${data.cpf}</td>
-             <td>${telefones}</td>
-             <td>${data.email}</td>
-             <td>${data.status}</td>
-             <td>${enderecos}</td>
-             <td>${cartoes}</td>
-           </tr>
-         </table>
-       `;
+          if (pedidos.length === 0) {
+            tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum pedido encontrado.</td></tr>`;
+          } else {
+            pedidos.forEach((pedido) => {
+              const trHist = document.createElement("tr");
+              const dataFormatada = new Date(pedido.data).toLocaleDateString(
+                "pt-BR"
+              );
+              const valorFormatado = pedido.valorTotal.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              });
+              trHist.innerHTML = `
+                            <td>${pedido.id}</td>
+                            <td>${dataFormatada}</td>
+                            <td>${valorFormatado}</td>
+                            <td>${pedido.status || "N/A"}</td>
+                        `;
+              tbodyHistorico.appendChild(trHist);
+            });
+          }
+        } catch (err) {
+          console.error("Erro ao carregar histórico:", err);
+          tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center; color:red;">Erro: ${err.message}</td></tr>`;
+        }
+      });
+    }
 
-        modalDetalhes.style.display = "flex";
-        modalDetalhes.classList.add("active");
-      } catch (err) {
-        detalhesClienteContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
-        modalDetalhes.classList.add("active");
-        modalDetalhes.style.display = "flex";
-      }
-    });
-
-    // Botão histórico
-    tr.querySelector(".btn-historico")?.addEventListener("click", () => {
-      tbodyHistorico.innerHTML = "";
-      const transacoes = historicoTransacoes[c.nome] || [];
-
-      if (transacoes.length === 0) {
-        tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhuma transação encontrada</td></tr>`;
-      } else {
-        transacoes.forEach((t) => {
-          const trHist = document.createElement("tr");
-          trHist.innerHTML = `
-            <td>${t.dataHora}</td>
-            <td>R$ ${t.valor.toFixed(2)}</td>
-            <td>R$ ${t.frete.toFixed(2)}</td>
-            <td>${t.status}</td>
-          `;
-          tbodyHistorico.appendChild(trHist);
-        });
-      }
-
-      modalHistorico.classList.add("active");
-    });
-
-    // Botão inativar
-    tr.querySelector(".btn-inativar")?.addEventListener("click", (e) => {
-      clienteParaInativar = e.currentTarget.dataset.id;
-      inativarModal.style.display = "flex";
-    });
-  });
-}
+    // Botão inativar (código existente)
+    const btnInativar = tr.querySelector(".btn-inativar");
+    // ... (seu código existente para o event listener de inativar) ...
+    if (btnInativar) {
+      btnInativar.addEventListener("click", (e) => {
+        clienteParaInativar = e.currentTarget.dataset.id;
+        inativarModal.style.display = "flex";
+      });
+    }
+  }); // Fim do forEach
+} // Fim da função renderizarClientes
 
 carregarClientes();
 
@@ -256,10 +258,9 @@ window.addEventListener("click", (e) => {
 btnSim?.addEventListener("click", async () => {
   if (!clienteParaInativar) return;
   try {
-    const res = await fetch(
-      `/admin/cliente/${clienteParaInativar}/inativar`,
-      { method: "PATCH" }
-    );
+    const res = await fetch(`/admin/cliente/${clienteParaInativar}/inativar`, {
+      method: "PATCH",
+    });
     if (!res.ok) throw new Error("Erro ao inativar cliente");
     await carregarClientes();
     inativarModal.style.display = "none";
@@ -297,11 +298,13 @@ document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
       : "";
     return (
       (!filtros.nome || c.nome.toLowerCase().includes(filtros.nome)) &&
-      (!filtros.dataNascimento || c.dataNascimento === filtros.dataNascimento) &&
+      (!filtros.dataNascimento ||
+        c.dataNascimento === filtros.dataNascimento) &&
       (!filtros.cpf || c.cpf.toLowerCase().includes(filtros.cpf)) &&
       (!filtros.genero ||
         (c.genero && c.genero.toLowerCase().includes(filtros.genero))) &&
-      (!filtros.telefone || telefone.toLowerCase().includes(filtros.telefone)) &&
+      (!filtros.telefone ||
+        telefone.toLowerCase().includes(filtros.telefone)) &&
       (!filtros.email || c.email.toLowerCase().includes(filtros.email))
     );
   });
@@ -321,9 +324,33 @@ criarFiltro(
 // ... (resto do estoque, vendas, trocas e detalhes permanece igual)
 
 const estoque = [
-  { idLivro: 1, titulo: "Livro A", quantidade: 10, fornecedor: "Fornecedor X", dataEntrada: "2025-08-01", valorCusto: 50.0, status: "Ativo" },
-  { idLivro: 2, titulo: "Livro B", quantidade: 0, fornecedor: "Fornecedor Y", dataEntrada: "2025-08-05", valorCusto: 35.0, status: "Ativo" },
-  { idLivro: 3, titulo: "Livro C", quantidade: 5, fornecedor: "Fornecedor Z", dataEntrada: "2025-08-10", valorCusto: 42.5, status: "Ativo" }
+  {
+    idLivro: 1,
+    titulo: "Livro A",
+    quantidade: 10,
+    fornecedor: "Fornecedor X",
+    dataEntrada: "2025-08-01",
+    valorCusto: 50.0,
+    status: "Ativo",
+  },
+  {
+    idLivro: 2,
+    titulo: "Livro B",
+    quantidade: 0,
+    fornecedor: "Fornecedor Y",
+    dataEntrada: "2025-08-05",
+    valorCusto: 35.0,
+    status: "Ativo",
+  },
+  {
+    idLivro: 3,
+    titulo: "Livro C",
+    quantidade: 5,
+    fornecedor: "Fornecedor Z",
+    dataEntrada: "2025-08-10",
+    valorCusto: 42.5,
+    status: "Ativo",
+  },
 ];
 
 const tbodyEstoque = document.getElementById("estoque-tbody");
@@ -349,24 +376,56 @@ estoque.forEach((item) => {
 });
 
 document.querySelectorAll(".btnEditarEstoque").forEach((btn) => {
-  btn.addEventListener("click", () => modalEditarEstoque.style.display="flex");
+  btn.addEventListener(
+    "click",
+    () => (modalEditarEstoque.style.display = "flex")
+  );
 });
 
-btnFecharModalEstoque?.addEventListener("click", () => modalEditarEstoque.style.display="none");
-btnCancelarEditar?.addEventListener("click", () => modalEditarEstoque.style.display="none");
-window.addEventListener("click", (e) => { if(e.target===modalEditarEstoque) modalEditarEstoque.style.display="none"; });
+btnFecharModalEstoque?.addEventListener(
+  "click",
+  () => (modalEditarEstoque.style.display = "none")
+);
+btnCancelarEditar?.addEventListener(
+  "click",
+  () => (modalEditarEstoque.style.display = "none")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalEditarEstoque)
+    modalEditarEstoque.style.display = "none";
+});
 
 // ======================= VENDAS =======================
 const vendas = [
-  { idVenda:101, cliente:"Ana Maria", data:"2025-08-01", total:150.5, status:"Concluída" },
-  { idVenda:102, cliente:"Bruno Silva", data:"2025-08-05", total:320.0, status:"Pendente" },
-  { idVenda:103, cliente:"Carla Souza", data:"2025-08-10", total:75.25, status:"Cancelada" }
+  {
+    idVenda: 101,
+    cliente: "Ana Maria",
+    data: "2025-08-01",
+    total: 150.5,
+    status: "Concluída",
+  },
+  {
+    idVenda: 102,
+    cliente: "Bruno Silva",
+    data: "2025-08-05",
+    total: 320.0,
+    status: "Pendente",
+  },
+  {
+    idVenda: 103,
+    cliente: "Carla Souza",
+    data: "2025-08-10",
+    total: 75.25,
+    status: "Cancelada",
+  },
 ];
 
 const tbodyVendas = document.getElementById("vendas-tbody");
 const modalStatusVenda = document.getElementById("modalStatusVenda");
 const btnFecharStatusVenda = document.getElementById("btnFecharStatusVenda");
-const btnCancelarStatusVenda = document.getElementById("btnCancelarStatusVenda");
+const btnCancelarStatusVenda = document.getElementById(
+  "btnCancelarStatusVenda"
+);
 
 vendas.forEach((item) => {
   const tr = document.createElement("tr");
@@ -387,15 +446,43 @@ document.querySelectorAll(".btnAlterarStatusVenda").forEach((btn) => {
   btn.addEventListener("click", () => modalStatusVenda.classList.add("active"));
 });
 
-btnFecharStatusVenda?.addEventListener("click", () => modalStatusVenda.classList.remove("active"));
-btnCancelarStatusVenda?.addEventListener("click", () => modalStatusVenda.classList.remove("active"));
-window.addEventListener("click", (e) => { if(e.target===modalStatusVenda) modalStatusVenda.classList.remove("active"); });
+btnFecharStatusVenda?.addEventListener("click", () =>
+  modalStatusVenda.classList.remove("active")
+);
+btnCancelarStatusVenda?.addEventListener("click", () =>
+  modalStatusVenda.classList.remove("active")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalStatusVenda)
+    modalStatusVenda.classList.remove("active");
+});
 
 // ======================= TROCAS/DEVOLUÇÕES =======================
 const trocas = [
-  { idPedido:1, cliente:"Ana Maria", produto:"Livro A", dataSolicitacao:"2025-08-15", motivo:"Defeito na impressão", status:"Pendente" },
-  { idPedido:2, cliente:"Carlos Souza", produto:"Livro B", dataSolicitacao:"2025-08-18", motivo:"Troca por outro título", status:"Aprovada" },
-  { idPedido:3, cliente:"Fernanda Lima", produto:"Livro C", dataSolicitacao:"2025-08-20", motivo:"Devolução por arrependimento", status:"Recusada" }
+  {
+    idPedido: 1,
+    cliente: "Ana Maria",
+    produto: "Livro A",
+    dataSolicitacao: "2025-08-15",
+    motivo: "Defeito na impressão",
+    status: "Pendente",
+  },
+  {
+    idPedido: 2,
+    cliente: "Carlos Souza",
+    produto: "Livro B",
+    dataSolicitacao: "2025-08-18",
+    motivo: "Troca por outro título",
+    status: "Aprovada",
+  },
+  {
+    idPedido: 3,
+    cliente: "Fernanda Lima",
+    produto: "Livro C",
+    dataSolicitacao: "2025-08-20",
+    motivo: "Devolução por arrependimento",
+    status: "Recusada",
+  },
 ];
 
 const tbodyTrocas = document.getElementById("trocas-tbody");
@@ -423,13 +510,26 @@ document.querySelectorAll(".btnAlterarStatusTroca").forEach((btn) => {
   btn.addEventListener("click", () => modalStatusTroca.classList.add("active"));
 });
 
-btnFecharStatus?.addEventListener("click", () => modalStatusTroca.classList.remove("active"));
-btnCancelarStatus?.addEventListener("click", () => modalStatusTroca.classList.remove("active"));
-window.addEventListener("click", (e) => { if(e.target===modalStatusTroca) modalStatusTroca.classList.remove("active"); });
+btnFecharStatus?.addEventListener("click", () =>
+  modalStatusTroca.classList.remove("active")
+);
+btnCancelarStatus?.addEventListener("click", () =>
+  modalStatusTroca.classList.remove("active")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalStatusTroca)
+    modalStatusTroca.classList.remove("active");
+});
 
 // ======================= DETALHES CLIENTE =======================
-btnFecharDetalhes?.addEventListener("click", () => modalDetalhes.style.display = "none");
- btnFecharDetalhesBtn?.addEventListener("click", () => modalDetalhes.style.display = "none");
- window.addEventListener("click", (e) => {
-   if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
- });
+btnFecharDetalhes?.addEventListener(
+  "click",
+  () => (modalDetalhes.style.display = "none")
+);
+btnFecharDetalhesBtn?.addEventListener(
+  "click",
+  () => (modalDetalhes.style.display = "none")
+);
+window.addEventListener("click", (e) => {
+  if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
+});
