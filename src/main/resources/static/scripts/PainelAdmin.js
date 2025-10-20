@@ -9,19 +9,18 @@ buttons.forEach((btn) => {
 
     btn.classList.add("active");
     const section = document.getElementById(btn.dataset.section);
-    if (section) section.classList.add("active"); // Fechar todos os modais que usam a classe 'active' ou 'modal-filtro'
+    if (section) section.classList.add("active");
 
+    // Fechar todos os modais que usam a classe 'active'
     document
-      .querySelectorAll(".modal.active, .modal-filtro.active")
-      .forEach((modal) => modal.classList.remove("active")); // Fechar modais que usam style.display
+      .querySelectorAll(".modal.active")
+      .forEach((modal) => modal.classList.remove("active"));
 
-    ["inativar-modal", "modalEditarEstoque", "modalDetalhesCliente"].forEach(
-      (id) => {
-        // Inclui modalDetalhesCliente
-        const modal = document.getElementById(id);
-        if (modal) modal.style.display = "none";
-      }
-    );
+    // Fechar modais que usam style.display
+    ["inativar-modal", "modalEditarEstoque"].forEach((id) => {
+      const modal = document.getElementById(id);
+      if (modal) modal.style.display = "none";
+    });
   });
 });
 
@@ -38,17 +37,17 @@ const btnSim = inativarModal?.querySelector(".btn-sim");
 
 const modalDetalhes = document.getElementById("modalDetalhesCliente");
 const btnFecharDetalhes = document.getElementById("btnFecharDetalhes");
-// const btnFecharDetalhesBtn = document.getElementById("btnFecharDetalhesBtn"); // REMOVIDO
+const btnFecharDetalhesBtn = document.getElementById("btnFecharDetalhesBtn");
 const detalhesClienteContent = document.getElementById(
   "detalhesClienteContent"
 );
 
-let clientesCarregados = [];
-let clienteParaInativar = null;
+let clientesCarregados = []; // Para armazenar os clientes e usar no filtro
+let clienteParaInativar = null; // variável global
 
 async function carregarClientes() {
   tbodyClientes.innerHTML =
-    '<tr><td colspan="8" style="text-align:center;">Carregando clientes...</td></tr>'; // Colspan 8 ok
+    '<tr><td colspan="8" style="text-align:center;">Carregando clientes...</td></tr>';
 
   try {
     const res = await fetch("/admin/clientes", {
@@ -61,25 +60,29 @@ async function carregarClientes() {
 
     const data = await res.json();
     clientesCarregados = data.clientes || [];
+
+    // Ordenar por ID antes de renderizar
     clientesCarregados.sort((a, b) => a.id - b.id);
+
     renderizarClientes(clientesCarregados);
   } catch (err) {
-    tbodyClientes.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">${err.message}</td></tr>`; // Colspan 8 ok
+    tbodyClientes.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">${err.message}</td></tr>`;
   }
 }
 
 function renderizarClientes(clientes) {
-  tbodyClientes.innerHTML = "";
+  tbodyClientes.innerHTML = ""; // Limpa a tabela
 
   if (clientes.length === 0) {
+    // Ajustado colspan para 8
     tbodyClientes.innerHTML =
-      '<tr><td colspan="8" style="text-align:center;">Nenhum cliente encontrado.</td></tr>'; // Colspan 8 ok
+      '<tr><td colspan="8" style="text-align:center;">Nenhum cliente encontrado.</td></tr>';
     return;
   }
 
   clientes.forEach((c) => {
     const tr = document.createElement("tr");
-    tr.dataset.clienteId = c.id;
+    tr.dataset.clienteId = c.id; // Mantém o dataset se precisar
     tr.innerHTML = `
       <td>${c.id}</td>
       <td>${c.nome || "-"}</td>
@@ -110,19 +113,20 @@ function renderizarClientes(clientes) {
     `;
     tbodyClientes.appendChild(tr);
 
-    // --- Listeners ---
+    // --- Adiciona os event listeners novamente ---
+    // Botão detalhes (código existente)
     const btnDetalhes = tr.querySelector(".btn-detalhes");
+    // ... (seu código existente para o event listener de detalhes) ...
     if (btnDetalhes) {
       btnDetalhes.addEventListener("click", async (e) => {
-        detalhesClienteContent.innerHTML =
-          '<p style="text-align:center;">Carregando detalhes...</p>';
-        modalDetalhes.style.display = "flex";
-        modalDetalhes.classList.add("active");
+        // Seu código para buscar e exibir detalhes aqui...
         try {
           const clienteId = e.currentTarget.dataset.id;
-          const res = await fetch(`/admin/cliente/${clienteId}`); // Corrigido
-          if (!res.ok) throw new Error("Erro ao carregar detalhes do cliente");
+          const res = await fetch(`admin/cliente/${clienteId}`);
+          if (!res.ok) throw new Error("Erro ao carregar cliente");
           const data = await res.json();
+
+          // ... (código para formatar telefones, endereços, cartões) ...
           const telefones =
             data.telefones?.map((t) => `(${t.ddd}) ${t.numero}`).join(", ") ||
             "-";
@@ -139,66 +143,75 @@ function renderizarClientes(clientes) {
                   `**** **** **** ${cc.numeroCartao.slice(-4)} (${cc.bandeira})`
               )
               .join("<br>") || "-";
+
           detalhesClienteContent.innerHTML = `
-                    <table class="detalhes-tabela">
-                    <thead> <tr><th>ID</th><th>Nome</th><th>Gênero</th><th>Nascimento</th><th>CPF</th><th>Telefones</th><th>E-mail</th><th>Status</th><th>Endereços</th><th>Cartões</th></tr></thead>
-                    <tbody><tr>
-                        <td>${data.id}</td><td>${data.nome}</td><td>${
-            data.genero || "-"
-          }</td><td>${
-            data.dataNascimento
-              ? new Date(data.dataNascimento).toLocaleDateString("pt-BR")
-              : "-"
-          }</td><td>${data.cpf}</td>
-                        <td>${telefones}</td><td>${data.email}</td><td>${
-            data.status
-          }</td><td>${enderecos}</td><td>${cartoes}</td>
-                    </tr></tbody>
-                    </table>`;
+              <table class="detalhes-tabela">
+                <tr><th>ID</th><th>Nome</th><th>Gênero</th><th>Nascimento</th><th>CPF</th><th>Telefones</th><th>E-mail</th><th>Status</th><th>Endereços</th><th>Cartões</th></tr>
+                <tr>
+                    <td>${data.id}</td>
+                    <td>${data.nome}</td>
+                    <td>${data.genero || "-"}</td>
+                    <td>${
+                      data.dataNascimento
+                        ? new Date(data.dataNascimento).toLocaleDateString(
+                            "pt-BR"
+                          )
+                        : "-"
+                    }</td>
+                    <td>${data.cpf}</td>
+                    <td>${telefones}</td>
+                    <td>${data.email}</td>
+                    <td>${data.status}</td>
+                    <td>${enderecos}</td>
+                    <td>${cartoes}</td>
+                </tr>
+              </table>
+            `;
+          modalDetalhes.style.display = "flex";
+          modalDetalhes.classList.add("active");
         } catch (err) {
-          console.error("Erro ao buscar detalhes:", err);
-          detalhesClienteContent.innerHTML = `<p style="color:red; text-align:center;">${err.message}</p>`;
+          detalhesClienteContent.innerHTML = `<p style="color:red;">${err.message}</p>`;
+          modalDetalhes.classList.add("active");
+          modalDetalhes.style.display = "flex";
         }
       });
     }
 
+    // Botão histórico (código modificado no passo 1)
     const btnHistorico = tr.querySelector(".btn-historico");
+    // ... (seu código modificado para o event listener de histórico) ...
     if (btnHistorico) {
       btnHistorico.addEventListener("click", async (e) => {
         const clienteId = e.currentTarget.dataset.id;
         tbodyHistorico.innerHTML =
           '<tr><td colspan="4" style="text-align:center;">Carregando histórico...</td></tr>';
         modalHistorico.classList.add("active");
+
         try {
-          const res = await fetch(`/cliente/${clienteId}/pedidos`); // Correto
+          const res = await fetch(`/cliente/${clienteId}/pedidos`);
           if (!res.ok)
             throw new Error(`Erro ao buscar pedidos: ${res.statusText}`);
           const pedidos = await res.json();
           tbodyHistorico.innerHTML = "";
+
           if (pedidos.length === 0) {
             tbodyHistorico.innerHTML = `<tr><td colspan="4" style="text-align:center;">Nenhum pedido encontrado.</td></tr>`;
           } else {
             pedidos.forEach((pedido) => {
               const trHist = document.createElement("tr");
               const dataFormatada = new Date(pedido.data).toLocaleDateString(
-                "pt-BR",
-                {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }
+                "pt-BR"
               );
               const valorFormatado = pedido.valorTotal.toLocaleString("pt-BR", {
                 style: "currency",
                 currency: "BRL",
               });
-              trHist.innerHTML = `<td>${
-                pedido.id
-              }</td><td>${dataFormatada}</td><td>${valorFormatado}</td><td>${
-                pedido.status || "N/A"
-              }</td>`;
+              trHist.innerHTML = `
+                            <td>${pedido.id}</td>
+                            <td>${dataFormatada}</td>
+                            <td>${valorFormatado}</td>
+                            <td>${pedido.status || "N/A"}</td>
+                        `;
               tbodyHistorico.appendChild(trHist);
             });
           }
@@ -209,15 +222,17 @@ function renderizarClientes(clientes) {
       });
     }
 
+    // Botão inativar (código existente)
     const btnInativar = tr.querySelector(".btn-inativar");
+    // ... (seu código existente para o event listener de inativar) ...
     if (btnInativar) {
       btnInativar.addEventListener("click", (e) => {
         clienteParaInativar = e.currentTarget.dataset.id;
         inativarModal.style.display = "flex";
       });
     }
-  });
-}
+  }); // Fim do forEach
+} // Fim da função renderizarClientes
 
 carregarClientes();
 
@@ -228,295 +243,247 @@ btnFecharHistorico?.addEventListener("click", () =>
 modalHistorico?.addEventListener("click", (e) => {
   if (e.target === modalHistorico) modalHistorico.classList.remove("active");
 });
+
 btnFecharInativar?.addEventListener(
   "click",
   () => (inativarModal.style.display = "none")
 );
 btnNao?.addEventListener("click", () => (inativarModal.style.display = "none"));
+btnSim?.addEventListener("click", () => (inativarModal.style.display = "none"));
 window.addEventListener("click", (e) => {
   if (e.target === inativarModal) inativarModal.style.display = "none";
 });
 
+// botão "sim" (inativar)
 btnSim?.addEventListener("click", async () => {
   if (!clienteParaInativar) return;
   try {
     const res = await fetch(`/admin/cliente/${clienteParaInativar}/inativar`, {
       method: "PATCH",
     });
-    if (!res.ok) {
-      const errorMsg = await res.text();
-      throw new Error(`Erro ao inativar cliente: ${errorMsg}`);
-    }
+    if (!res.ok) throw new Error("Erro ao inativar cliente");
     await carregarClientes();
     inativarModal.style.display = "none";
     clienteParaInativar = null;
-    alert("Cliente inativado com sucesso!");
   } catch (err) {
-    console.error("Erro ao inativar:", err);
     alert(err.message);
   }
 });
 
-btnFecharDetalhes?.addEventListener("click", () => {
-  modalDetalhes.style.display = "none";
-  modalDetalhes.classList.remove("active");
-});
-window.addEventListener("click", (e) => {
-  if (e.target === modalDetalhes) {
-    modalDetalhes.style.display = "none";
-    modalDetalhes.classList.remove("active");
-  }
-});
+// ======================= FILTROS =======================
+// function criarFiltro(btnAbrir, painel, btnFechar, btnLimpar, formId) {
+//   btnAbrir?.addEventListener("click", () => painel?.classList.toggle("active"));
+//   btnFechar?.addEventListener("click", () =>
+//     painel?.classList.remove("active")
+//   );
+//   btnLimpar?.addEventListener("click", () =>
+//     document.getElementById(formId)?.reset()
+//   );
+// }
 
-// ======================= FILTROS (GENÉRICO E CLIENTES) =======================
-function criarFiltro(
-  btnAbrirId,
-  painelId,
-  btnFecharId,
-  btnLimparId,
-  formId,
-  btnFiltrarId,
-  funcaoFiltrar
-) {
-  const btnAbrir = document.getElementById(btnAbrirId);
-  const painel = document.getElementById(painelId);
-  const btnFechar = document.getElementById(btnFecharId);
-  const btnLimpar = document.getElementById(btnLimparId);
-  const form = document.getElementById(formId);
-  const btnFiltrar = document.getElementById(btnFiltrarId);
-
-  btnAbrir?.addEventListener("click", () => painel?.classList.toggle("active"));
-  btnFechar?.addEventListener("click", () =>
-    painel?.classList.remove("active")
-  );
-  btnLimpar?.addEventListener("click", () => {
-    form?.reset();
-    // Se for o filtro de clientes, recarrega todos
-    if (formId === "formFiltro") {
-      carregarClientes();
-    }
-    // Adicionar lógica similar para outros filtros se necessário
-  });
-  btnFiltrar?.addEventListener("click", () => {
-    if (form && funcaoFiltrar) {
-      funcaoFiltrar(form);
-    }
-  });
-}
-
-async function filtrarClientes(form) {
+document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
+  const form = document.getElementById("formFiltro");
   const filtros = {
-    nome: form.nome.value || null,
-    dataNascimento: form.dataNascimento.value || null,
-    cpf: form.cpf.value || null,
-    email: form.email.value || null,
+    nome: form.nome.value.toLowerCase(),
+    dataNascimento: form.dataNascimento.value,
+    cpf: form.cpf.value.toLowerCase(),
+    genero: form.genero.value.toLowerCase(),
+    telefone: form.telefone.value.toLowerCase(),
+    email: form.email.value.toLowerCase(),
   };
-  Object.keys(filtros).forEach(
-    (key) => filtros[key] === null && delete filtros[key]
-  );
-  tbodyClientes.innerHTML =
-    '<tr><td colspan="8" style="text-align:center;">Filtrando...</td></tr>';
-  try {
-    const res = await fetch("/admin/clientes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(filtros),
-    });
-    if (!res.ok) throw new Error("Erro ao filtrar clientes");
-    const data = await res.json();
-    const clientesFiltrados = data.clientes || [];
-    clientesFiltrados.sort((a, b) => a.id - b.id);
-    renderizarClientes(clientesFiltrados);
-  } catch (err) {
-    tbodyClientes.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">${err.message}</td></tr>`;
-  }
-}
 
-criarFiltro(
-  "btnAbrirFiltro",
-  "painelFiltro",
-  "btnFecharFiltro",
-  "btnLimpar",
-  "formFiltro",
-  "btnFiltrarClientes",
-  filtrarClientes
-);
+  const clientesFiltrados = clientesCarregados.filter((c) => {
+    const telefone = c.telefones.length
+      ? c.telefones[0].ddd + " " + c.telefones[0].numero
+      : "";
+    return (
+      (!filtros.nome || c.nome.toLowerCase().includes(filtros.nome)) &&
+      (!filtros.dataNascimento ||
+        c.dataNascimento === filtros.dataNascimento) &&
+      (!filtros.cpf || c.cpf.toLowerCase().includes(filtros.cpf)) &&
+      (!filtros.genero ||
+        (c.genero && c.genero.toLowerCase().includes(filtros.genero))) &&
+      (!filtros.telefone ||
+        telefone.toLowerCase().includes(filtros.telefone)) &&
+      (!filtros.email || c.email.toLowerCase().includes(filtros.email))
+    );
+  });
+
+  renderizarClientes(clientesFiltrados);
+});
+
+// criarFiltro(
+//   document.getElementById("btnAbrirFiltro"),
+//   document.getElementById("painelFiltro"),
+//   document.getElementById("btnFecharFiltro"),
+//   document.getElementById("btnLimpar"),
+//   "formFiltro"
+// );
 
 // ======================= ESTOQUE =======================
 const tbodyEstoque = document.getElementById("estoque-tbody");
 const modalEditarEstoque = document.getElementById("modalEditarEstoque");
-const formEditarEstoque = document.getElementById("formEditarEstoque");
+const formEditarEstoque = document.getElementById("formEditarEstoque"); // Pegar o form
 const btnFecharModalEstoque = document.getElementById("btnFecharModalEstoque");
 const btnCancelarEditar = document.getElementById("btnCancelarEditar");
-let produtoParaEditarId = null;
+let produtoParaEditarId = null; // Para guardar o ID do produto sendo editado
 
+// Função para buscar e renderizar produtos no estoque
 async function carregarEstoque() {
-  if (!tbodyEstoque) return;
-  tbodyEstoque.innerHTML =
-    '<tr><td colspan="7" style="text-align:center;">Carregando estoque...</td></tr>';
-
-  try {
-    const res = await fetch("/produtos");
-    if (!res.ok) throw new Error("Erro ao carregar estoque");
-    const produtos = await res.json();
-
-    tbodyEstoque.innerHTML = "";
-
-    if (produtos.length === 0) {
-      tbodyEstoque.innerHTML =
-        '<tr><td colspan="7" style="text-align:center;">Nenhum produto encontrado.</td></tr>';
-      return;
-    }
-
-    produtos.sort((a, b) => a.id - b.id);
-
-    produtos.forEach((produto) => {
-      const tr = document.createElement("tr");
-      tr.dataset.produtoId = produto.id;
-      tr.innerHTML = `
-                <td>${produto.id}</td>          
-                <td>${produto.nome || "-"}</td> 
-                <td>${produto.autor || "-"}</td> 
-                <td>${
-        produto.preco
-          ? produto.preco.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })
-          : "-"
-      }</td> 
-                <td>${produto.estoque !== null ? produto.estoque : "-"}</td> 
-                <td>Ativo</td>
-                <td>
-                    <button class="btn-acao-tabela btnEditarEstoque" data-id="${
-        produto.id
-      }"><i class='bx bx-edit'></i></button>
-                </td>
-            `;
-      tbodyEstoque.appendChild(tr); // Listener botão Editar
-
-      const btnEditar = tr.querySelector(".btnEditarEstoque");
-      if (btnEditar) {
-        btnEditar.addEventListener("click", (e) => {
-          // Removido async desnecessário
-          produtoParaEditarId = e.currentTarget.dataset.id;
-          abrirModalEditarEstoque(produtoParaEditarId);
-        });
-      }
-    });
-  } catch (err) {
-    console.error("Erro ao carregar estoque:", err);
-    tbodyEstoque.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">${err.message}</td></tr>`;
-  }
-}
-
-async function abrirModalEditarEstoque(produtoId) {
-  if (!formEditarEstoque || !modalEditarEstoque) return;
-  formEditarEstoque.reset();
-  formEditarEstoque.querySelector("#editId").value = ""; // Limpa ID oculto
-
-  try {
-    const res = await fetch(`/produtos/${produtoId}`);
-    if (!res.ok) throw new Error("Produto não encontrado para edição.");
-    const produto = await res.json();
-
-    formEditarEstoque.querySelector("#editId").value = produto.id;
-    formEditarEstoque.querySelector("#editNome").value = produto.nome || "";
-    formEditarEstoque.querySelector("#editAutor").value = produto.autor || "";
-    formEditarEstoque.querySelector("#editDescricao").value =
-      produto.descricao || "";
-    formEditarEstoque.querySelector("#editDescDetalhada").value =
-      produto.descDetalhada || "";
-    formEditarEstoque.querySelector("#editPreco").value =
-      produto.preco !== null ? produto.preco : "";
-    formEditarEstoque.querySelector("#editEstoque").value =
-      produto.estoque !== null ? produto.estoque : "";
-    formEditarEstoque.querySelector("#editImagemUrl").value =
-      produto.imagemUrl || "";
-
-    modalEditarEstoque.style.display = "flex"; // Abre o modal
-  } catch (err) {
-    console.error("Erro ao buscar produto para edição:", err);
-    alert(`Erro ao carregar dados do produto: ${err.message}`);
-  }
-}
-
-if (formEditarEstoque) {
-  formEditarEstoque.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    // Pega ID do campo oculto, mais seguro que variável global
-    const idDoProduto = formEditarEstoque.querySelector("#editId").value;
-    if (!idDoProduto) {
-      alert("ID do produto não encontrado no formulário.");
-      return;
-    }
-
-    const novaQuantidadeInput = formEditarEstoque.querySelector("#editEstoque");
-    if (!novaQuantidadeInput || novaQuantidadeInput.value === "") {
-      alert("Por favor, insira uma quantidade válida.");
-      return;
-    }
-    const novaQuantidade = parseInt(novaQuantidadeInput.value);
-    if (isNaN(novaQuantidade) || novaQuantidade < 0) {
-      alert("A quantidade deve ser um número não negativo.");
-      return;
-    }
+    if (!tbodyEstoque) return;
+    tbodyEstoque.innerHTML = '<tr><td colspan="7" style="text-align:center;">Carregando estoque...</td></tr>'; // Colspan 8
 
     try {
-      const res = await fetch(`/produtos/${idDoProduto}/estoque`, {
-        // Usa ID do form
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantidade: novaQuantidade }),
-      });
+        const res = await fetch("/produtos"); // Chama GET /produtos
+        if (!res.ok) throw new Error("Erro ao carregar estoque");
+        const produtos = await res.json(); // Lista de objetos Produto
 
-      if (!res.ok) {
-        const errorMsg = await res.text();
-        throw new Error(`Erro ao atualizar estoque: ${errorMsg}`);
-      }
+        tbodyEstoque.innerHTML = ""; // Limpa a tabela
 
-      alert("Estoque atualizado com sucesso!");
-      modalEditarEstoque.style.display = "none";
-      produtoParaEditarId = null; // Limpa variável global se ainda usar
-      await carregarEstoque(); // Recarrega a tabela
+        if (produtos.length === 0) {
+            tbodyEstoque.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum produto encontrado.</td></tr>';
+            return;
+        }
+
+        // Ordenar por ID (opcional, mas consistente com clientes)
+        produtos.sort((a, b) => a.id - b.id);
+
+        produtos.forEach((produto) => {
+            const tr = document.createElement("tr");
+            tr.dataset.produtoId = produto.id; // Adiciona dataset para fácil acesso
+            tr.innerHTML = `
+                <td>${produto.id}</td>          
+                <td>${produto.nome || '-'}</td> 
+                <td>${produto.autor || '-'}</td>
+                <td>${produto.preco ? produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</td>
+                <td>${produto.estoque !== null ? produto.estoque : '-'}</td>
+                <td>Ativo</td>
+                <td>
+                    <button class="btn-acao-tabela btnEditarEstoque" data-id="${produto.id}"><i class='bx bx-edit'></i></button>
+                </td>
+            `;
+            tbodyEstoque.appendChild(tr);
+
+            // Adiciona listener ao botão Editar desta linha
+            const btnEditar = tr.querySelector(".btnEditarEstoque");
+            if (btnEditar) {
+                btnEditar.addEventListener("click", async (e) => {
+                    produtoParaEditarId = e.currentTarget.dataset.id; // Guarda o ID
+                    abrirModalEditarEstoque(produtoParaEditarId); // Chama função para buscar dados e abrir modal
+                });
+            }
+        });
+
     } catch (err) {
-      console.error("Erro ao salvar estoque:", err);
-      alert(`Erro ao salvar: ${err.message}`);
+        console.error("Erro ao carregar estoque:", err);
+        tbodyEstoque.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">${err.message}</td></tr>`;
     }
-  });
 }
 
+// Função para buscar dados do produto e preencher o modal
+async function abrirModalEditarEstoque(produtoId) {
+    if (!formEditarEstoque || !modalEditarEstoque) return;
+
+    formEditarEstoque.reset(); // Limpa o formulário
+
+    try {
+        const res = await fetch(`/produtos/${produtoId}`); // Chama GET /produtos/{id}
+        if (!res.ok) throw new Error('Produto não encontrado para edição.');
+        const produto = await res.json();
+
+        // Preenche o formulário no modal com os dados do produto
+        formEditarEstoque.querySelector("#editId").value = produto.id; // Campo ID (somente leitura)
+        formEditarEstoque.querySelector("#editNome").value = produto.nome || '';
+        formEditarEstoque.querySelector("#editAutor").value = produto.autor || '';
+        formEditarEstoque.querySelector("#editDescricao").value = produto.descricao || '';
+        formEditarEstoque.querySelector("#editDescDetalhada").value = produto.descDetalhada || '';
+        formEditarEstoque.querySelector("#editPreco").value = produto.preco !== null ? produto.preco : '';
+        formEditarEstoque.querySelector("#editEstoque").value = produto.estoque !== null ? produto.estoque : '';
+        formEditarEstoque.querySelector("#editImagemUrl").value = produto.imagemUrl || '';
+        // Status não vem do backend, pode ser removido ou gerenciado de outra forma se necessário
+        // formEditarEstoque.querySelector("#editStatus").value = "Ativo"; 
+
+        modalEditarEstoque.style.display = "flex"; // Abre o modal
+
+    } catch (err) {
+        console.error("Erro ao buscar produto para edição:", err);
+        alert(`Erro ao carregar dados do produto: ${err.message}`);
+    }
+}
+
+// Listener para o submit do formulário de edição de estoque
+if (formEditarEstoque) {
+    formEditarEstoque.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Impede o envio padrão do formulário
+
+        if (!produtoParaEditarId) {
+            alert("Nenhum produto selecionado para edição.");
+            return;
+        }
+
+        // Pega apenas a nova quantidade do formulário
+        const novaQuantidadeInput = formEditarEstoque.querySelector("#editEstoque");
+        
+        if (!novaQuantidadeInput || novaQuantidadeInput.value === '') {
+             alert("Por favor, insira uma quantidade válida.");
+             return;
+        }
+
+        const novaQuantidade = parseInt(novaQuantidadeInput.value);
+
+        if (isNaN(novaQuantidade) || novaQuantidade < 0) {
+             alert("A quantidade deve ser um número não negativo.");
+             return;
+        }
+
+
+        try {
+            // Chama o endpoint PUT para atualizar APENAS o estoque
+            const res = await fetch(`/produtos/${produtoParaEditarId}/estoque`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantidade: novaQuantidade }) // Envia o DTO esperado
+            });
+
+            if (!res.ok) {
+                 const errorMsg = await res.text();
+                 throw new Error(`Erro ao atualizar estoque: ${errorMsg}`);
+            }
+
+            // Se a atualização foi bem-sucedida
+            alert("Estoque atualizado com sucesso!");
+            modalEditarEstoque.style.display = "none"; // Fecha o modal
+            produtoParaEditarId = null; // Limpa o ID guardado
+            await carregarEstoque(); // Recarrega a tabela de estoque
+
+        } catch (err) {
+            console.error("Erro ao salvar estoque:", err);
+            alert(`Erro ao salvar: ${err.message}`);
+        }
+    });
+}
+
+
 // Listeners Modais Estoque
-btnFecharModalEstoque?.addEventListener("click", () => {
-  modalEditarEstoque.style.display = "none";
-  produtoParaEditarId = null;
-});
-btnCancelarEditar?.addEventListener("click", () => {
-  modalEditarEstoque.style.display = "none";
-  produtoParaEditarId = null;
-});
-window.addEventListener("click", (e) => {
-  if (e.target === modalEditarEstoque) {
-    modalEditarEstoque.style.display = "none";
-    produtoParaEditarId = null;
-  }
-});
+btnFecharModalEstoque?.addEventListener("click", () => { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; });
+btnCancelarEditar?.addEventListener("click", () => { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; });
+window.addEventListener("click", (e) => { if(e.target === modalEditarEstoque) { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; } });
 
-// Cria Filtro Estoque
-criarFiltro(
-  "btnAbrirFiltroEstoque",
-  "painelFiltroEstoque",
-  "btnFecharFiltroEstoque",
-  "btnLimparEstoque",
-  "formFiltroEstoque",
-  null,
-  null
-);
+// Cria Filtro Estoque (sem função de filtro real por enquanto)
+// criarFiltro(
+//   "btnAbrirFiltroEstoque",
+//   "painelFiltroEstoque",
+//   "btnFecharFiltroEstoque",
+//   "btnLimparEstoque",
+//   "formFiltroEstoque",
+//   null, // ID do botão filtrar (se existir)
+//   null // Função de filtro de estoque (a ser criada se necessário)
+// );
 
-carregarEstoque(); // Carrega estoque ao iniciar
+// Carrega o estoque ao iniciar a página
+carregarEstoque();
 
-// ======================= VENDAS (Exemplo) =======================
+// ======================= VENDAS =======================
 const vendas = [
   {
     idVenda: 101,
@@ -540,6 +507,7 @@ const vendas = [
     status: "Cancelada",
   },
 ];
+
 const tbodyVendas = document.getElementById("vendas-tbody");
 const modalStatusVenda = document.getElementById("modalStatusVenda");
 const btnFecharStatusVenda = document.getElementById("btnFecharStatusVenda");
@@ -547,23 +515,25 @@ const btnCancelarStatusVenda = document.getElementById(
   "btnCancelarStatusVenda"
 );
 
-if (tbodyVendas) {
-  // Verifica se tbodyVendas existe antes de usar
-  tbodyVendas.innerHTML = ""; // Limpa
-  vendas.forEach((item) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${item.idVenda}</td><td>${item.cliente}</td><td>${
-      item.data
-    }</td><td>R$ ${item.total.toFixed(2)}</td><td>${
-      item.status
-    }</td><td><button class="btn-acao-tabela btnAlterarStatusVenda"><i class='bx bx-edit'></i></button></td>`;
-    tbodyVendas.appendChild(tr);
-  });
-}
+vendas.forEach((item) => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${item.idVenda}</td>
+    <td>${item.cliente}</td>
+    <td>${item.data}</td>
+    <td>R$ ${item.total.toFixed(2)}</td>
+    <td>${item.status}</td>
+    <td>
+      <button class="btn-acao-tabela btnAlterarStatusVenda"><i class='bx bx-edit'></i></button>
+    </td>
+  `;
+  tbodyVendas.appendChild(tr);
+});
 
 document.querySelectorAll(".btnAlterarStatusVenda").forEach((btn) => {
   btn.addEventListener("click", () => modalStatusVenda.classList.add("active"));
 });
+
 btnFecharStatusVenda?.addEventListener("click", () =>
   modalStatusVenda.classList.remove("active")
 );
@@ -575,17 +545,7 @@ window.addEventListener("click", (e) => {
     modalStatusVenda.classList.remove("active");
 });
 
-criarFiltro(
-  "btnAbrirFiltroVendas",
-  "painelFiltroVendas",
-  "btnFecharFiltroVendas",
-  "btnLimparVendas",
-  "formFiltroVendas",
-  null,
-  null
-);
-
-// ======================= TROCAS/DEVOLUÇÕES (Exemplo) =======================
+// ======================= TROCAS/DEVOLUÇÕES =======================
 const trocas = [
   {
     idPedido: 1,
@@ -612,24 +572,32 @@ const trocas = [
     status: "Recusada",
   },
 ];
+
 const tbodyTrocas = document.getElementById("trocas-tbody");
 const modalStatusTroca = document.getElementById("modalStatusTroca");
 const btnFecharStatus = document.getElementById("btnFecharStatus");
 const btnCancelarStatus = document.getElementById("btnCancelarStatus");
 
-if (tbodyTrocas) {
-  // Verifica se tbodyTrocas existe
-  tbodyTrocas.innerHTML = ""; // Limpa
-  trocas.forEach((item) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${item.idPedido}</td><td>${item.cliente}</td><td>${item.produto}</td><td>${item.dataSolicitacao}</td><td>${item.motivo}</td><td>${item.status}</td><td><button class="btn-acao-tabela btnAlterarStatusTroca"><i class='bx bx-edit'></i></button></td>`;
-    tbodyTrocas.appendChild(tr);
-  });
-}
+trocas.forEach((item) => {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td>${item.idPedido}</td>
+    <td>${item.cliente}</td>
+    <td>${item.produto}</td>
+    <td>${item.dataSolicitacao}</td>
+    <td>${item.motivo}</td>
+    <td>${item.status}</td>
+    <td>
+      <button class="btn-acao-tabela btnAlterarStatusTroca"><i class='bx bx-edit'></i></button>
+    </td>
+  `;
+  tbodyTrocas.appendChild(tr);
+});
 
 document.querySelectorAll(".btnAlterarStatusTroca").forEach((btn) => {
   btn.addEventListener("click", () => modalStatusTroca.classList.add("active"));
 });
+
 btnFecharStatus?.addEventListener("click", () =>
   modalStatusTroca.classList.remove("active")
 );
@@ -641,25 +609,15 @@ window.addEventListener("click", (e) => {
     modalStatusTroca.classList.remove("active");
 });
 
-criarFiltro(
-  "btnFiltroTrocas",
-  "painelFiltroTrocas",
-  "btnFecharFiltroTrocas",
-  "btnLimparTrocas",
-  "formFiltroTrocas",
-  null,
-  null
-);
-
 // ======================= DETALHES CLIENTE =======================
 btnFecharDetalhes?.addEventListener(
   "click",
   () => (modalDetalhes.style.display = "none")
 );
-// btnFecharDetalhesBtn?.addEventListener(
-//   "click",
-//   () => (modalDetalhes.style.display = "none")
-// );
+btnFecharDetalhesBtn?.addEventListener(
+  "click",
+  () => (modalDetalhes.style.display = "none")
+);
 window.addEventListener("click", (e) => {
   if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
 });
