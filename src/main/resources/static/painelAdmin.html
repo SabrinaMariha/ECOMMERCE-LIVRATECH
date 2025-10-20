@@ -102,9 +102,9 @@
               <table class="tabela-clientes" id="tabelaHistorico">
                 <thead>
                   <tr>
-                    <th>ID Pedido</th>    
+                    <th>ID Pedido</th>
                     <th>Data</th>
-                    <th>Valor Total</th> 
+                    <th>Valor Total</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -194,12 +194,11 @@
             <table class="tabela-clientes">
               <thead>
                 <tr>
-                  <th>ID Livro</th>
+                  <th>ID</th>
                   <th>Título</th>
+                  <th>Autor</th>
+                  <th>Preço</th>
                   <th>Quantidade</th>
-                  <th>Fornecedor</th>
-                  <th>Data de Entrada</th>
-                  <th>Valor de Custo</th>
                   <th>Status</th>
                   <th>Ações</th>
                 </tr>
@@ -216,30 +215,40 @@
               <span id="btnFecharModalEstoque" class="close">&times;</span>
               <h2>Editar Livro</h2>
               <form id="formEditarEstoque" class="formulario-consulta">
+                <input type="hidden" id="editId" name="editId">
+
                 <div class="grid-filtros">
                   <div class="campo-filtro">
-                    <label for="editTitulo">Título</label>
-                    <input type="text" id="editTitulo" />
+                    <label for="editNome">Título</label>
+                    <input type="text" id="editNome" name="editNome" />
                   </div>
                   <div class="campo-filtro">
-                    <label for="editQuantidade">Quantidade</label>
-                    <input type="number" id="editQuantidade" />
+                    <label for="editAutor">Autor</label>
+                    <input type="text" id="editAutor" name="editAutor" />
+                  </div>
+                  <div class="campo-filtro" style="flex-basis: 100%;">
+                    <label for="editDescricao">Descrição Curta</label>
+                    <textarea id="editDescricao" name="editDescricao" rows="2"></textarea>
+                  </div>
+                  <div class="campo-filtro" style="flex-basis: 100%;">
+                    <label for="editDescDetalhada">Descrição Detalhada</label>
+                    <textarea id="editDescDetalhada" name="editDescDetalhada" rows="4"></textarea>
                   </div>
                   <div class="campo-filtro">
-                    <label for="editFornecedor">Fornecedor</label>
-                    <input type="text" id="editFornecedor" />
+                    <label for="editPreco">Preço (R$)</label>
+                    <input type="number" step="0.01" id="editPreco" name="editPreco" />
                   </div>
                   <div class="campo-filtro">
-                    <label for="editDataEntrada">Data de Entrada</label>
-                    <input type="date" id="editDataEntrada" />
+                    <label for="editEstoque">Quantidade (Estoque)</label>
+                    <input type="number" id="editEstoque" name="editEstoque" />
                   </div>
                   <div class="campo-filtro">
-                    <label for="editValorCusto">Valor de Custo</label>
-                    <input type="number" step="0.01" id="editValorCusto" />
+                    <label for="editImagemUrl">URL da Imagem</label>
+                    <input type="text" id="editImagemUrl" name="editImagemUrl" />
                   </div>
                   <div class="campo-filtro">
                     <label for="editStatus">Status</label>
-                    <select id="editStatus">
+                    <select id="editStatus" name="editStatus">
                       <option value="Ativo">Ativo</option>
                       <option value="Inativo">Inativo</option>
                     </select>
@@ -247,7 +256,7 @@
                 </div>
                 <div class="btn-acao">
                   <button type="button" class="btn-principal btnFechar" id="btnCancelarEditar">Cancelar</button>
-                  <button type="submit" class="btn-principal">Salvar</button>
+                  <button type="submit" class="btn-principal">Salvar Estoque</button>
                 </div>
               </form>
             </div>
