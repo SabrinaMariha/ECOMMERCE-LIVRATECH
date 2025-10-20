@@ -170,7 +170,7 @@
                     <!-- Cartões -->
                     <div id="card-container-cartoes">
 
-                        <div id="card-template-cartao" class="card-container" >
+                        <div id="card-template-cartao" class="card-container " >
 
                             <button type="button" class="remove-btn" title="Remover cartão">&times;</button>
 
@@ -223,8 +223,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-principal" onclick="addCard('cartao')">Adicionar Outro
-                        Cartão</button>
+                    <button type="button" class="btn-principal" data-tipo-card="cartao">Adicionar Outro Cartão</button>
 
                     <!-- Cupons -->
                     <div id="card-container-cupom">
@@ -243,7 +242,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-principal" onclick="addCard('cupom')">Adicionar Cupom</button>
+                    <button type="button" class="btn-principal" data-tipo-cupom="cupom">Adicionar Cupom</button>
                 </form>
 
                 <div id="card-container-total">
@@ -285,7 +284,7 @@
     <footer class="footer">
         <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
     </footer>
-    <script src="scripts/FinalizarCompra.js"></script>
+    <script type="module" src="scripts/finalizarCompra/FinalizarCompra.js"></script>
     <script src="API/cepAPI.js"></script>
     <script src="scripts/Script.js"></script>
     <script src="API/carrinhoAPI.js"></script>
