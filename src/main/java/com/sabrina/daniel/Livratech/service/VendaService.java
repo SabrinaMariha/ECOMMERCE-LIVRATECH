@@ -133,9 +133,7 @@ public class VendaService {
                     ? new Date()
                     : pedido.getTransacoes().get(0).getData();
 
-            String status = pedido.getTransacoes().isEmpty()
-                    ? "SEM_TRANSACAO"
-                    : pedido.getTransacoes().get(0).getStatus().name();
+           StatusCompra status = pedido.getStatus();
 
             return new PedidoDTO(
                     pedido.getId(),
@@ -269,8 +267,7 @@ public class VendaService {
     Date dataPedido = pedidoSalvo.getTransacoes().isEmpty() ? new Date() :
             pedidoSalvo.getTransacoes().get(0).getData();
 
-    String status = pedidoSalvo.getTransacoes().isEmpty() ? "SEM_TRANSACAO" :
-            pedidoSalvo.getTransacoes().get(0).getStatus().name();
+    StatusCompra status = pedidoSalvo.getStatus();
 
         List<TransacaoDTO> transacoesDTO = pedidoSalvo.getTransacoes().stream()
                 .map(transacao -> new TransacaoDTO(
