@@ -1,3 +1,4 @@
+import { atualizarTotais } from "./CalcularTotais.js"; // ⬅️ IMPORTAR A FUNÇÃO AQUI
 export function calcularFretePorEstado(estado) {
   switch (estado) {
     case "SP":
@@ -21,4 +22,5 @@ export function atualizarFrete(estado) {
   document.getElementById("valorFreteResumoTotal").textContent = `R$ ${frete
     .toFixed(2)
     .replace(".", ",")}`;
+    atualizarTotais(frete); // ⬅️ CHAMADA ESSENCIAL
 }

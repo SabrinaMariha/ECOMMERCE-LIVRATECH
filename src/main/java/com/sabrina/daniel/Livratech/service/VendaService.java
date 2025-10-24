@@ -379,15 +379,24 @@ public class VendaService {
                     Produto produto = produtoService.findById(itemReq.produtoId())
                             .orElseThrow(() -> new ValidacaoException("Produto com ID " + itemReq.produtoId() + " não encontrado"));
 
-                    // CORREÇÃO APLICADA AQUI:
-                    // Converte o retorno de produto.getPreco() (que deve ser Double) para BigDecimal
+                    // Resolve o erro de tipo: Converte o Double do getPreco() para BigDecimal
                     return BigDecimal.valueOf(produto.getPreco())
                             .multiply(BigDecimal.valueOf(itemReq.quantidade()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal valorTotalPedido = valorTotalItens;
+        BigDecimal valorFrete = request.valorFrete() != null ? request.valorFrete() : BigDecimal.ZERO;
 
-        return valorTotalPedido;
+        // 3. Subtrair Desconto
+        // O valorDesconto deve ser um valor positivo enviado do frontend (ex: 5.00)
+        BigDecimal valorDesconto = request.valorDesconto() != null ? request.valorDesconto() : BigDecimal.ZERO;
+
+        // Fórmula Final: Total = Itens + Frete - Desconto
+        BigDecimal totalGeral = valorTotalItens
+                .add(valorFrete)
+                .subtract(valorDesconto);
+
+        // O valor Total do Pedido é o Total Geral (Itens + Frete - Cupom)
+        return totalGeral;
     }
 }

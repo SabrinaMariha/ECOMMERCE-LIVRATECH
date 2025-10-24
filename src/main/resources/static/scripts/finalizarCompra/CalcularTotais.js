@@ -16,14 +16,15 @@ export function atualizarTotais(frete = null, descontoAtivo = 0) {
   });
 
   if (frete === null) {
-    frete =
-      parseFloat(
-        document
-          .getElementById("valorFreteResumoTotal")
-          .textContent.replace("R$", "")
-          .replace(",", ".")
-      ) || 0;
-  }
+      // ⚠️ RE-APLICANDO A CONVERSÃO DE VÍRGULA PARA PONTO PARA GARANTIR O FLOAT
+      frete =
+        parseFloat(
+          document
+            .getElementById("valorFreteResumoTotal")
+            .textContent.replace("R$", "")
+            .replace(",", ".") // MANTENHA ISSO!
+        ) || 0;
+    }
 
   const valorDesconto = totalItens * (descontoAtivo / 100);
   const totalGeral = totalItens + frete - valorDesconto;

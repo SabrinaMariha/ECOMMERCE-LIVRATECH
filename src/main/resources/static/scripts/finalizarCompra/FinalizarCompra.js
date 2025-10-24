@@ -166,13 +166,24 @@ async function finalizarCompra(clienteId) {
           .replace(",", ".")
       ) || 0;
 
-    const totalItens = itens.reduce((acc, item) => {
-      const el = document.querySelector(
-        `.cart-item[data-produto-id='${item.produtoId}'] .item-price`
-      );
-      const preco = el ? parseFloat(el.textContent.replace("R$", "").replace(",", ".").trim()) : 0;
-      return acc + preco * item.quantidade;
-    }, 0);
+    const desconto =
+           parseFloat(
+             document
+               .getElementById("valorCuponsResumo")
+               ?.textContent.replace("- R$", "") // Remove o sinal de menos e 'R$'
+               .replace(",", ".")
+               .trim()
+           ) || 0;
+
+         // A variável totalItens que você calculava antes é agora só o subtotal:
+         const subTotalItens = itens.reduce((acc, item) => {
+           const el = document.querySelector(
+             `.cart-item[data-produto-id='${item.produtoId}'] .item-price`
+           );
+           // Usar a lógica do frontend para obter o preço (PODE SER NECESSÁRIO AJUSTAR AQUI)
+           const preco = el ? parseFloat(el.textContent.replace("R$", "").replace(",", ".").trim()) : 0;
+           return acc + preco * item.quantidade;
+         }, 0);
 
     const transacoes = [];
 
@@ -222,6 +233,8 @@ async function finalizarCompra(clienteId) {
       salvarEndereco: salvarEndereco,
       itens: itens,
       transacoes: transacoes,
+      valorFrete: frete,
+      valorDesconto: desconto,
     };
 
     console.log("Pedido enviado:", pedido);
