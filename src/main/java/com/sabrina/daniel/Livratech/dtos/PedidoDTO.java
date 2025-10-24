@@ -11,5 +11,6 @@ public record PedidoDTO(
         BigDecimal valorTotal,
         List<ItemDTO> itens,
         String enderecoEntrega,
-        String cartaoUtilizado
+        String cartaoUtilizado,
+        String nomeCliente
 ) {}
