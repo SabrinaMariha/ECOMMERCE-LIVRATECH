@@ -485,7 +485,6 @@ carregarEstoque();
 
 // ======================= VENDAS =======================
 
-// Variáveis Globais para Vendas
 const tbodyVendas = document.getElementById("vendas-tbody");
 const modalStatusVenda = document.getElementById("modalStatusVenda");
 const btnFecharStatusVenda = document.getElementById("btnFecharStatusVenda");
@@ -494,6 +493,28 @@ const formStatusVenda = document.getElementById("formStatusVenda");
 const selectNovoStatusVenda = document.getElementById("novoStatusVenda");
 let pedidoParaAtualizarId = null;
 let vendasCarregadas = [];
+let statusCompraOpcoes = [];
+
+/** Função para buscar os status de compra do backend */
+async function carregarOpcoesStatusCompra() {
+    try {
+        const response = await fetch('/admin/pedidos/status');
+        if (!response.ok) {
+            throw new Error('Erro ao buscar opções de status');
+        }
+        statusCompraOpcoes = await response.json();
+        console.log("Opções de StatusCompra carregadas:", statusCompraOpcoes);
+    } catch (error) {
+        console.error("Falha ao carregar opções de StatusCompra:", error);
+        statusCompraOpcoes = ['EM_PROCESSAMENTO', 'APROVADA', 'REPROVADA', 'EM_TRANSITO', 'ENTREGUE'];
+    }
+}
+
+/** Função para formatar o nome do status para exibição */
+function formatarStatusNome(statusName) {
+    if (!statusName) return "";
+    return statusName.replace(/_/g, ' ').replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+}
 
 /** Função para buscar e renderizar vendas */
 async function carregarVendas(filtros = {}) {
@@ -503,6 +524,8 @@ async function carregarVendas(filtros = {}) {
     let url = "/admin/pedidos";
     const params = new URLSearchParams();
     if (filtros.status) params.append('status', filtros.status);
+    if (filtros.idVenda) params.append('idVenda', filtros.idVenda);
+    if (filtros.nomeCliente) params.append('nomeCliente', filtros.nomeCliente);
 
     const queryString = params.toString();
     if (queryString) url += `?${queryString}`;
@@ -536,8 +559,8 @@ function renderizarVendas(pedidos) {
         tr.dataset.pedidoId = pedido.id;
         tr.dataset.statusAtual = pedido.status;
 
-        const dataFormatada = pedido.data ? new Date(pedido.data).toLocaleDateString("pt-BR") : "-";
-        const valorFormatado = pedido.valorTotal
+        const dataFormatada = pedido.data ? new Date(pedido.data).toLocaleDateString("pt-BR", { timeZone: 'UTC' }) : "-";
+        const valorFormatado = pedido.valorTotal != null
             ? pedido.valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
             : "R$ 0,00";
 
@@ -546,7 +569,7 @@ function renderizarVendas(pedidos) {
             <td>${pedido.nomeCliente || "-"}</td>
             <td>${dataFormatada}</td>
             <td>${valorFormatado}</td>
-            <td>${pedido.status || "N/A"}</td>
+            <td>${formatarStatusNome(pedido.status) || "N/A"}</td>
             <td>
                 <button class="btn-acao-tabela btnAlterarStatusVenda" data-id="${pedido.id}" data-status="${pedido.status || ''}">
                     <i class='bx bx-edit'></i>
@@ -566,52 +589,34 @@ function renderizarVendas(pedidos) {
     });
 }
 
-// Função para abrir o modal de status e configurar opções
+/** Função para abrir o modal de status e configurar opções */
 function abrirModalStatusVenda(statusAtual) {
     if (!modalStatusVenda || !selectNovoStatusVenda) {
         console.error("Modal ou Select de status não encontrado!");
         return;
     }
 
-    console.log("Abrindo modal para status atual:", statusAtual); // Para depuração
+    console.log("Abrindo modal para status atual:", statusAtual);
 
-    selectNovoStatusVenda.innerHTML = '<option value="">Selecione...</option>';
+    selectNovoStatusVenda.innerHTML = '';
 
-    if (statusAtual === 'APROVADA') {
-        selectNovoStatusVenda.innerHTML += '<option value="EM_TRANSITO">Em Trânsito</option>';
-        console.log("Adicionada opção: Em Trânsito"); // Para depuração
-    } else if (statusAtual === 'EM_TRANSITO') {
-        selectNovoStatusVenda.innerHTML += '<option value="ENTREGUE">Entregue</option>';
-        console.log("Adicionada opção: Entregue"); // Para depuração
-    }
-    else if (statusAtual === 'EM_PROCESSAMENTO') {
-         selectNovoStatusVenda.innerHTML += '<option value="APROVADA">Aprovada</option>';
-         selectNovoStatusVenda.innerHTML += '<option value="REPROVADA">Reprovada</option>';
-    }
-    selectNovoStatusVenda.disabled = selectNovoStatusVenda.options.length <= 1;
-
-    if (selectNovoStatusVenda.disabled) {
-         console.log("Nenhuma transição de status válida encontrada."); // Para depuração
+    if (statusCompraOpcoes.length === 0) {
+        console.warn("Opções de status ainda não carregadas, usando fallback.");
+        statusCompraOpcoes = ['EM_PROCESSAMENTO', 'APROVADA', 'REPROVADA', 'EM_TRANSITO', 'ENTREGUE'];
     }
 
+    statusCompraOpcoes.forEach(statusValue => {
+        const option = document.createElement('option');
+        option.value = statusValue;
+        option.textContent = formatarStatusNome(statusValue);
+        selectNovoStatusVenda.appendChild(option);
+    });
+
+    selectNovoStatusVenda.value = statusAtual || "";
+    const desabilitar = statusAtual === 'ENTREGUE' || statusAtual === 'REPROVADA';
+    selectNovoStatusVenda.disabled = desabilitar;
     modalStatusVenda.classList.add("active");
 }
-
-/** Listeners para fechar o modal de status */
-btnFecharStatusVenda?.addEventListener("click", () => {
-    modalStatusVenda.classList.remove("active");
-    pedidoParaAtualizarId = null;
-});
-btnCancelarStatusVenda?.addEventListener("click", () => {
-    modalStatusVenda.classList.remove("active");
-    pedidoParaAtualizarId = null;
-});
-window.addEventListener("click", (e) => {
-    if (e.target === modalStatusVenda) {
-        modalStatusVenda.classList.remove("active");
-        pedidoParaAtualizarId = null;
-    }
-});
 
 /** Listener para o submit do formulário de atualização de status */
 if (formStatusVenda) {
@@ -633,19 +638,25 @@ if (formStatusVenda) {
             const res = await fetch(`/admin/pedidos/${pedidoParaAtualizarId}/status`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ novoStatus })
+                body: JSON.stringify({ novoStatus: novoStatus })
             });
 
+            const responseBody = await res.text();
+            console.log("Resposta do backend:", responseBody);
+
             if (!res.ok) {
-                const errorMsg = await res.text();
-                throw new Error(`Erro ao atualizar status: ${errorMsg}`);
+                let errorMsg = responseBody;
+                try {
+                    const errorJson = JSON.parse(responseBody);
+                    errorMsg = errorJson.message || JSON.stringify(errorJson);
+                } catch {}
+                throw new Error(`Erro ao atualizar status (${res.status}): ${errorMsg}`);
             }
 
             alert("Status atualizado com sucesso!");
             modalStatusVenda.classList.remove("active");
             pedidoParaAtualizarId = null;
             await carregarVendas();
-
         } catch (err) {
             console.error("Erro ao salvar status:", err);
             alert(`Erro ao salvar: ${err.message}`);
@@ -653,16 +664,21 @@ if (formStatusVenda) {
     });
 }
 
-/** Filtro de vendas por status */
+/** Filtro de vendas */
 const formFiltroVendas = document.getElementById("formFiltroVendas");
 const btnFiltrarVendas = formFiltroVendas?.querySelector("button.btn-principal:not(.btnFechar):not(#btnLimparVendas)");
 const btnLimparVendas = document.getElementById("btnLimparVendas");
 const selectStatusVendaFiltro = document.getElementById("statusVenda");
+const inputIdVendaFiltro = document.getElementById("idVenda");
+const inputNomeClienteFiltro = document.getElementById("nomeCliente");
 
 btnFiltrarVendas?.addEventListener("click", () => {
     const filtros = {
-        status: selectStatusVendaFiltro.value || null
+        status: selectStatusVendaFiltro.value || null,
+        idVenda: inputIdVendaFiltro.value || null,
+        nomeCliente: inputNomeClienteFiltro.value || null
     };
+    Object.keys(filtros).forEach(key => (filtros[key] == null || filtros[key] === '') && delete filtros[key]);
     carregarVendas(filtros);
 });
 
@@ -679,18 +695,41 @@ const painelFiltroVendas = document.getElementById("painelFiltroVendas");
 btnAbrirFiltroVendas?.addEventListener("click", () => painelFiltroVendas?.classList.toggle("active"));
 btnFecharFiltroVendas?.addEventListener("click", () => painelFiltroVendas?.classList.remove("active"));
 
-/** Inicialização de abas para carregar dados específicos */
+/** Inicialização: Carrega opções de status e chama a função de carregar dados da aba ativa */
+document.addEventListener('DOMContentLoaded', async () => {
+    await carregarOpcoesStatusCompra();
+    const abaAtivaInicial = document.querySelector(".menu-btn.active");
+    if (abaAtivaInicial) {
+        const secaoAtiva = abaAtivaInicial.dataset.section;
+        if (secaoAtiva === 'vendas') await carregarVendas();
+        else if (secaoAtiva === 'estoque') await carregarEstoque();
+        else if (secaoAtiva === 'clientes') await carregarClientes();
+    } else {
+        await carregarClientes();
+    }
+});
+
+/** Event listener para trocar abas e carregar dados correspondentes */
 buttons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (btn.dataset.section === 'vendas') carregarVendas();
-    if (btn.dataset.section === 'estoque') carregarEstoque();
-    if (btn.dataset.section === 'clientes') carregarClientes();
-    if (btn.dataset.section === 'trocas') {
-        // carregarTrocas(); // Implementar se necessário
+  btn.addEventListener("click", async () => {
+    buttons.forEach(b => b.classList.remove('active'));
+    sections.forEach(sec => sec.classList.remove('active'));
+
+    btn.classList.add('active');
+    const sectionId = btn.dataset.section;
+    const sectionElement = document.getElementById(sectionId);
+    if (sectionElement) sectionElement.classList.add('active');
+
+    if (sectionId === 'vendas') await carregarVendas();
+    else if (sectionId === 'estoque') await carregarEstoque();
+    else if (sectionId === 'clientes') await carregarClientes();
+    else if (sectionId === 'trocas') {
+        console.log("Carregando dados de Trocas (implementar se necessário)");
+    } else if (sectionId === 'relatorios') {
+        console.log("Aba Relatórios selecionada (implementar se necessário)");
     }
   });
 });
-
 
 // ======================= TROCAS/DEVOLUÇÕES =======================
 const trocas = [
