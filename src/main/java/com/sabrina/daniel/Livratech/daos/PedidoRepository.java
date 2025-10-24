@@ -1,5 +1,6 @@
 package com.sabrina.daniel.Livratech.daos;
 
+import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import com.sabrina.daniel.Livratech.model.Pedido;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +14,10 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
             "LEFT JOIN FETCH i.produto " +
             "WHERE p.cliente.id = :clienteId")
     List<Pedido> findPedidosComItensPorCliente(@Param("clienteId") Long clienteId);
+
+    @Query("SELECT DISTINCT p FROM Pedido p LEFT JOIN FETCH p.itens i LEFT JOIN FETCH i.produto ORDER BY p.id DESC")
+    List<Pedido> findAllWithItens();
+
+    // Buscar por Status (Exemplo simples)
+    List<Pedido> findByTransacoes_Status(StatusCompra status);
 }
