@@ -65,26 +65,32 @@ async function carregarDadosCliente(clienteId) {
 
       // Preenche formulário ao selecionar um cartão
       selectCartoes.addEventListener("change", (e) => {
-        const valor = e.target.value;
-        const opcaoSalvarCartao = document.querySelector("input[name='salvar-cartao']");
+              const valor = e.target.value;
+              const opcaoSalvarCartao = document.querySelector("input[name='salvar-cartao']");
+              const cartaoId = parseInt(valor); // Tenta converter o valor para número
 
-        if (valor === "novo") {
-          // Habilita checkbox quando for "Novo cartão"
-          opcaoSalvarCartao.disabled = false;
-          preencherFormularioCartao(null); // limpa o formulário se quiser
-        } else {
-          // Desabilita checkbox ao escolher outro cartão
-          opcaoSalvarCartao.disabled = true;
-          opcaoSalvarCartao.checked = false; // opcional: desmarca o checkbox também
+              if (valor === "novo") {
+                // CASO 1: "Novo cartão"
+                opcaoSalvarCartao.disabled = false;
+                preencherFormularioCartao(null); // Limpa o formulário
 
-          // Se o valor for numérico (um cartão salvo), preenche os campos
-          const cartaoId = parseInt(valor);
-          const cartaoSelecionado = window.dadosCliente.cartoesCredito.find(
-            (c) => c.id === cartaoId
-          );
-          preencherFormularioCartao(cartaoSelecionado);
-        }
-      });
+              } else if (!isNaN(cartaoId)) { // CASO 2: É um número de ID válido
+                // Desabilita checkbox
+                opcaoSalvarCartao.disabled = true;
+                opcaoSalvarCartao.checked = false;
+
+                // Busca e preenche
+                const cartaoSelecionado = window.dadosCliente.cartoesCredito.find(
+                  (c) => c.id === cartaoId
+                );
+                preencherFormularioCartao(cartaoSelecionado);
+
+              } else {
+                // CASO 3: É "Selecione" (ou qualquer outro texto que não seja "novo" ou um número)
+                // Apenas limpa o formulário para evitar dados errados
+                preencherFormularioCartao(null);
+              }
+            });
     }
   } catch (error) {
     console.error("Erro ao carregar dados do cliente:", error);
@@ -100,7 +106,7 @@ function preencherFormularioCartao(cartao) {
     limparFormularioCartao();
     return;
   }
-
+form.dataset.cartaoId = cartao.id;
   form.querySelector("input[name='numero-cartao']").value = cartao.numeroCartao;
   form.querySelector("input[name='nome-titular']").value = cartao.nomeImpresso;
   form.querySelector("select[name='bandeira']").value = cartao.bandeira;
@@ -112,7 +118,7 @@ function preencherFormularioCartao(cartao) {
 function limparFormularioCartao() {
   const form = document.querySelector("#card-template-cartao");
   if (!form) return;
-
+form.dataset.cartaoId = "";
   form.querySelector("input[name='numero-cartao']").value = "";
   form.querySelector("input[name='nome-titular']").value = "";
   form.querySelector("select[name='bandeira']").value = "Selecione";
@@ -193,16 +199,9 @@ async function finalizarCompra(clienteId) {
     document
       .querySelectorAll("#card-container-cartoes .card-container")
       .forEach((cardEl) => {
-        const numero = cardEl.querySelector("input[name='numeroCartao']")?.value;
+        const numero = cardEl.querySelector("input[name='numero-cartao']")?.value;
         if (!numero) return;
 
-        const cartaoObj = {
-          numeroCartao: numero,
-          nomeImpresso: cardEl.querySelector("input[name='nomeImpresso']")?.value,
-          bandeira: cardEl.querySelector("select[name='bandeira']")?.value,
-          codigoSeguranca: cardEl.querySelector("input[name='cvv']")?.value,
-          preferencial: cardEl.querySelector("input[name='preferencial']")?.checked || false,
-        };
 
         const valor = parseFloat(
           cardEl
@@ -211,15 +210,29 @@ async function finalizarCompra(clienteId) {
             .replace(",", ".")
         ) || 0;
 
-        const salvarCartao =
-          cardEl.querySelector("input[name='salvar-cartao']")?.checked || false;
+       const cartaoExistenteId = parseInt(cardEl.dataset.cartaoId) || null;
 
+               const salvarCartao =
+                 cardEl.querySelector("input[name='salvar-cartao']")?.checked || false;
+
+               let cartaoNovo = null;
+
+               // Só cria um objeto cartaoNovo se NÃO for um cartão existente
+               if (!cartaoExistenteId) {
+                 cartaoNovo = {
+                   numeroCartao: numero,
+                   nomeImpresso: cardEl.querySelector("input[name='nome-titular']")?.value,
+                   bandeira: cardEl.querySelector("select[name='bandeira']")?.value,
+                   codigoSeguranca: cardEl.querySelector("input[name='cvv']")?.value,
+                   preferencial: cardEl.querySelector("input[name='preferencial']")?.checked || false,
+                 };
+               }
         transacoes.push({
           valor: valor,
           status: "EM_PROCESSAMENTO",
           salvarCartao: salvarCartao,
-          cartaoExistenteId: null,
-          cartaoNovo: cartaoObj,
+          cartaoExistenteId: cartaoExistenteId, // Será o ID ou null
+          cartaoNovo: cartaoNovo,
         });
       });
 

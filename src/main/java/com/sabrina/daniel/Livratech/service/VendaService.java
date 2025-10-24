@@ -294,7 +294,7 @@ public class VendaService {
 
         pedido.setTransacoes(transacoes);
     }
-
+        System.out.println("Número de transações a salvar: " + pedido.getTransacoes().size());
     // ---------- SALVAR PEDIDO ----------
     Pedido pedidoSalvo = pedidoRepository.save(pedido);
 
