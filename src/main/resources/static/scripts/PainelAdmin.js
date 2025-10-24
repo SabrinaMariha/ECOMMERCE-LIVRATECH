@@ -271,15 +271,15 @@ btnSim?.addEventListener("click", async () => {
 });
 
 // ======================= FILTROS =======================
-function criarFiltro(btnAbrir, painel, btnFechar, btnLimpar, formId) {
-  btnAbrir?.addEventListener("click", () => painel?.classList.toggle("active"));
-  btnFechar?.addEventListener("click", () =>
-    painel?.classList.remove("active")
-  );
-  btnLimpar?.addEventListener("click", () =>
-    document.getElementById(formId)?.reset()
-  );
-}
+// function criarFiltro(btnAbrir, painel, btnFechar, btnLimpar, formId) {
+//   btnAbrir?.addEventListener("click", () => painel?.classList.toggle("active"));
+//   btnFechar?.addEventListener("click", () =>
+//     painel?.classList.remove("active")
+//   );
+//   btnLimpar?.addEventListener("click", () =>
+//     document.getElementById(formId)?.reset()
+//   );
+// }
 
 document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
   const form = document.getElementById("formFiltro");
@@ -312,88 +312,176 @@ document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
   renderizarClientes(clientesFiltrados);
 });
 
-criarFiltro(
-  document.getElementById("btnAbrirFiltro"),
-  document.getElementById("painelFiltro"),
-  document.getElementById("btnFecharFiltro"),
-  document.getElementById("btnLimpar"),
-  "formFiltro"
-);
+// criarFiltro(
+//   document.getElementById("btnAbrirFiltro"),
+//   document.getElementById("painelFiltro"),
+//   document.getElementById("btnFecharFiltro"),
+//   document.getElementById("btnLimpar"),
+//   "formFiltro"
+// );
 
 // ======================= ESTOQUE =======================
-// ... (resto do estoque, vendas, trocas e detalhes permanece igual)
-
-const estoque = [
-  {
-    idLivro: 1,
-    titulo: "Livro A",
-    quantidade: 10,
-    fornecedor: "Fornecedor X",
-    dataEntrada: "2025-08-01",
-    valorCusto: 50.0,
-    status: "Ativo",
-  },
-  {
-    idLivro: 2,
-    titulo: "Livro B",
-    quantidade: 0,
-    fornecedor: "Fornecedor Y",
-    dataEntrada: "2025-08-05",
-    valorCusto: 35.0,
-    status: "Ativo",
-  },
-  {
-    idLivro: 3,
-    titulo: "Livro C",
-    quantidade: 5,
-    fornecedor: "Fornecedor Z",
-    dataEntrada: "2025-08-10",
-    valorCusto: 42.5,
-    status: "Ativo",
-  },
-];
-
 const tbodyEstoque = document.getElementById("estoque-tbody");
 const modalEditarEstoque = document.getElementById("modalEditarEstoque");
+const formEditarEstoque = document.getElementById("formEditarEstoque"); // Pegar o form
 const btnFecharModalEstoque = document.getElementById("btnFecharModalEstoque");
 const btnCancelarEditar = document.getElementById("btnCancelarEditar");
+let produtoParaEditarId = null; // Para guardar o ID do produto sendo editado
 
-estoque.forEach((item) => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${item.idLivro}</td>
-    <td>${item.titulo}</td>
-    <td>${item.quantidade}</td>
-    <td>${item.fornecedor}</td>
-    <td>${item.dataEntrada}</td>
-    <td>R$ ${item.valorCusto.toFixed(2)}</td>
-    <td>${item.status}</td>
-    <td>
-      <button class="btn-acao-tabela btnEditarEstoque"><i class='bx bx-edit'></i></button>
-    </td>
-  `;
-  tbodyEstoque.appendChild(tr);
-});
+// Função para buscar e renderizar produtos no estoque
+async function carregarEstoque() {
+    if (!tbodyEstoque) return;
+    tbodyEstoque.innerHTML = '<tr><td colspan="7" style="text-align:center;">Carregando estoque...</td></tr>'; // Colspan 8
 
-document.querySelectorAll(".btnEditarEstoque").forEach((btn) => {
-  btn.addEventListener(
-    "click",
-    () => (modalEditarEstoque.style.display = "flex")
-  );
-});
+    try {
+        const res = await fetch("/produtos"); // Chama GET /produtos
+        if (!res.ok) throw new Error("Erro ao carregar estoque");
+        const produtos = await res.json(); // Lista de objetos Produto
 
-btnFecharModalEstoque?.addEventListener(
-  "click",
-  () => (modalEditarEstoque.style.display = "none")
-);
-btnCancelarEditar?.addEventListener(
-  "click",
-  () => (modalEditarEstoque.style.display = "none")
-);
-window.addEventListener("click", (e) => {
-  if (e.target === modalEditarEstoque)
-    modalEditarEstoque.style.display = "none";
-});
+        tbodyEstoque.innerHTML = ""; // Limpa a tabela
+
+        if (produtos.length === 0) {
+            tbodyEstoque.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum produto encontrado.</td></tr>';
+            return;
+        }
+
+        // Ordenar por ID (opcional, mas consistente com clientes)
+        produtos.sort((a, b) => a.id - b.id);
+
+        produtos.forEach((produto) => {
+            const tr = document.createElement("tr");
+            tr.dataset.produtoId = produto.id; // Adiciona dataset para fácil acesso
+            tr.innerHTML = `
+                <td>${produto.id}</td>          
+                <td>${produto.nome || '-'}</td> 
+                <td>${produto.autor || '-'}</td>
+                <td>${produto.preco ? produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</td>
+                <td>${produto.estoque !== null ? produto.estoque : '-'}</td>
+                <td>Ativo</td>
+                <td>
+                    <button class="btn-acao-tabela btnEditarEstoque" data-id="${produto.id}"><i class='bx bx-edit'></i></button>
+                </td>
+            `;
+            tbodyEstoque.appendChild(tr);
+
+            // Adiciona listener ao botão Editar desta linha
+            const btnEditar = tr.querySelector(".btnEditarEstoque");
+            if (btnEditar) {
+                btnEditar.addEventListener("click", async (e) => {
+                    produtoParaEditarId = e.currentTarget.dataset.id; // Guarda o ID
+                    abrirModalEditarEstoque(produtoParaEditarId); // Chama função para buscar dados e abrir modal
+                });
+            }
+        });
+
+    } catch (err) {
+        console.error("Erro ao carregar estoque:", err);
+        tbodyEstoque.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">${err.message}</td></tr>`;
+    }
+}
+
+// Função para buscar dados do produto e preencher o modal
+async function abrirModalEditarEstoque(produtoId) {
+    if (!formEditarEstoque || !modalEditarEstoque) return;
+
+    formEditarEstoque.reset(); // Limpa o formulário
+
+    try {
+        const res = await fetch(`/produtos/${produtoId}`); // Chama GET /produtos/{id}
+        if (!res.ok) throw new Error('Produto não encontrado para edição.');
+        const produto = await res.json();
+
+        // Preenche o formulário no modal com os dados do produto
+        formEditarEstoque.querySelector("#editId").value = produto.id; // Campo ID (somente leitura)
+        formEditarEstoque.querySelector("#editNome").value = produto.nome || '';
+        formEditarEstoque.querySelector("#editAutor").value = produto.autor || '';
+        formEditarEstoque.querySelector("#editDescricao").value = produto.descricao || '';
+        formEditarEstoque.querySelector("#editDescDetalhada").value = produto.descDetalhada || '';
+        formEditarEstoque.querySelector("#editPreco").value = produto.preco !== null ? produto.preco : '';
+        formEditarEstoque.querySelector("#editEstoque").value = produto.estoque !== null ? produto.estoque : '';
+        formEditarEstoque.querySelector("#editImagemUrl").value = produto.imagemUrl || '';
+        // Status não vem do backend, pode ser removido ou gerenciado de outra forma se necessário
+        // formEditarEstoque.querySelector("#editStatus").value = "Ativo"; 
+
+        modalEditarEstoque.style.display = "flex"; // Abre o modal
+
+    } catch (err) {
+        console.error("Erro ao buscar produto para edição:", err);
+        alert(`Erro ao carregar dados do produto: ${err.message}`);
+    }
+}
+
+// Listener para o submit do formulário de edição de estoque
+if (formEditarEstoque) {
+    formEditarEstoque.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Impede o envio padrão do formulário
+
+        if (!produtoParaEditarId) {
+            alert("Nenhum produto selecionado para edição.");
+            return;
+        }
+
+        // Pega apenas a nova quantidade do formulário
+        const novaQuantidadeInput = formEditarEstoque.querySelector("#editEstoque");
+        
+        if (!novaQuantidadeInput || novaQuantidadeInput.value === '') {
+             alert("Por favor, insira uma quantidade válida.");
+             return;
+        }
+
+        const novaQuantidade = parseInt(novaQuantidadeInput.value);
+
+        if (isNaN(novaQuantidade) || novaQuantidade < 0) {
+             alert("A quantidade deve ser um número não negativo.");
+             return;
+        }
+
+
+        try {
+            // Chama o endpoint PUT para atualizar APENAS o estoque
+            const res = await fetch(`/produtos/${produtoParaEditarId}/estoque`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ quantidade: novaQuantidade }) // Envia o DTO esperado
+            });
+
+            if (!res.ok) {
+                 const errorMsg = await res.text();
+                 throw new Error(`Erro ao atualizar estoque: ${errorMsg}`);
+            }
+
+            // Se a atualização foi bem-sucedida
+            alert("Estoque atualizado com sucesso!");
+            modalEditarEstoque.style.display = "none"; // Fecha o modal
+            produtoParaEditarId = null; // Limpa o ID guardado
+            await carregarEstoque(); // Recarrega a tabela de estoque
+
+        } catch (err) {
+            console.error("Erro ao salvar estoque:", err);
+            alert(`Erro ao salvar: ${err.message}`);
+        }
+    });
+}
+
+
+// Listeners Modais Estoque
+btnFecharModalEstoque?.addEventListener("click", () => { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; });
+btnCancelarEditar?.addEventListener("click", () => { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; });
+window.addEventListener("click", (e) => { if(e.target === modalEditarEstoque) { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; } });
+
+// Cria Filtro Estoque (sem função de filtro real por enquanto)
+// criarFiltro(
+//   "btnAbrirFiltroEstoque",
+//   "painelFiltroEstoque",
+//   "btnFecharFiltroEstoque",
+//   "btnLimparEstoque",
+//   "formFiltroEstoque",
+//   null, // ID do botão filtrar (se existir)
+//   null // Função de filtro de estoque (a ser criada se necessário)
+// );
+
+// Carrega o estoque ao iniciar a página
+carregarEstoque();
 
 // ======================= VENDAS =======================
 const vendas = [
