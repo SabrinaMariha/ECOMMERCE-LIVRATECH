@@ -335,10 +335,11 @@
                 <div class="campo-filtro">
                   <label for="statusVenda">Status</label>
                   <select id="statusVenda">
-                    <option value="">Todos</option>
-                    <option>Pendente</option>
-                    <option>Concluída</option>
-                    <option>Cancelada</option>
+                    <option value="EM_PROCESSAMENTO">Em Processamento</option>
+                    <option value="APROVADA">Aprovada</option>
+                    <option value="REPROVADA">Reprovada</option>
+                    <option value="EM_TRANSITO">Em Trânsito</option>
+                    <option value="ENTREGUE">Entregue</option>
                   </select>
                 </div>
                 <div class="campo-filtro">
@@ -381,10 +382,12 @@
               <form id="formStatusVenda">
                 <div class="campo-filtro">
                   <label for="novoStatusVenda">Novo Status</label>
-                  <select id="novoStatusVenda">
-                    <option>Pendente</option>
-                    <option>Concluída</option>
-                    <option>Cancelada</option>
+                  <select id="novoStatusVenda" name="novoStatus">
+                    <option value="EM_PROCESSAMENTO">Em Processamento</option>
+                    <option value="APROVADA">Aprovada</option>
+                    <option value="REPROVADA">Reprovada</option>
+                    <option value="EM_TRANSITO">Em Trânsito</option>
+                    <option value="ENTREGUE">Entregue</option>
                   </select>
                 </div>
                 <div class="btn-acao">
@@ -392,6 +395,17 @@
                   <button type="submit" class="btn-principal">Salvar</button>
                 </div>
               </form>
+            </div>
+          </div>
+            <!-- Modal Detalhes Venda -->
+          <div id="modalDetalhesVenda" class="modal-filtro">
+            <div class="modal-conteudo modal-detalhes-venda-tamanho">
+              <h3>Detalhes do Pedido <span id="detalhePedidoId">#</span></h3>
+              <div id="detalhesVendaContent">
+              </div>
+              <div class="linha btn-acao">
+                <button type="button" class="btn-principal btnFechar" id="btnFecharDetalhesVenda">Fechar</button>
+              </div>
             </div>
           </div>
         </div>
@@ -493,9 +507,8 @@
   <footer class="footer">
     <p>&copy; 2025 LivraTec. Todos os direitos reservados.</p>
   </footer>
-
   <script src="scripts/Script.js"></script>
-  <script src="scripts/PainelAdmin.js"></script>
+  <script type="module" src="scripts/PainelAdmin/PainelAdmin.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 

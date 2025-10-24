@@ -6,6 +6,7 @@ import com.sabrina.daniel.Livratech.daos.ClienteRepository;
 import com.sabrina.daniel.Livratech.daos.EnderecoRepository;
 import com.sabrina.daniel.Livratech.daos.PedidoRepository;
 import com.sabrina.daniel.Livratech.dtos.*;
+import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import com.sabrina.daniel.Livratech.model.*;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,81 +81,6 @@ public class VendaService {
     }
 
     // ------------------ PEDIDOS ------------------
-//    public PedidoDTO finalizarCompra(Long clienteId, Pedido pedido) {
-//        Cliente cliente = clienteRepository.findById(clienteId)
-//                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-//        pedido.setCliente(cliente);
-//
-//        // Associa itens ao pedido
-//        if (pedido.getItens() != null) {
-//            pedido.getItens().forEach(item -> {
-//                Produto produto = produtoService.findById(item.getProduto().getId())
-//                        .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-//                item.setProduto(produto);
-//                item.setPedido(pedido);
-//            });
-//        }
-//
-//        // Associa transações
-//        if (pedido.getTransacoes() != null) {
-//            pedido.getTransacoes().forEach(t -> {
-//                t.setPedido(pedido);
-//                t.setData(new Date());
-//            });
-//        }
-//
-//        // Associa endereço pelo id na tabela de endereços
-//        if (pedido.getEnderecoPedido() != null) {
-//            Endereco endereco = enderecoRepository.findById(pedido.getEnderecoPedido().getId())
-//                    .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
-//            pedido.setEnderecoPedido(endereco);
-//        }
-//
-//
-//        Pedido pedidoSalvo = pedidoRepository.save(pedido);
-//
-//        // Mapeia itens para DTO
-//        List<ItemDTO> itensDTO = pedidoSalvo.getItens().stream()
-//                .map(item -> new ItemDTO(
-//                        item.getId(),
-//                        item.getProduto().getId(),
-//                        item.getQuantidade(),
-//                        item.getProduto().getNome(),
-//                        item.getProduto().getAutor(),
-//                        item.getProduto().getPreco().doubleValue(),
-//                        item.getProduto().getImagemUrl()
-//                )).toList();
-//
-//        BigDecimal valorTotal = pedidoSalvo.getTransacoes().stream()
-//                .map(t -> t.getValor() != null ? t.getValor() : BigDecimal.ZERO)
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
-//
-//        // Endereço usado
-//        String enderecoEntrega = pedidoSalvo.getEnderecoPedido() == null ? "" :
-//                pedidoSalvo.getEnderecoPedido().getLogradouro() + ", " +
-//                        pedidoSalvo.getEnderecoPedido().getNumero() + ", " +
-//                        pedidoSalvo.getEnderecoPedido().getBairro() + ", " +
-//                        pedidoSalvo.getEnderecoPedido().getCidade() + ", " +
-//                        pedidoSalvo.getEnderecoPedido().getEstado() + ", " +
-//                        pedidoSalvo.getEnderecoPedido().getCep();
-//
-//
-//        Date dataPedido = pedidoSalvo.getTransacoes().isEmpty() ? new Date() :
-//                pedidoSalvo.getTransacoes().get(0).getData();
-//
-//        String status = pedidoSalvo.getTransacoes().isEmpty() ? "SEM_TRANSACAO" :
-//                pedidoSalvo.getTransacoes().get(0).getStatus().name();
-//
-//        return new PedidoDTO(
-//                pedidoSalvo.getId(),
-//                dataPedido,
-//                status,
-//                valorTotal,
-//                itensDTO,
-//                enderecoEntrega,
-//                pedidoSalvo.getTransacoes()
-//        );
-//    }
 
     public List<PedidoDTO> listarPedidosDoCliente(Long clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId)
@@ -250,7 +176,7 @@ public class VendaService {
     Pedido pedido = new Pedido();
     pedido.setCliente(cliente);
 
-
+    pedido.setValorTotal(valorTotalPedido);
     // ---------- ENDEREÇO ----------
     if (request.enderecoId() != null) {
         Endereco endereco = enderecoRepository.findById(request.enderecoId())
@@ -312,7 +238,7 @@ public class VendaService {
 
         pedido.setTransacoes(transacoes);
     }
-        System.out.println("Número de transações a salvar: " + pedido.getTransacoes().size());
+     pedido.setStatus(StatusCompra.EM_PROCESSAMENTO);
     // ---------- SALVAR PEDIDO ----------
     Pedido pedidoSalvo = pedidoRepository.save(pedido);
 

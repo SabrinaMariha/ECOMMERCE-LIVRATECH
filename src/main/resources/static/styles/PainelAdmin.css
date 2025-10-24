@@ -13,7 +13,17 @@
 .section {
   display: none;
 }
+/* Adicione esta classe ao seu painelAdmin.css, se necessário */
 
+
+.tabela-detalhes-venda th, .tabela-detalhes-venda td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.tabela-detalhes-venda th {
+    background: #f0f0f0;
+}
 .section.active {
   display: block;
 }
@@ -211,7 +221,7 @@
     padding: 10px; ;
 }
 
-#modalHistorico .modal-conteudo {
+#modalHistorico {
   background: #fff;
   padding: 20px;
   border-radius: 8px;
@@ -501,3 +511,38 @@
 #modalDetalhesCliente .btn-acao button {
   width: auto;          /* sobrescreve regra genérica */
 }
+/* Seu código existente... */
+
+.modal-detalhes-venda-tamanho {
+    width: 900px; /* Ou um valor que funcione no seu layout */
+    max-width: 95%;
+}
+
+.modal-filtro {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.7); /* <-- AJUSTADO: Fundo mais escuro para garantir o "dim" */
+    align-items: center;
+    justify-content: center;
+}
+
+/* Garante que o modal só apareça quando a classe 'active' for aplicada pelo JS */
+.modal-filtro.active {
+    display: flex;
+}
+
+/* A CLASSE modal-conteudo DEVE TER UM FUNDO SÓLIDO */
+.modal-filtro .modal-conteudo {
+    background-color: white; /* <-- ESSENCIAL: Garante fundo branco para o conteúdo */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); /* Sombra mais forte */
+}
+
+/* ... o resto do seu código CSS */

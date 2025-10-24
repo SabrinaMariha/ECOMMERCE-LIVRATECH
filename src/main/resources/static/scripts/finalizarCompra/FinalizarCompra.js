@@ -177,13 +177,23 @@ async function finalizarCompra(clienteId) {
 
          // A variável totalItens que você calculava antes é agora só o subtotal:
          const subTotalItens = itens.reduce((acc, item) => {
-           const el = document.querySelector(
-             `.cart-item[data-produto-id='${item.produtoId}'] .item-price`
-           );
-           // Usar a lógica do frontend para obter o preço (PODE SER NECESSÁRIO AJUSTAR AQUI)
-           const preco = el ? parseFloat(el.textContent.replace("R$", "").replace(",", ".").trim()) : 0;
-           return acc + preco * item.quantidade;
-         }, 0);
+                    // 1. Encontra o elemento do item
+                    const itemElement = document.querySelector(
+                      `.cart-item[data-produto-id='${item.produtoId}']`
+                    );
+
+                    if (!itemElement) return acc;
+
+                    // 2. Tenta ler o preço unitário (colocado na correção anterior)
+                    const precoUnitarioEl = itemElement.querySelector('.item-price');
+                    const precoUnitario = precoUnitarioEl
+                      ? parseFloat(precoUnitarioEl.textContent.replace("R$", "").replace(",", ".").trim())
+                      : 0;
+
+                    // 3. Retorna o total somado
+                    return acc + precoUnitario * item.quantidade;
+
+                  }, 0);
 
     const transacoes = [];
 
@@ -279,9 +289,10 @@ async function finalizarCompra(clienteId) {
     alert(`Compra finalizada com sucesso! Pedido ID: ${pedidoSalvo.id}`);
 
     // Limpa carrinho e cupom
-    await fetch(`http://localhost:8080/carrinho/${clienteId}/limpar`, {
-      method: "DELETE",
-    });
+   await fetch(`http://localhost:8080/carrinho/${clienteId}/limpar`, {
+     method: "DELETE",
+   });
+
     document.querySelector(".secao-itens").innerHTML = '<h2 class="itens">Itens</h2>';
     document.getElementById("card-container-cupom").innerHTML = "";
     atualizarTotais();
