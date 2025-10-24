@@ -229,6 +229,24 @@ public class VendaService {
     Cliente cliente = clienteRepository.findById(clienteId)
             .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
+
+        BigDecimal totalPago = request.transacoes().stream()
+                // Obtém o valor de cada transação (garantindo que não seja nulo)
+                .map(t -> t.valor() != null ? t.valor() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // 2. Calcular o Valor Total do Pedido (usando a nova função)
+        BigDecimal valorTotalPedido = calcularValorTotalPedido(request); // <-- CHAMADA AQUI!
+
+        // 3. Comparar
+        // O método compareTo retorna 0 se os valores forem iguais.
+        if (totalPago.compareTo(valorTotalPedido) != 0) {
+            throw new ValidacaoException(
+                    "Erro de pagamento: O valor total pago nos cartões (R$ " + totalPago +
+                            ") não corresponde ao valor total do pedido (R$ " + valorTotalPedido + ")."
+            );
+        }
+
     Pedido pedido = new Pedido();
     pedido.setCliente(cliente);
 
@@ -283,7 +301,7 @@ public class VendaService {
                 cartao = t.cartaoNovo();
             }
 
-            if (Boolean.TRUE.equals(t.salvarCartao())) {
+            if (t.cartaoExistenteId() == null && Boolean.TRUE.equals(t.salvarCartao())) {
                 cartao.setCliente(cliente);
                 cartaoRepository.save(cartao);
             }
@@ -351,5 +369,25 @@ public class VendaService {
                 enderecoEntrega,
                 transacoesDTO
         );
-}
+    }
+    // VendaService.java
+
+    private BigDecimal calcularValorTotalPedido(FinalizarCompraRequest request) {
+
+        BigDecimal valorTotalItens = request.itens().stream()
+                .map(itemReq -> {
+                    Produto produto = produtoService.findById(itemReq.produtoId())
+                            .orElseThrow(() -> new ValidacaoException("Produto com ID " + itemReq.produtoId() + " não encontrado"));
+
+                    // CORREÇÃO APLICADA AQUI:
+                    // Converte o retorno de produto.getPreco() (que deve ser Double) para BigDecimal
+                    return BigDecimal.valueOf(produto.getPreco())
+                            .multiply(BigDecimal.valueOf(itemReq.quantidade()));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal valorTotalPedido = valorTotalItens;
+
+        return valorTotalPedido;
+    }
 }

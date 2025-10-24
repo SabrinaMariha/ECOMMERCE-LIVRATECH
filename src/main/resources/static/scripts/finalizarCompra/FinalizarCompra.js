@@ -8,123 +8,104 @@ const clienteId = localStorage.getItem("clienteId");
 if (!clienteId) console.error("Cliente não logado!");
 console.log("Cliente ID:", clienteId);
 
-// ----------------- CARREGA DADOS DO CLIENTE -----------------
-async function carregarDadosCliente(clienteId) {
-  if (!clienteId) return;
+/// ----------------- CARREGA DADOS DO CLIENTE -----------------
+ async function carregarDadosCliente(clienteId) {
+   if (!clienteId) return;
 
-  try {
-    const response = await fetch(`http://localhost:8080/clientes/${clienteId}`);
-    if (!response.ok) throw new Error("Erro ao buscar dados do cliente");
+   try {
+     const response = await fetch(`http://localhost:8080/clientes/${clienteId}`);
+     if (!response.ok) throw new Error("Erro ao buscar dados do cliente");
 
-    const dados = await response.json();
-    window.dadosCliente = dados; // salva globalmente
-    console.log("Dados do cliente:", dados);
+     const dados = await response.json();
+     window.dadosCliente = dados; // salva globalmente
+     console.log("Dados do cliente:", dados);
 
-    const enderecos = dados.enderecos || [];
-    const cartoes = dados.cartoesCredito || [];
+     const enderecos = dados.enderecos || [];
+     const cartoes = dados.cartoesCredito || [];
 
-    // --- ENDEREÇOS ---
-    const selectEnderecos = document.querySelector("select[name='enderecos']");
-    if (selectEnderecos) {
-      selectEnderecos.innerHTML = "";
-      enderecos.forEach((endereco) => {
-        const option = document.createElement("option");
-        option.value = endereco.id;
-        option.textContent =
-          endereco.fraseIdentificadora || `Endereço ${endereco.id}`;
-        option.dataset.estado = endereco.estado || "";
-        selectEnderecos.appendChild(option);
-      });
+     // --- ENDEREÇOS ---
+     const selectEnderecos = document.querySelector("select[name='enderecos']");
+     if (selectEnderecos) {
+       selectEnderecos.innerHTML = "";
+       enderecos.forEach((endereco) => {
+         const option = document.createElement("option");
+         option.value = endereco.id;
+         option.textContent =
+           endereco.fraseIdentificadora || `Endereço ${endereco.id}`;
+         option.dataset.estado = endereco.estado || "";
+         selectEnderecos.appendChild(option);
+       });
 
-      if (enderecos.length > 0) {
-        const primeiro = selectEnderecos.options[0];
-        selectEnderecos.value = primeiro.value;
-        atualizarFrete(primeiro.dataset.estado);
-      }
+       if (enderecos.length > 0) {
+         const primeiro = selectEnderecos.options[0];
+         selectEnderecos.value = primeiro.value;
+         atualizarFrete(primeiro.dataset.estado);
+       }
 
-      selectEnderecos.addEventListener("change", (e) => {
-        const estado = e.target.selectedOptions[0].dataset.estado || "";
-        atualizarFrete(estado);
-      });
-    }
+       selectEnderecos.addEventListener("change", (e) => {
+         const estado = e.target.selectedOptions[0].dataset.estado || "";
+         atualizarFrete(estado);
+       });
+     }
 
-    // --- CARTÕES ---
-    const selectCartoes = document.querySelector("select[name='cartoes']");
-    if (selectCartoes) {
-      selectCartoes.innerHTML = "";
-      cartoes.forEach((cartao) => {
+     // --- CARTÕES ---
+     const selectCartoes = document.querySelector("select[name='cartoes']");
+     if (selectCartoes) {
+       popularSelectCartoes(selectCartoes, cartoes);
+       // O Event Listener de 'change' está no final do arquivo (DOMContentLoaded)
+     }
+
+   } catch (error) {
+     console.error("Erro ao carregar dados do cliente:", error);
+   }
+ } // <--- FIM CORRETO DA FUNÇÃO
+
+// ----------------- FUNÇÕES AUXILIARES -----------------
+function popularSelectCartoes(selectElement, cartoesCadastrados) {
+    if (!selectElement) return;
+
+    selectElement.innerHTML = "";
+
+    // 1. Adiciona os cartões cadastrados
+    cartoesCadastrados.forEach((cartao) => {
         const option = document.createElement("option");
         option.value = cartao.id;
         const ultimosDigitos = cartao.numeroCartao.slice(-4);
         option.textContent = `${cartao.bandeira} **** ${ultimosDigitos}`;
-        selectCartoes.appendChild(option);
-      });
+        selectElement.appendChild(option);
+    });
 
-      selectCartoes.innerHTML += `<option selected> Selecione</option>
-                                   <option value="novo">Novo cartão</option> `;
-
-      // Preenche formulário ao selecionar um cartão
-      selectCartoes.addEventListener("change", (e) => {
-              const valor = e.target.value;
-              const opcaoSalvarCartao = document.querySelector("input[name='salvar-cartao']");
-              const cartaoId = parseInt(valor); // Tenta converter o valor para número
-
-              if (valor === "novo") {
-                // CASO 1: "Novo cartão"
-                opcaoSalvarCartao.disabled = false;
-                preencherFormularioCartao(null); // Limpa o formulário
-
-              } else if (!isNaN(cartaoId)) { // CASO 2: É um número de ID válido
-                // Desabilita checkbox
-                opcaoSalvarCartao.disabled = true;
-                opcaoSalvarCartao.checked = false;
-
-                // Busca e preenche
-                const cartaoSelecionado = window.dadosCliente.cartoesCredito.find(
-                  (c) => c.id === cartaoId
-                );
-                preencherFormularioCartao(cartaoSelecionado);
-
-              } else {
-                // CASO 3: É "Selecione" (ou qualquer outro texto que não seja "novo" ou um número)
-                // Apenas limpa o formulário para evitar dados errados
-                preencherFormularioCartao(null);
-              }
-            });
-    }
-  } catch (error) {
-    console.error("Erro ao carregar dados do cliente:", error);
-  }
+    // 2. Adiciona as opções "Selecione" e "Novo Cartão"
+    selectElement.innerHTML += `<option selected> Selecione</option>
+                                <option value="novo">Novo cartão</option> `;
 }
 
-// ----------------- FUNÇÕES AUXILIARES -----------------
-function preencherFormularioCartao(cartao) {
-  const form = document.querySelector("#card-template-cartao");
-  if (!form) return;
+function preencherFormularioCartao(formEl, cartao) {
+  if (!formEl) return;
 
   if (!cartao) {
-    limparFormularioCartao();
-    return;
-  }
-form.dataset.cartaoId = cartao.id;
-  form.querySelector("input[name='numero-cartao']").value = cartao.numeroCartao;
-  form.querySelector("input[name='nome-titular']").value = cartao.nomeImpresso;
-  form.querySelector("select[name='bandeira']").value = cartao.bandeira;
-  form.querySelector("input[name='cvv']").value = "";
-  form.querySelector("input[name='valor']").value = "";
-  form.querySelector("input[name='salvar-cartao']").checked = false;
+      limparFormularioCartao(formEl); // Passa o formEl para limparFormularioCartao
+      return;
+    }
+
+formEl.dataset.cartaoId = cartao.id;
+  formEl.querySelector("input[name='numero-cartao']").value = cartao.numeroCartao;
+  formEl.querySelector("input[name='nome-titular']").value = cartao.nomeImpresso;
+  formEl.querySelector("select[name='bandeira']").value = cartao.bandeira;
+  formEl.querySelector("input[name='cvv']").value = "";
+  formEl.querySelector("input[name='valor']").value = "";
+  formEl.querySelector("input[name='salvar-cartao']").checked = false;
 }
 
-function limparFormularioCartao() {
-  const form = document.querySelector("#card-template-cartao");
-  if (!form) return;
-form.dataset.cartaoId = "";
-  form.querySelector("input[name='numero-cartao']").value = "";
-  form.querySelector("input[name='nome-titular']").value = "";
-  form.querySelector("select[name='bandeira']").value = "Selecione";
-  form.querySelector("input[name='cvv']").value = "";
-  form.querySelector("input[name='valor']").value = "";
-  form.querySelector("input[name='salvar-cartao']").checked = false;
+function limparFormularioCartao(formEl) {
+  if (!formEl) return;
+    formEl.dataset.cartaoId = "";
+  formEl.querySelector("input[name='numero-cartao']").value = "";
+  formEl.querySelector("input[name='nome-titular']").value = "";
+  formEl.querySelector("select[name='bandeira']").value = "Selecione";
+  formEl.querySelector("input[name='cvv']").value = "";
+  formEl.querySelector("input[name='valor']").value = "";
+  formEl.querySelector("input[name='salvar-cartao']").checked = false;
 }
 
 
@@ -195,7 +176,6 @@ async function finalizarCompra(clienteId) {
 
     const transacoes = [];
 
-    // Itera todos os formulários de cartões adicionados
     document
       .querySelectorAll("#card-container-cartoes .card-container")
       .forEach((cardEl) => {
@@ -257,11 +237,32 @@ async function finalizarCompra(clienteId) {
     );
 
     if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`Erro no backend: ${response.status} ${response.statusText}\n${text}`);
-    }
+          // 1. Tenta ler a resposta como JSON (padrão de muitos erros do Spring)
+          let errorMessage = `Erro no backend: ${response.status} ${response.statusText}`;
 
-    const pedidoSalvo = await response.json();
+          try {
+            const errorData = await response.json();
+            if (errorData.message) {
+                errorMessage = errorData.message;
+            } else if (errorData.detail) {
+                errorMessage = errorData.detail;
+            } else if (errorData.error) {
+                 errorMessage = errorData.error;
+            } else {
+                 // Se falhar, tenta ler como texto
+                 const text = await response.text();
+                 if (text) errorMessage = text;
+            }
+          } catch (e) {
+            const text = await response.text();
+            if (text) errorMessage = text;
+          }
+
+          // Joga o erro (com a mensagem extraída)
+          throw new Error(errorMessage);
+        }
+
+        const pedidoSalvo = await response.json();
     alert(`Compra finalizada com sucesso! Pedido ID: ${pedidoSalvo.id}`);
 
     // Limpa carrinho e cupom
@@ -307,4 +308,35 @@ document.addEventListener("DOMContentLoaded", () => {
       if (tipoCupom) addCard(tipoCupom, atualizarTotais);
     }
   });
+
+  document.addEventListener("change", (e) => {
+          // Verifica se o elemento que disparou o 'change' é um dos selects de cartões
+          if (e.target.matches("select[name='cartoes']")) {
+              // Reutiliza a lógica que estava dentro de carregarDadosCliente
+              const selectCartoesEl = e.target;
+              const valor = selectCartoesEl.value;
+              const cartaoContainer = selectCartoesEl.closest(".card-container");
+              const opcaoSalvarCartao = cartaoContainer.querySelector("input[name='salvar-cartao']");
+              const cartaoId = parseInt(valor);
+
+              if (valor === "novo") {
+                  opcaoSalvarCartao.disabled = false;
+                  preencherFormularioCartao(cartaoContainer, null);
+              } else if (!isNaN(cartaoId)) {
+                  opcaoSalvarCartao.disabled = true;
+                  opcaoSalvarCartao.checked = false;
+
+                  const cartaoSelecionado = window.dadosCliente.cartoesCredito.find(
+                    (c) => c.id === cartaoId
+                  );
+                  preencherFormularioCartao(cartaoContainer, cartaoSelecionado);
+              } else {
+                  preencherFormularioCartao(cartaoContainer, null);
+              }
+          }
+
+          if (e.target.classList.contains("itemQuantidade")) {
+            atualizarTotais();
+          }
+      });
 });
