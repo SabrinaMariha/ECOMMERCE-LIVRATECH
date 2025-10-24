@@ -45,13 +45,14 @@ public class AdminService {
         repositories.put(Pedido.class.getName(), pedidoRepository);
     }
 
+    // --- Métodos de Cliente ---
     public List<Cliente> findAll(FiltroCliente clienteASerConsultado) {
-        return clienteRepository.findAllByFiltros(clienteASerConsultado);
+        List<Cliente> clientes = clienteRepository.findAllByFiltros(clienteASerConsultado);
+        return clientes;
     }
 
     public DadosConsultaCliente findDTOById(Long id) throws Exception {
-        Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new Exception("Cliente não encontrado"));
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new Exception("Cliente não encontrado"));
         return toDTO(cliente);
     }
 
@@ -64,18 +65,20 @@ public class AdminService {
     }
 
     public DadosConsultaCliente inativarPorId(long id) {
-        Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
         cliente.setStatus(Status.INATIVO);
         clienteRepository.save(cliente);
         return toDTO(cliente);
     }
 
+    // --- Métodos de Pedido ---
     public List<PedidoDTO> listarTodosPedidos(StatusCompra status) {
-        List<Pedido> pedidos = (status != null)
-                ? pedidoRepository.findPedidosComDetalhesByStatus(status)
-                : pedidoRepository.findAllPedidosComDetalhes();
-
+        List<Pedido> pedidos;
+        if (status != null) {
+            pedidos = pedidoRepository.findPedidosComDetalhesByStatus(status);
+        } else {
+            pedidos = pedidoRepository.findAllPedidosComDetalhes();
+        }
         return pedidos.stream().map(this::mapPedidoToDTO).toList();
     }
 
@@ -90,20 +93,13 @@ public class AdminService {
         Transacao transacaoPrincipal = pedido.getTransacoes().get(0);
         StatusCompra statusAtual = transacaoPrincipal.getStatus();
 
-        if (!isTransicaoValida(statusAtual, novoStatus)) {
-            throw new IllegalStateException("Transição de status inválida de " + statusAtual + " para " + novoStatus);
-        }
+        System.out.println("Atualizando status do pedido " + pedidoId + " de " + statusAtual + " para " + novoStatus);
 
         transacaoPrincipal.setStatus(novoStatus);
         return mapPedidoToDTO(pedido);
     }
 
-    private boolean isTransicaoValida(StatusCompra atual, StatusCompra novo) {
-        if (atual == StatusCompra.APROVADA && novo == StatusCompra.EM_TRANSITO) return true;
-        if (atual == StatusCompra.EM_TRANSITO && novo == StatusCompra.ENTREGUE) return true;
-        return false;
-    }
-
+    // --- Helper para mapear Pedido em PedidoDTO ---
     private PedidoDTO mapPedidoToDTO(Pedido pedido) {
         List<ItemDTO> itensDTO = pedido.getItens().stream()
                 .map(item -> new ItemDTO(
@@ -119,6 +115,7 @@ public class AdminService {
         BigDecimal valorTotal = BigDecimal.ZERO;
         String status = "SEM_TRANSACAO";
         Date dataPedido = pedido.getId() != null ? new Date() : null;
+        String nomeCliente = (pedido.getCliente() != null) ? pedido.getCliente().getNome() : "Cliente não informado";
 
         if (pedido.getTransacoes() != null && !pedido.getTransacoes().isEmpty()) {
             Transacao transacaoPrincipal = pedido.getTransacoes().get(0);
@@ -130,20 +127,13 @@ public class AdminService {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
-        String enderecoEntrega = pedido.getEnderecoPedido() != null
-                ? pedido.getEnderecoPedido().getLogradouro() + ", " +
-                pedido.getEnderecoPedido().getNumero() + " - " +
-                pedido.getEnderecoPedido().getCidade()
-                : "Endereço não informado";
+        String enderecoEntrega = pedido.getEnderecoPedido() != null ?
+                pedido.getEnderecoPedido().getLogradouro() + ", " +
+                        pedido.getEnderecoPedido().getNumero() + " - " +
+                        pedido.getEnderecoPedido().getCidade() : "Endereço não informado";
 
-        String cartaoUtilizado = (pedido.getCartaoPedido() != null &&
-                pedido.getCartaoPedido().getNumeroCartao() != null &&
-                pedido.getCartaoPedido().getNumeroCartao().length() >= 4)
-                ? "**** **** **** " + pedido.getCartaoPedido().getNumeroCartao()
-                .substring(pedido.getCartaoPedido().getNumeroCartao().length() - 4)
-                : "Cartão não informado";
-
-        String nomeCliente = pedido.getCliente() != null ? pedido.getCliente().getNome() : "Cliente não informado";
+        String cartaoUtilizado = pedido.getCartaoPedido() != null && pedido.getCartaoPedido().getNumeroCartao() != null && pedido.getCartaoPedido().getNumeroCartao().length() >= 4 ?
+                "**** **** **** " + pedido.getCartaoPedido().getNumeroCartao().substring(pedido.getCartaoPedido().getNumeroCartao().length() - 4) : "Cartão não informado";
 
         return new PedidoDTO(
                 pedido.getId(),
