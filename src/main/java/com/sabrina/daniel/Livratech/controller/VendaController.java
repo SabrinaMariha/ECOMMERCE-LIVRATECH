@@ -45,10 +45,18 @@ public class VendaController {
     }
 
     // ------------------ CARTÕES ------------------
-    @PostMapping("/{id}/cartao")
-    public ResponseEntity<CartaoDeCredito> cadastrarCartao(@PathVariable Long id, @RequestBody CartaoDeCredito cartao) {
-        return ResponseEntity.ok(vendaService.salvarCartao(id, cartao));
+//    @PostMapping("/{id}/cartao")
+//    public ResponseEntity<CartaoDeCredito> cadastrarCartao(@PathVariable Long id, @RequestBody CartaoDeCredito cartao) {
+//        return ResponseEntity.ok(vendaService.salvarCartao(id, cartao));
+//    }
+    @PostMapping("/{id}/cartoes")
+    public ResponseEntity<List<CartaoDeCredito>> cadastrarCartoes(
+            @PathVariable Long id,
+            @RequestBody List<CartaoDeCredito> cartoes
+    ) {
+        return ResponseEntity.ok(vendaService.salvarCartoes(id, cartoes));
     }
+
 
     @GetMapping("/{id}/cartoes")
     public ResponseEntity<List<CartaoDeCredito>> listarCartoes(@PathVariable Long id) {
@@ -56,12 +64,20 @@ public class VendaController {
     }
 
     // ------------------ PEDIDOS ------------------
+//    @PostMapping(value = "/{id}/finalizar-compra", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<PedidoDTO> finalizarCompra(@PathVariable Long id, @RequestBody Pedido pedido) {
+//        PedidoDTO salvo = vendaService.finalizarCompra(id, pedido);
+//        return ResponseEntity.ok(salvo);
+//    }
+
     @PostMapping(value = "/{id}/finalizar-compra", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PedidoDTO> finalizarCompra(@PathVariable Long id, @RequestBody Pedido pedido) {
-        PedidoDTO salvo = vendaService.finalizarCompra(id, pedido);
+    public ResponseEntity<PedidoDTO> finalizarCompra(
+            @PathVariable Long id,
+            @RequestBody FinalizarCompraRequest request
+    ) {
+        PedidoDTO salvo = vendaService.finalizarCompra(id, request);
         return ResponseEntity.ok(salvo);
     }
-
 
     @GetMapping("/{id}/pedidos")
     public ResponseEntity<List<PedidoDTO>> listarPedidosPorCliente(@PathVariable Long id) {

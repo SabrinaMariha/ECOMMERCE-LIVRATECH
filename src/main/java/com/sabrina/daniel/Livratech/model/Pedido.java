@@ -36,8 +36,8 @@ public class Pedido {
     @JoinColumn(name = "endereco_id")
     private Endereco enderecoPedido;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cartao_id")
-    private CartaoDeCredito cartaoPedido;
+
+
+
 }
 

@@ -163,20 +163,23 @@
                 <h2 class="pagamento">Forma de Pagamento</h2>
 
                 <form class="formulario-outra-forma-pag" id="formulario-outra-forma-pag">
-                    <label class="label-campo">Cartões Cadastrados</label>
-                    <select class="input-campo" name="cartoes" id="select-cartoes"></select>
-
 
                     <!-- Cartões -->
                     <div id="card-container-cartoes">
 
-                        <div id="card-template-cartao" class="card-container" >
+                        <div id="card-template-cartao" class="card-container " >
 
                             <button type="button" class="remove-btn" title="Remover cartão">&times;</button>
 
 
+                            <div class="linha">
+                                <div class="coluna">
+                                    <label class="label-campo">Cartões de Crédito Cadastrados</label>
+                                    <select class="input-campo" name="cartoes" id="select-cartoes">
 
-                            <label class="label-campo"> Novo Cartão de Crédito </label>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="linha">
                                 <div class="coluna">
                                     <label class="label-campo">Número do Cartão</label>
@@ -185,10 +188,10 @@
                                 <div class="coluna-40">
                                     <label class="label-campo">Bandeira</label>
                                     <select class="input-campo" name="bandeira">
-                                        <option selected>Escolha...</option>
-                                        <option>Visa</option>
-                                        <option>MasterCard</option>
-                                        <option>Amex</option>
+                                        <option selected>Selecione</option>
+                                        <option>VISA</option>
+                                        <option>MASTERCARD</option>
+                                        <option>ELO</option>
                                     </select>
                                 </div>
                             </div>
@@ -203,10 +206,7 @@
                                 </div>
                             </div>
                             <div class="linha">
-                                <div class="coluna">
-                                    <label class="label-campo">Validade</label>
-                                    <input type="text" class="input-campo" name="validade" placeholder="MM/AA">
-                                </div>
+
                                 <div class="coluna">
                                     <label class="label-campo">Valor</label>
                                     <input type="text" class="input-campo" name="valor" placeholder="R$ 0,00">
@@ -216,15 +216,16 @@
                             <div class="linha">
                                 <div class="coluna">
                                     <div class="checkbox-group">
-                                        <label class="label-campo"><input type="checkbox" name="salvar-cartao"> Salvar
-                                            para próximas compras</label>
+                                        <label class="label-campo">
+                                            <input type="checkbox" name="salvar-cartao" disabled="true"> Salvar
+                                            para próximas compras
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-principal" onclick="addCard('cartao')">Adicionar Outro
-                        Cartão</button>
+                    <button type="button" class="btn-principal" data-tipo-card="cartao">Adicionar Outro Cartão</button>
 
                     <!-- Cupons -->
                     <div id="card-container-cupom">
@@ -243,7 +244,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-principal" onclick="addCard('cupom')">Adicionar Cupom</button>
+                    <button type="button" class="btn-principal" data-tipo-cupom="cupom">Adicionar Cupom</button>
                 </form>
 
                 <div id="card-container-total">
@@ -285,7 +286,7 @@
     <footer class="footer">
         <p>&copy; 2025 Trabalho Laboratório de Engenharia de Software. Todos os direitos reservados.</p>
     </footer>
-    <script src="scripts/FinalizarCompra.js"></script>
+    <script type="module" src="scripts/finalizarCompra/FinalizarCompra.js"></script>
     <script src="API/cepAPI.js"></script>
     <script src="scripts/Script.js"></script>
     <script src="API/carrinhoAPI.js"></script>
