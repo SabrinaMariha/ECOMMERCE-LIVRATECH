@@ -484,66 +484,198 @@ window.addEventListener("click", (e) => { if(e.target === modalEditarEstoque) { 
 carregarEstoque();
 
 // ======================= VENDAS =======================
-const vendas = [
-  {
-    idVenda: 101,
-    cliente: "Ana Maria",
-    data: "2025-08-01",
-    total: 150.5,
-    status: "Concluída",
-  },
-  {
-    idVenda: 102,
-    cliente: "Bruno Silva",
-    data: "2025-08-05",
-    total: 320.0,
-    status: "Pendente",
-  },
-  {
-    idVenda: 103,
-    cliente: "Carla Souza",
-    data: "2025-08-10",
-    total: 75.25,
-    status: "Cancelada",
-  },
-];
 
+// Variáveis Globais para Vendas
 const tbodyVendas = document.getElementById("vendas-tbody");
 const modalStatusVenda = document.getElementById("modalStatusVenda");
 const btnFecharStatusVenda = document.getElementById("btnFecharStatusVenda");
-const btnCancelarStatusVenda = document.getElementById(
-  "btnCancelarStatusVenda"
-);
+const btnCancelarStatusVenda = document.getElementById("btnCancelarStatusVenda");
+const formStatusVenda = document.getElementById("formStatusVenda");
+const selectNovoStatusVenda = document.getElementById("novoStatusVenda");
+let pedidoParaAtualizarId = null;
+let vendasCarregadas = [];
 
-vendas.forEach((item) => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${item.idVenda}</td>
-    <td>${item.cliente}</td>
-    <td>${item.data}</td>
-    <td>R$ ${item.total.toFixed(2)}</td>
-    <td>${item.status}</td>
-    <td>
-      <button class="btn-acao-tabela btnAlterarStatusVenda"><i class='bx bx-edit'></i></button>
-    </td>
-  `;
-  tbodyVendas.appendChild(tr);
-});
+/** Função para buscar e renderizar vendas */
+async function carregarVendas(filtros = {}) {
+    if (!tbodyVendas) return;
+    tbodyVendas.innerHTML = '<tr><td colspan="6" style="text-align:center;">Carregando vendas...</td></tr>';
 
-document.querySelectorAll(".btnAlterarStatusVenda").forEach((btn) => {
-  btn.addEventListener("click", () => modalStatusVenda.classList.add("active"));
-});
+    let url = "/admin/pedidos";
+    const params = new URLSearchParams();
+    if (filtros.status) params.append('status', filtros.status);
 
-btnFecharStatusVenda?.addEventListener("click", () =>
-  modalStatusVenda.classList.remove("active")
-);
-btnCancelarStatusVenda?.addEventListener("click", () =>
-  modalStatusVenda.classList.remove("active")
-);
-window.addEventListener("click", (e) => {
-  if (e.target === modalStatusVenda)
+    const queryString = params.toString();
+    if (queryString) url += `?${queryString}`;
+
+    try {
+        const res = await fetch(url);
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Erro ${res.status}: ${errorText || res.statusText}`);
+        }
+        const pedidos = await res.json();
+        vendasCarregadas = pedidos || [];
+        renderizarVendas(vendasCarregadas);
+    } catch (err) {
+        console.error("Erro ao carregar vendas:", err);
+        tbodyVendas.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">${err.message}</td></tr>`;
+    }
+}
+
+/** Função para renderizar a tabela de vendas */
+function renderizarVendas(pedidos) {
+    tbodyVendas.innerHTML = "";
+
+    if (!pedidos || pedidos.length === 0) {
+        tbodyVendas.innerHTML = '<tr><td colspan="6" style="text-align:center;">Nenhuma venda encontrada.</td></tr>';
+        return;
+    }
+
+    pedidos.forEach((pedido) => {
+        const tr = document.createElement("tr");
+        tr.dataset.pedidoId = pedido.id;
+        tr.dataset.statusAtual = pedido.status;
+
+        const dataFormatada = pedido.data ? new Date(pedido.data).toLocaleDateString("pt-BR") : "-";
+        const valorFormatado = pedido.valorTotal
+            ? pedido.valorTotal.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+            : "R$ 0,00";
+
+        tr.innerHTML = `
+            <td>${pedido.id}</td>
+            <td>${pedido.nomeCliente || "-"}</td>
+            <td>${dataFormatada}</td>
+            <td>${valorFormatado}</td>
+            <td>${pedido.status || "N/A"}</td>
+            <td>
+                <button class="btn-acao-tabela btnAlterarStatusVenda" data-id="${pedido.id}" data-status="${pedido.status || ''}">
+                    <i class='bx bx-edit'></i>
+                </button>
+            </td>
+        `;
+        tbodyVendas.appendChild(tr);
+
+        const btnAlterar = tr.querySelector(".btnAlterarStatusVenda");
+        if (btnAlterar) {
+            btnAlterar.addEventListener("click", (e) => {
+                pedidoParaAtualizarId = e.currentTarget.dataset.id;
+                const statusAtual = e.currentTarget.dataset.status;
+                abrirModalStatusVenda(statusAtual);
+            });
+        }
+    });
+}
+
+/** Função para abrir o modal de status e configurar opções */
+function abrirModalStatusVenda(statusAtual) {
+    if (!modalStatusVenda || !selectNovoStatusVenda) return;
+
+    selectNovoStatusVenda.innerHTML = '<option value="">Selecione...</option>';
+
+    if (statusAtual === 'APROVADA') {
+        selectNovoStatusVenda.innerHTML += '<option value="EM_TRANSITO">Em Trânsito</option>';
+    } else if (statusAtual === 'EM_TRANSITO') {
+        selectNovoStatusVenda.innerHTML += '<option value="ENTREGUE">Entregue</option>';
+    }
+
+    selectNovoStatusVenda.disabled = selectNovoStatusVenda.options.length <= 1;
+    modalStatusVenda.classList.add("active");
+}
+
+/** Listeners para fechar o modal de status */
+btnFecharStatusVenda?.addEventListener("click", () => {
     modalStatusVenda.classList.remove("active");
+    pedidoParaAtualizarId = null;
 });
+btnCancelarStatusVenda?.addEventListener("click", () => {
+    modalStatusVenda.classList.remove("active");
+    pedidoParaAtualizarId = null;
+});
+window.addEventListener("click", (e) => {
+    if (e.target === modalStatusVenda) {
+        modalStatusVenda.classList.remove("active");
+        pedidoParaAtualizarId = null;
+    }
+});
+
+/** Listener para o submit do formulário de atualização de status */
+if (formStatusVenda) {
+    formStatusVenda.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        if (!pedidoParaAtualizarId) {
+            alert("Nenhum pedido selecionado para atualização.");
+            return;
+        }
+
+        const novoStatus = selectNovoStatusVenda.value;
+        if (!novoStatus) {
+            alert("Selecione um novo status.");
+            return;
+        }
+
+        try {
+            const res = await fetch(`/admin/pedidos/${pedidoParaAtualizarId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ novoStatus })
+            });
+
+            if (!res.ok) {
+                const errorMsg = await res.text();
+                throw new Error(`Erro ao atualizar status: ${errorMsg}`);
+            }
+
+            alert("Status atualizado com sucesso!");
+            modalStatusVenda.classList.remove("active");
+            pedidoParaAtualizarId = null;
+            await carregarVendas();
+
+        } catch (err) {
+            console.error("Erro ao salvar status:", err);
+            alert(`Erro ao salvar: ${err.message}`);
+        }
+    });
+}
+
+/** Filtro de vendas por status */
+const formFiltroVendas = document.getElementById("formFiltroVendas");
+const btnFiltrarVendas = formFiltroVendas?.querySelector("button.btn-principal:not(.btnFechar):not(#btnLimparVendas)");
+const btnLimparVendas = document.getElementById("btnLimparVendas");
+const selectStatusVendaFiltro = document.getElementById("statusVenda");
+
+btnFiltrarVendas?.addEventListener("click", () => {
+    const filtros = {
+        status: selectStatusVendaFiltro.value || null
+    };
+    carregarVendas(filtros);
+});
+
+btnLimparVendas?.addEventListener("click", () => {
+    formFiltroVendas?.reset();
+    carregarVendas();
+});
+
+/** Botões para abrir e fechar o painel de filtro de vendas */
+const btnAbrirFiltroVendas = document.getElementById("btnAbrirFiltroVendas");
+const btnFecharFiltroVendas = document.getElementById("btnFecharFiltroVendas");
+const painelFiltroVendas = document.getElementById("painelFiltroVendas");
+
+btnAbrirFiltroVendas?.addEventListener("click", () => painelFiltroVendas?.classList.toggle("active"));
+btnFecharFiltroVendas?.addEventListener("click", () => painelFiltroVendas?.classList.remove("active"));
+
+/** Inicialização de abas para carregar dados específicos */
+buttons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (btn.dataset.section === 'vendas') carregarVendas();
+    if (btn.dataset.section === 'estoque') carregarEstoque();
+    if (btn.dataset.section === 'clientes') carregarClientes();
+    if (btn.dataset.section === 'trocas') {
+        // carregarTrocas(); // Implementar se necessário
+    }
+  });
+});
+
 
 // ======================= TROCAS/DEVOLUÇÕES =======================
 const trocas = [

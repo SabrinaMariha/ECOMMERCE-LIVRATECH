@@ -368,28 +368,26 @@
                 </tr>
               </thead>
               <tbody id="vendas-tbody">
-                <!-- Vendas adicionadas via JS -->
+                <tr><td colspan="6" style="text-align:center;">Carregando...</td></tr>
               </tbody>
             </table>
           </div>
-
+          
           <!-- Modal Alterar Status Venda -->
           <div id="modalStatusVenda" class="modal">
             <div class="modal-content">
               <span class="close" id="btnFecharStatusVenda">&times;</span>
-              <h2>Status da Venda</h2>
+              <h2>Alterar Status da Venda</h2>
               <form id="formStatusVenda">
                 <div class="campo-filtro">
                   <label for="novoStatusVenda">Novo Status</label>
                   <select id="novoStatusVenda">
-                    <option>Pendente</option>
-                    <option>Concluída</option>
-                    <option>Cancelada</option>
+                    <option value="">Selecione...</option>
                   </select>
                 </div>
                 <div class="btn-acao">
                   <button type="button" class="btn-principal btnFechar" id="btnCancelarStatusVenda">Cancelar</button>
-                  <button type="submit" class="btn-principal">Salvar</button>
+                  <button type="submit" class="btn-principal">Salvar Status</button> {/* Texto ajustado */}
                 </div>
               </form>
             </div>

@@ -150,6 +150,8 @@ public class VendaService {
         String status = pedidoSalvo.getTransacoes().isEmpty() ? "SEM_TRANSACAO" :
                 pedidoSalvo.getTransacoes().get(0).getStatus().name();
 
+        String nomeCliente = (pedidoSalvo.getCliente() != null) ? pedidoSalvo.getCliente().getNome() : "Cliente não informado";
+
         return new PedidoDTO(
                 pedidoSalvo.getId(),
                 dataPedido,
@@ -157,7 +159,8 @@ public class VendaService {
                 valorTotal,
                 itensDTO,
                 enderecoEntrega,
-                cartaoUtilizado
+                cartaoUtilizado,
+                nomeCliente // <--- Adicionado aqui
         );
     }
 
@@ -208,6 +211,8 @@ public class VendaService {
             String status = pedido.getTransacoes().isEmpty() ? "SEM_TRANSACAO" :
                     pedido.getTransacoes().get(0).getStatus().name();
 
+            String nomeCliente = (pedido.getCliente() != null) ? pedido.getCliente().getNome() : "Cliente não informado";
+
             return new PedidoDTO(
                     pedido.getId(),
                     dataPedido,
@@ -215,7 +220,8 @@ public class VendaService {
                     valorTotal,
                     itensDTO,
                     enderecoEntrega,
-                    cartaoUtilizado
+                    cartaoUtilizado,
+                    nomeCliente
             );
         }).toList();
     }
