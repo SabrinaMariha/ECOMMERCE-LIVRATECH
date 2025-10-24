@@ -589,7 +589,7 @@ function renderizarVendas(pedidos) {
     });
 }
 
-/** Função para abrir o modal de status e configurar opções */
+// Função para abrir o modal de status (CORRIGIDA PARA MOSTRAR TODAS AS OPÇÕES)
 function abrirModalStatusVenda(statusAtual) {
     if (!modalStatusVenda || !selectNovoStatusVenda) {
         console.error("Modal ou Select de status não encontrado!");
@@ -598,24 +598,41 @@ function abrirModalStatusVenda(statusAtual) {
 
     console.log("Abrindo modal para status atual:", statusAtual);
 
-    selectNovoStatusVenda.innerHTML = '';
+    // Limpa opções anteriores
+    selectNovoStatusVenda.innerHTML = ''; // Limpa completamente
 
+    // Verifica se as opções foram carregadas, usa fallback se necessário
     if (statusCompraOpcoes.length === 0) {
-        console.warn("Opções de status ainda não carregadas, usando fallback.");
-        statusCompraOpcoes = ['EM_PROCESSAMENTO', 'APROVADA', 'REPROVADA', 'EM_TRANSITO', 'ENTREGUE'];
+        console.warn("Opções de status não carregadas, usando fallback.");
+         // Fallback caso a busca inicial tenha falhado
+         statusCompraOpcoes = ['EM_PROCESSAMENTO', 'APROVADA', 'REPROVADA', 'EM_TRANSITO', 'ENTREGUE'];
     }
 
+    // Popula o select com TODAS as opções disponíveis
     statusCompraOpcoes.forEach(statusValue => {
         const option = document.createElement('option');
-        option.value = statusValue;
-        option.textContent = formatarStatusNome(statusValue);
+        option.value = statusValue; // O valor é o nome exato do enum (ex: EM_TRANSITO)
+        option.textContent = formatarStatusNome(statusValue); // O texto é formatado (ex: Em Trânsito)
         selectNovoStatusVenda.appendChild(option);
     });
 
-    selectNovoStatusVenda.value = statusAtual || "";
+    // Pré-seleciona o status atual
+    selectNovoStatusVenda.value = statusAtual || ""; // Define o valor selecionado
+
+    // Opcional: Desabilita o select apenas para status finais (se ainda desejar)
     const desabilitar = statusAtual === 'ENTREGUE' || statusAtual === 'REPROVADA';
     selectNovoStatusVenda.disabled = desabilitar;
-    modalStatusVenda.classList.add("active");
+
+    if (desabilitar) {
+        console.log("Select desabilitado pois o status atual é final:", statusAtual);
+    } else {
+         // Garante que esteja habilitado para outros status
+         selectNovoStatusVenda.disabled = false;
+         console.log("Select habilitado para status:", statusAtual);
+    }
+
+
+    modalStatusVenda.classList.add("active"); // Mostra o modal
 }
 
 /** Listener para o submit do formulário de atualização de status */
