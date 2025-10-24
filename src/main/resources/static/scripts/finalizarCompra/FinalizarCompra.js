@@ -60,13 +60,30 @@ async function carregarDadosCliente(clienteId) {
         selectCartoes.appendChild(option);
       });
 
+      selectCartoes.innerHTML += `<option selected> Selecione</option>
+                                   <option value="novo">Novo cartão</option> `;
+
       // Preenche formulário ao selecionar um cartão
       selectCartoes.addEventListener("change", (e) => {
-        const cartaoId = parseInt(e.target.value);
-        const cartaoSelecionado = window.dadosCliente.cartoesCredito.find(
-          (c) => c.id === cartaoId
-        );
-        preencherFormularioCartao(cartaoSelecionado);
+        const valor = e.target.value;
+        const opcaoSalvarCartao = document.querySelector("input[name='salvar-cartao']");
+
+        if (valor === "novo") {
+          // Habilita checkbox quando for "Novo cartão"
+          opcaoSalvarCartao.disabled = false;
+          preencherFormularioCartao(null); // limpa o formulário se quiser
+        } else {
+          // Desabilita checkbox ao escolher outro cartão
+          opcaoSalvarCartao.disabled = true;
+          opcaoSalvarCartao.checked = false; // opcional: desmarca o checkbox também
+
+          // Se o valor for numérico (um cartão salvo), preenche os campos
+          const cartaoId = parseInt(valor);
+          const cartaoSelecionado = window.dadosCliente.cartoesCredito.find(
+            (c) => c.id === cartaoId
+          );
+          preencherFormularioCartao(cartaoSelecionado);
+        }
       });
     }
   } catch (error) {
@@ -88,7 +105,6 @@ function preencherFormularioCartao(cartao) {
   form.querySelector("input[name='nome-titular']").value = cartao.nomeImpresso;
   form.querySelector("select[name='bandeira']").value = cartao.bandeira;
   form.querySelector("input[name='cvv']").value = "";
-  form.querySelector("input[name='validade']").value = "";
   form.querySelector("input[name='valor']").value = "";
   form.querySelector("input[name='salvar-cartao']").checked = false;
 }
@@ -99,9 +115,8 @@ function limparFormularioCartao() {
 
   form.querySelector("input[name='numero-cartao']").value = "";
   form.querySelector("input[name='nome-titular']").value = "";
-  form.querySelector("select[name='bandeira']").value = "Escolha...";
+  form.querySelector("select[name='bandeira']").value = "Selecione";
   form.querySelector("input[name='cvv']").value = "";
-  form.querySelector("input[name='validade']").value = "";
   form.querySelector("input[name='valor']").value = "";
   form.querySelector("input[name='salvar-cartao']").checked = false;
 }

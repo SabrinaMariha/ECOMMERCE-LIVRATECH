@@ -5,10 +5,7 @@ import com.sabrina.daniel.Livratech.daos.CartaoRepository;
 import com.sabrina.daniel.Livratech.daos.ClienteRepository;
 import com.sabrina.daniel.Livratech.daos.EnderecoRepository;
 import com.sabrina.daniel.Livratech.daos.PedidoRepository;
-import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
-import com.sabrina.daniel.Livratech.dtos.FinalizarCompraRequest;
-import com.sabrina.daniel.Livratech.dtos.ItemDTO;
-import com.sabrina.daniel.Livratech.dtos.PedidoDTO;
+import com.sabrina.daniel.Livratech.dtos.*;
 import com.sabrina.daniel.Livratech.model.*;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,9 +176,21 @@ public class VendaService {
                     ))
                     .toList();
 
+            // Mapeia transações para DTO (evita erro do Jackson)
+            List<TransacaoDTO> transacoesDTO = pedido.getTransacoes().stream()
+                    .map(t -> new TransacaoDTO(
+                            t.getId(),
+                            t.getValor(),
+                            t.getStatus() != null ? t.getStatus().name() : "DESCONHECIDO",
+                            t.getData(),
+                            t.getCartao() != null ? t.getCartao().getBandeira().name() : null,
+                            t.getCartao() != null ? t.getCartao().getNumeroCartao().substring(t.getCartao().getNumeroCartao().length() - 4) : null
+                    ))
+                    .toList();
+
             // Calcula valor total
-            BigDecimal valorTotal = pedido.getTransacoes().stream()
-                    .map(t -> t.getValor() != null ? t.getValor() : BigDecimal.ZERO)
+            BigDecimal valorTotal = transacoesDTO.stream()
+                    .map(t -> t.valor() != null ? t.valor() : BigDecimal.ZERO)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
             // Endereço usado no pedido
@@ -193,14 +202,14 @@ public class VendaService {
                             pedido.getEnderecoPedido().getEstado() + ", " +
                             pedido.getEnderecoPedido().getCep();
 
+            // Data e status do pedido (usa primeira transação)
+            Date dataPedido = pedido.getTransacoes().isEmpty()
+                    ? new Date()
+                    : pedido.getTransacoes().get(0).getData();
 
-            // Data do pedido (pega a primeira transação como referência)
-            Date dataPedido = pedido.getTransacoes().isEmpty() ? new Date() :
-                    pedido.getTransacoes().get(0).getData();
-
-            // Status do pedido (pega a primeira transação como referência)
-            String status = pedido.getTransacoes().isEmpty() ? "SEM_TRANSACAO" :
-                    pedido.getTransacoes().get(0).getStatus().name();
+            String status = pedido.getTransacoes().isEmpty()
+                    ? "SEM_TRANSACAO"
+                    : pedido.getTransacoes().get(0).getStatus().name();
 
             return new PedidoDTO(
                     pedido.getId(),
@@ -209,13 +218,14 @@ public class VendaService {
                     valorTotal,
                     itensDTO,
                     enderecoEntrega,
-                    pedido.getTransacoes()
+                    transacoesDTO // ✅ agora usamos DTOs, não entidades
             );
         }).toList();
     }
 
 
-public PedidoDTO finalizarCompra(Long clienteId, FinalizarCompraRequest request) {
+
+    public PedidoDTO finalizarCompra(Long clienteId, FinalizarCompraRequest request) {
     Cliente cliente = clienteRepository.findById(clienteId)
             .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
@@ -318,14 +328,28 @@ public PedidoDTO finalizarCompra(Long clienteId, FinalizarCompraRequest request)
     String status = pedidoSalvo.getTransacoes().isEmpty() ? "SEM_TRANSACAO" :
             pedidoSalvo.getTransacoes().get(0).getStatus().name();
 
-    return new PedidoDTO(
-            pedidoSalvo.getId(),
-            dataPedido,
-            status,
-            valorTotal,
-            itensDTO,
-            enderecoEntrega,
-            pedidoSalvo.getTransacoes()
-    );
+        List<TransacaoDTO> transacoesDTO = pedidoSalvo.getTransacoes().stream()
+                .map(transacao -> new TransacaoDTO(
+                        transacao.getId(),
+                        transacao.getValor(),
+                        transacao.getStatus() != null ? transacao.getStatus().name() : null,
+                        transacao.getData(),
+                        transacao.getCartao() != null ? transacao.getCartao().getBandeira().name() : null, // bandeira
+                        transacao.getCartao() != null ? transacao.getCartao().getNumeroCartao().substring(
+                                Math.max(0, transacao.getCartao().getNumeroCartao().length() - 4)
+                        ) : null // últimos 4 dígitos
+                ))
+                .toList();
+
+
+        return new PedidoDTO(
+                pedidoSalvo.getId(),
+                dataPedido,
+                status,
+                valorTotal,
+                itensDTO,
+                enderecoEntrega,
+                transacoesDTO
+        );
 }
 }

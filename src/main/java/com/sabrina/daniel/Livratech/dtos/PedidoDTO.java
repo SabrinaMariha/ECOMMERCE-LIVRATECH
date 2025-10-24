@@ -13,5 +13,5 @@ public record PedidoDTO(
         BigDecimal valorTotal,
         List<ItemDTO> itens,
         String enderecoEntrega,
-        List<Transacao> transacoes // <-- Agora representa corretamente o uso de múltiplos cartões
+        List<TransacaoDTO> transacoes // <-- Agora representa corretamente o uso de múltiplos cartões
 ) {}
