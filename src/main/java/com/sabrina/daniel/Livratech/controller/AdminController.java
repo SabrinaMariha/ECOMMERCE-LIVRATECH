@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
@@ -87,5 +89,13 @@ public class AdminController {
             System.err.println("Erro ao atualizar status do pedido " + pedidoId + ": " + e.getMessage());
             return ResponseEntity.status(500).body("Erro interno ao atualizar status do pedido.");
         }
+    }
+
+    @GetMapping("/pedidos/status")
+    public ResponseEntity<List<String>> listarTodosStatusCompra() {
+        List<String> statusList = Arrays.stream(StatusCompra.values())
+                .map(Enum::name) // Pega o nome de cada enum
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(statusList);
     }
 }

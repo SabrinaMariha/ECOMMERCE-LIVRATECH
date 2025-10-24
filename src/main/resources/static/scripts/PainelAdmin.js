@@ -566,19 +566,34 @@ function renderizarVendas(pedidos) {
     });
 }
 
-/** Função para abrir o modal de status e configurar opções */
+// Função para abrir o modal de status e configurar opções
 function abrirModalStatusVenda(statusAtual) {
-    if (!modalStatusVenda || !selectNovoStatusVenda) return;
+    if (!modalStatusVenda || !selectNovoStatusVenda) {
+        console.error("Modal ou Select de status não encontrado!");
+        return;
+    }
+
+    console.log("Abrindo modal para status atual:", statusAtual); // Para depuração
 
     selectNovoStatusVenda.innerHTML = '<option value="">Selecione...</option>';
 
     if (statusAtual === 'APROVADA') {
         selectNovoStatusVenda.innerHTML += '<option value="EM_TRANSITO">Em Trânsito</option>';
+        console.log("Adicionada opção: Em Trânsito"); // Para depuração
     } else if (statusAtual === 'EM_TRANSITO') {
         selectNovoStatusVenda.innerHTML += '<option value="ENTREGUE">Entregue</option>';
+        console.log("Adicionada opção: Entregue"); // Para depuração
+    }
+    else if (statusAtual === 'EM_PROCESSAMENTO') {
+         selectNovoStatusVenda.innerHTML += '<option value="APROVADA">Aprovada</option>';
+         selectNovoStatusVenda.innerHTML += '<option value="REPROVADA">Reprovada</option>';
+    }
+    selectNovoStatusVenda.disabled = selectNovoStatusVenda.options.length <= 1;
+
+    if (selectNovoStatusVenda.disabled) {
+         console.log("Nenhuma transição de status válida encontrada."); // Para depuração
     }
 
-    selectNovoStatusVenda.disabled = selectNovoStatusVenda.options.length <= 1;
     modalStatusVenda.classList.add("active");
 }
 
