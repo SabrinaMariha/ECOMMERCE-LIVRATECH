@@ -1,3 +1,4 @@
+import { carregarVendas, inicializarListenersVendas } from "./GerenciarVendas.js";
 // ======================= CONTROLE DE ABAS =======================
 const buttons = document.querySelectorAll(".menu-btn");
 const sections = document.querySelectorAll(".section");
@@ -8,7 +9,11 @@ buttons.forEach((btn) => {
     sections.forEach((sec) => sec.classList.remove("active"));
 
     btn.classList.add("active");
-    const section = document.getElementById(btn.dataset.section);
+
+    // CORREÇÃO: Pegue o ID da seção (data-section) do botão antes de usá-lo
+    const sectionId = btn.dataset.section; // <--- Variável 'sectionId' definida aqui!
+
+    const section = document.getElementById(sectionId); // Use 'sectionId' para obter o elemento
     if (section) section.classList.add("active");
 
     // Fechar todos os modais que usam a classe 'active'
@@ -21,6 +26,11 @@ buttons.forEach((btn) => {
       const modal = document.getElementById(id);
       if (modal) modal.style.display = "none";
     });
+
+    // AGORA FUNCIONA: Usa a variável 'sectionId' definida acima
+    if (sectionId === 'vendas') {
+        carregarVendas();
+    }
   });
 });
 
@@ -483,67 +493,9 @@ window.addEventListener("click", (e) => { if(e.target === modalEditarEstoque) { 
 // Carrega o estoque ao iniciar a página
 carregarEstoque();
 
+
 // ======================= VENDAS =======================
-const vendas = [
-  {
-    idVenda: 101,
-    cliente: "Ana Maria",
-    data: "2025-08-01",
-    total: 150.5,
-    status: "Concluída",
-  },
-  {
-    idVenda: 102,
-    cliente: "Bruno Silva",
-    data: "2025-08-05",
-    total: 320.0,
-    status: "Pendente",
-  },
-  {
-    idVenda: 103,
-    cliente: "Carla Souza",
-    data: "2025-08-10",
-    total: 75.25,
-    status: "Cancelada",
-  },
-];
 
-const tbodyVendas = document.getElementById("vendas-tbody");
-const modalStatusVenda = document.getElementById("modalStatusVenda");
-const btnFecharStatusVenda = document.getElementById("btnFecharStatusVenda");
-const btnCancelarStatusVenda = document.getElementById(
-  "btnCancelarStatusVenda"
-);
-
-vendas.forEach((item) => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${item.idVenda}</td>
-    <td>${item.cliente}</td>
-    <td>${item.data}</td>
-    <td>R$ ${item.total.toFixed(2)}</td>
-    <td>${item.status}</td>
-    <td>
-      <button class="btn-acao-tabela btnAlterarStatusVenda"><i class='bx bx-edit'></i></button>
-    </td>
-  `;
-  tbodyVendas.appendChild(tr);
-});
-
-document.querySelectorAll(".btnAlterarStatusVenda").forEach((btn) => {
-  btn.addEventListener("click", () => modalStatusVenda.classList.add("active"));
-});
-
-btnFecharStatusVenda?.addEventListener("click", () =>
-  modalStatusVenda.classList.remove("active")
-);
-btnCancelarStatusVenda?.addEventListener("click", () =>
-  modalStatusVenda.classList.remove("active")
-);
-window.addEventListener("click", (e) => {
-  if (e.target === modalStatusVenda)
-    modalStatusVenda.classList.remove("active");
-});
 
 // ======================= TROCAS/DEVOLUÇÕES =======================
 const trocas = [
@@ -621,3 +573,4 @@ btnFecharDetalhesBtn?.addEventListener(
 window.addEventListener("click", (e) => {
   if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
 });
+inicializarListenersVendas();

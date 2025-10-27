@@ -1,12 +1,14 @@
 package com.sabrina.daniel.Livratech.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -20,6 +22,7 @@ public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transacao> transacoes;
@@ -36,8 +39,12 @@ public class Pedido {
     @JoinColumn(name = "endereco_id")
     private Endereco enderecoPedido;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private StatusCompra status;
 
 
+    private BigDecimal valorTotal;
 
 }
 

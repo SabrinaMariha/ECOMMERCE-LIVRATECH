@@ -64,4 +64,22 @@ public class AdminController {
         DadosConsultaCliente dto = adminService.inativarPorId(id);
         return ResponseEntity.ok("Cliente " + dto.nome() + " inativado com sucesso!");
     }
+
+    @GetMapping("/vendas")
+    public ResponseEntity<List<Map<String, Object>>> buscarVendas() throws Exception {
+        List<Map<String, Object>> vendas = adminService.buscarVendas();
+        return ResponseEntity.ok(vendas);
+    }
+
+    @GetMapping("vendas/{pedidoId}/detalhes")
+    public ResponseEntity<Map<String, Object>> buscarDetalhesDoPedido(@PathVariable Long pedidoId) throws Exception {
+        Map<String, Object> detalhes = adminService.buscarDetalhesDoPedido(pedidoId);
+        return ResponseEntity.ok(detalhes);
+    }
+
+    @PutMapping("/vendas/{pedidoId}/atualizar-status")
+    public ResponseEntity<String> atualizarStatusDoPedido(@PathVariable Long pedidoId, @RequestParam String novoStatus) throws Exception {
+        adminService.atualizarStatusDoPedido(pedidoId, novoStatus);
+        return ResponseEntity.ok("Status do pedido atualizado com sucesso para: " + novoStatus);
+    }
 }
