@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -70,6 +72,7 @@ public class TrocaService {
         return solicitacaoSalva;
     }
 
-    // --- Adicione outros métodos aqui ---
-    // Ex: listarSolicitacoesPendentes, autorizarTroca, confirmarRecebimento, gerarCupom, etc.
+    public List<SolicitacaoTroca> listarTrocasPorCliente(Long clienteId) {
+        return solicitacaoTrocaRepository.findByPedidoClienteId(clienteId);
+    }
 }
