@@ -4,6 +4,7 @@ import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
 import com.sabrina.daniel.Livratech.daos.ItemRepository;
 import com.sabrina.daniel.Livratech.daos.PedidoRepository;
 import com.sabrina.daniel.Livratech.daos.SolicitacaoTrocaRepository;
+import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
 import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import com.sabrina.daniel.Livratech.enums.StatusTroca;
 import com.sabrina.daniel.Livratech.model.Item;
@@ -34,45 +35,73 @@ public class TrocaService {
         this.solicitacaoTrocaRepository = solicitacaoTrocaRepository;
     }
 
-    public SolicitacaoTroca solicitarTrocaItem(Long pedidoId, Long itemId, String motivo) {
-        // 1. Buscar o Pedido
+    private SolicitacaoTrocaDTO toDTO(SolicitacaoTroca solicitacao) {
+        if (solicitacao == null) {
+            return null;
+        }
+        Long pedidoId = (solicitacao.getPedido() != null) ? solicitacao.getPedido().getId() : null;
+        Long itemId = (solicitacao.getItem() != null) ? solicitacao.getItem().getId() : null;
+        String nomeProduto = "N/A";
+        if (solicitacao.getItem() != null && solicitacao.getItem().getProduto() != null) {
+            nomeProduto = solicitacao.getItem().getProduto().getNome();
+        }
+
+        return new SolicitacaoTrocaDTO(
+                solicitacao.getId(),
+                pedidoId,
+                itemId,
+                nomeProduto,
+                solicitacao.getMotivo(),
+                solicitacao.getDataSolicitacao(),
+                solicitacao.getStatus()
+        );
+    }
+
+    public SolicitacaoTrocaDTO solicitarTrocaItem(Long pedidoId, Long itemId, String motivo) {
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new RuntimeException("Pedido com ID " + pedidoId + " não encontrado."));
 
-        // 2. Validar Status do Pedido (RN0043)
         if (pedido.getStatus() != StatusCompra.ENTREGUE) {
             throw new ValidacaoException("Não é possível solicitar troca para pedidos que não foram entregues. Status atual: " + pedido.getStatus());
         }
 
-        // 3. Buscar o Item específico dentro do pedido
         Item itemParaTrocar = pedido.getItens().stream()
                 .filter(item -> item.getId().equals(itemId))
                 .findFirst()
                 .orElseThrow(() -> new ValidacaoException("Item com ID " + itemId + " não encontrado no pedido " + pedidoId + "."));
 
-        // 4. Criar a Solicitação de Troca
         SolicitacaoTroca novaSolicitacao = new SolicitacaoTroca();
         novaSolicitacao.setPedido(pedido);
         novaSolicitacao.setItem(itemParaTrocar);
         novaSolicitacao.setMotivo(motivo);
         novaSolicitacao.setDataSolicitacao(LocalDateTime.now());
-        novaSolicitacao.setStatus(StatusTroca.PENDENTE); // Status inicial
+        novaSolicitacao.setStatus(StatusTroca.PENDENTE);
 
-        // 5. Salvar a Solicitação de Troca
         SolicitacaoTroca solicitacaoSalva = solicitacaoTrocaRepository.save(novaSolicitacao);
 
-        // 6. (Opcional - Decidir se o status do pedido principal muda para EM_TROCA - RN0041)
-        // Se você decidir que *qualquer* solicitação de item muda o status do pedido inteiro:
-        // pedido.setStatus(StatusCompra.EM_TROCA);
-        // pedidoRepository.save(pedido);
-        // Nota: Considere se isso faz sentido. Talvez seja melhor manter o pedido como ENTREGUE
-        // e gerenciar o status apenas na SolicitacaoTroca.
+        pedido.setStatus(StatusCompra.EM_TROCA);
+        pedidoRepository.save(pedido);
 
-        // 7. Retornar a solicitação salva
-        return solicitacaoSalva;
+        return toDTO(solicitacaoSalva);
     }
 
-    public List<SolicitacaoTroca> listarTrocasPorCliente(Long clienteId) {
-        return solicitacaoTrocaRepository.findByPedidoClienteId(clienteId);
+    public List<SolicitacaoTrocaDTO> listarTrocasPorCliente(Long clienteId) {
+        List<SolicitacaoTroca> solicitacoes = solicitacaoTrocaRepository.findByPedidoClienteId(clienteId);
+        return solicitacoes.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<SolicitacaoTrocaDTO> listarSolicitacoesPendentesAdmin() {
+
+        return List.of();
+    }
+    public SolicitacaoTrocaDTO autorizarTroca(Long solicitacaoId) {
+
+        return null;
+    }
+    public SolicitacaoTrocaDTO confirmarRecebimentoTroca(Long solicitacaoId, boolean retornarEstoque) {
+
+        return null;
     }
 }

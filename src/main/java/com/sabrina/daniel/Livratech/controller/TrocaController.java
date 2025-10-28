@@ -1,20 +1,26 @@
 package com.sabrina.daniel.Livratech.controller;
 
 import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
+import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
+import com.sabrina.daniel.Livratech.service.TrocaService;
 import com.sabrina.daniel.Livratech.daos.PedidoRepository;
 import com.sabrina.daniel.Livratech.model.Pedido;
-import com.sabrina.daniel.Livratech.model.SolicitacaoTroca;
-import com.sabrina.daniel.Livratech.service.TrocaService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/trocas")
 public class TrocaController {
+
+    private static final Logger logger = LoggerFactory.getLogger(TrocaController.class);
 
     private final TrocaService trocaService;
     private final PedidoRepository pedidoRepository;
@@ -38,47 +44,50 @@ public class TrocaController {
         }
 
         try {
-            Pedido pedido = pedidoRepository.findById(pedidoId).orElseThrow(() -> new RuntimeException("Pedido não encontrado."));
-            if (!pedido.getCliente().getId().equals(clienteId)) {
-                 return ResponseEntity.status(403).body("Este pedido não pertence ao cliente informado.");
+            Pedido pedido = pedidoRepository.findById(pedidoId)
+                 .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado com ID: " + pedidoId));
+            if (pedido.getCliente() == null || !pedido.getCliente().getId().equals(clienteId)) {
+                 logger.warn("Tentativa de solicitar troca para pedido {} por cliente não autorizado {}", pedidoId, clienteId);
+                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Este pedido não pertence ao cliente informado.");
             }
 
-            SolicitacaoTroca solicitacaoSalva = trocaService.solicitarTrocaItem(pedidoId, itemId, motivo);
-
-            return ResponseEntity.ok(solicitacaoSalva);
+            SolicitacaoTrocaDTO solicitacaoDTO = trocaService.solicitarTrocaItem(pedidoId, itemId, motivo);
+            return ResponseEntity.ok(solicitacaoDTO);
 
         } catch (ValidacaoException e) {
+            logger.warn("Falha na validação ao solicitar troca: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            logger.error("Erro ao solicitar troca (Recurso não encontrado): {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (RuntimeException e) {
-            System.err.println("Erro ao solicitar troca: " + e.getMessage());
-            return ResponseEntity.status(500).body("Erro interno ao processar a solicitação de troca.");
+            logger.error("Erro interno ao solicitar troca para cliente {} pedido {} item {}", clienteId, pedidoId, itemId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao processar a solicitação de troca.");
         }
     }
 
     @GetMapping("/cliente/{clienteId}/solicitacoes")
     public ResponseEntity<?> listarTrocasDoCliente(@PathVariable Long clienteId) {
         try {
-            List<SolicitacaoTroca> solicitacoes = trocaService.listarTrocasPorCliente(clienteId);
-            if (solicitacoes.isEmpty()) {
-                return ResponseEntity.ok("Nenhuma solicitação de troca encontrada para este cliente.");
-            }
-            return ResponseEntity.ok(solicitacoes);
+            List<SolicitacaoTrocaDTO> solicitacoesDTO = trocaService.listarTrocasPorCliente(clienteId);
+            return ResponseEntity.ok(solicitacoesDTO);
         } catch (Exception e) {
-            System.err.println("Erro ao listar trocas do cliente: " + e.getMessage());
-            return ResponseEntity.status(500).body("Erro interno ao buscar as solicitações de troca.");
+            logger.error("Erro ao listar trocas para cliente {}", clienteId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao buscar as solicitações de troca.");
         }
     }
 
-
-    // --- Endpoints para ADMIN ---
-    // (Mantidos como estavam, podem ser movidos para AdminController se preferir)
+    // --- Endpoints para ADMIN (Exemplos) ---
     /*
     @GetMapping("/admin/pendentes")
-    // ...
-    @PutMapping("/admin/{solicitacaoId}/autorizar")
-    // ...
-    @PutMapping("/admin/{solicitacaoId}/confirmar-recebimento")
-    // ...
-    */
+    public ResponseEntity<?> listarTrocasPendentesAdmin() { ... }
 
+    @PutMapping("/admin/{solicitacaoId}/autorizar")
+    public ResponseEntity<?> autorizarTroca(@PathVariable Long solicitacaoId) { ... }
+
+    @PutMapping("/admin/{solicitacaoId}/confirmar-recebimento")
+    public ResponseEntity<?> confirmarRecebimento(
+            @PathVariable Long solicitacaoId,
+            @RequestParam(required = true) boolean retornarEstoque) { ... }
+    */
 }
