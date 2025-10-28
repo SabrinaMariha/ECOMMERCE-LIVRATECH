@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+
 public class SolicitacaoTroca {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +20,8 @@ public class SolicitacaoTroca {
     @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 
-    @ManyToOne @JoinColumn(name = "item_id")
+    @ManyToOne
+    @JoinColumn(name = "item_id")
     private Item item;
 
     private String motivo;
