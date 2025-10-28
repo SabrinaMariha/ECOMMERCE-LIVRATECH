@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-public class SolicitaçãoTroca {
+public class SolicitacaoTroca {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
