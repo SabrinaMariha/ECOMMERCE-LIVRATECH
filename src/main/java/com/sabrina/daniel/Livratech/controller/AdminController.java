@@ -3,9 +3,11 @@ package com.sabrina.daniel.Livratech.controller;
 
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.dtos.FiltroCliente;
+import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
 import com.sabrina.daniel.Livratech.model.Cliente;
 import com.sabrina.daniel.Livratech.service.AdminService;
 import com.sabrina.daniel.Livratech.service.ClienteService;
+import com.sabrina.daniel.Livratech.service.TrocaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,8 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    @Autowired
+    private TrocaService trocaService;
 
     @PostMapping("/clientes")
     public ResponseEntity<Map<String, Object>> buscarClientes(@RequestBody FiltroCliente filtroClientes) throws Exception {
@@ -54,11 +58,13 @@ public class AdminController {
 
         return ResponseEntity.ok(resposta);
     }
+
     @GetMapping("/cliente/{id}")
     public ResponseEntity<DadosConsultaCliente> buscarPorId(@PathVariable long id) throws Exception {
         DadosConsultaCliente dto = adminService.findDTOById(id);
         return ResponseEntity.ok(dto);
     }
+
     @PatchMapping("/cliente/{id}/inativar")
     public ResponseEntity<String> inativarPorId(@PathVariable long id) throws Exception {
         DadosConsultaCliente dto = adminService.inativarPorId(id);
@@ -81,5 +87,11 @@ public class AdminController {
     public ResponseEntity<String> atualizarStatusDoPedido(@PathVariable Long pedidoId, @RequestParam String novoStatus) throws Exception {
         adminService.atualizarStatusDoPedido(pedidoId, novoStatus);
         return ResponseEntity.ok("Status do pedido atualizado com sucesso para: " + novoStatus);
+    }
+
+    @GetMapping("/trocas")
+    public ResponseEntity<List<SolicitacaoTrocaDTO>> buscarSolicitacoesDeTroca() {
+        List<SolicitacaoTrocaDTO> solicitacoes = trocaService.listarTodasSolicitacoesAdmin();
+        return ResponseEntity.ok(solicitacoes);
     }
 }
