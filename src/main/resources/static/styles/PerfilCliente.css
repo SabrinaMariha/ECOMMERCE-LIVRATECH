@@ -357,7 +357,6 @@
     font-weight: bold;
     color: #555;
     text-align: right;
-    flex: 1;
     align-self: center;
     font-size: 0.9rem;
   }
