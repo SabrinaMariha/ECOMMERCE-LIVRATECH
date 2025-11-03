@@ -33,15 +33,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 switch (pedido.status) {
                     case "ENTREGUE":
-                        // **MODIFICADO**: Agora o onclick redireciona passando os IDs na URL
                         botaoTrocaHTML = `<button class="btn-principal btn-troca"
                                 onclick="window.location.href='telaTroca.html?pedidoId=${pedidoId}&itemId=${itemId}'">Trocar</button>`;
                         break;
                     case "EM_TROCA":
+                        botaoTrocaHTML = `<label class="label-campo label-troca" style="color: #007bff;">Troca em análise</label>`;
+                        break;
                     case "TROCA_AUTORIZADA":
+                        botaoTrocaHTML = `<label class="label-campo label-troca" style="color: #007bff;">Troca autorizada</label>`;
+                        break;
                     case "TROCADO":
                         // Label para itens que já estão em processo de troca
-                        botaoTrocaHTML = `<label class="label-campo label-troca" style="color: #007bff;">Troca em análise</label>`;
+                        botaoTrocaHTML = `<label class="label-campo label-troca" style="color: #229a00;">Troca realizada</label>`;
                         break;
                     default:
                         // Botão desabilitado para pedidos não entregues
