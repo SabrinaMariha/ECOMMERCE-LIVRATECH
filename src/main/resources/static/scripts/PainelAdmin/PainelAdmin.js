@@ -1,3 +1,5 @@
+// Arquivo: src/main/resources/static/scripts/PainelAdmin/PainelAdmin.js
+
 import { carregarVendas, inicializarListenersVendas } from "./GerenciarVendas.js";
 // ======================= CONTROLE DE ABAS =======================
 const buttons = document.querySelectorAll(".menu-btn");
@@ -30,6 +32,11 @@ buttons.forEach((btn) => {
     // AGORA FUNCIONA: Usa a variável 'sectionId' definida acima
     if (sectionId === 'vendas') {
         carregarVendas();
+    }
+
+    // ADICIONADO: Carrega as trocas ao clicar na aba
+    if (sectionId === 'trocas') {
+        carregarTrocas();
     }
   });
 });
@@ -244,6 +251,7 @@ function renderizarClientes(clientes) {
   }); // Fim do forEach
 } // Fim da função renderizarClientes
 
+// Carrega clientes na inicialização (primeira aba)
 carregarClientes();
 
 // ======================= MODAIS CLIENTES =======================
@@ -362,8 +370,8 @@ async function carregarEstoque() {
             const tr = document.createElement("tr");
             tr.dataset.produtoId = produto.id; // Adiciona dataset para fácil acesso
             tr.innerHTML = `
-                <td>${produto.id}</td>          
-                <td>${produto.nome || '-'}</td> 
+                <td>${produto.id}</td>
+                <td>${produto.nome || '-'}</td>
                 <td>${produto.autor || '-'}</td>
                 <td>${produto.preco ? produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</td>
                 <td>${produto.estoque !== null ? produto.estoque : '-'}</td>
@@ -411,7 +419,7 @@ async function abrirModalEditarEstoque(produtoId) {
         formEditarEstoque.querySelector("#editEstoque").value = produto.estoque !== null ? produto.estoque : '';
         formEditarEstoque.querySelector("#editImagemUrl").value = produto.imagemUrl || '';
         // Status não vem do backend, pode ser removido ou gerenciado de outra forma se necessário
-        // formEditarEstoque.querySelector("#editStatus").value = "Ativo"; 
+        // formEditarEstoque.querySelector("#editStatus").value = "Ativo";
 
         modalEditarEstoque.style.display = "flex"; // Abre o modal
 
@@ -433,7 +441,7 @@ if (formEditarEstoque) {
 
         // Pega apenas a nova quantidade do formulário
         const novaQuantidadeInput = formEditarEstoque.querySelector("#editEstoque");
-        
+
         if (!novaQuantidadeInput || novaQuantidadeInput.value === '') {
              alert("Por favor, insira uma quantidade válida.");
              return;
@@ -479,77 +487,106 @@ btnFecharModalEstoque?.addEventListener("click", () => { modalEditarEstoque.styl
 btnCancelarEditar?.addEventListener("click", () => { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; });
 window.addEventListener("click", (e) => { if(e.target === modalEditarEstoque) { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; } });
 
-// Cria Filtro Estoque (sem função de filtro real por enquanto)
-// criarFiltro(
-//   "btnAbrirFiltroEstoque",
-//   "painelFiltroEstoque",
-//   "btnFecharFiltroEstoque",
-//   "btnLimparEstoque",
-//   "formFiltroEstoque",
-//   null, // ID do botão filtrar (se existir)
-//   null // Função de filtro de estoque (a ser criada se necessário)
-// );
-
-// Carrega o estoque ao iniciar a página
+// Carrega o estoque ao iniciar a página (pois é a segunda aba)
 carregarEstoque();
 
 
 // ======================= VENDAS =======================
+// A lógica foi movida para GerenciarVendas.js e é importada
 
 
-// ======================= TROCAS/DEVOLUÇÕES =======================
-const trocas = [
-  {
-    idPedido: 1,
-    cliente: "Ana Maria",
-    produto: "Livro A",
-    dataSolicitacao: "2025-08-15",
-    motivo: "Defeito na impressão",
-    status: "Pendente",
-  },
-  {
-    idPedido: 2,
-    cliente: "Carlos Souza",
-    produto: "Livro B",
-    dataSolicitacao: "2025-08-18",
-    motivo: "Troca por outro título",
-    status: "Aprovada",
-  },
-  {
-    idPedido: 3,
-    cliente: "Fernanda Lima",
-    produto: "Livro C",
-    dataSolicitacao: "2025-08-20",
-    motivo: "Devolução por arrependimento",
-    status: "Recusada",
-  },
-];
-
+// ======================= TROCAS/DEVOLUÇÕES (MODIFICADO) =======================
 const tbodyTrocas = document.getElementById("trocas-tbody");
 const modalStatusTroca = document.getElementById("modalStatusTroca");
 const btnFecharStatus = document.getElementById("btnFecharStatus");
 const btnCancelarStatus = document.getElementById("btnCancelarStatus");
 
-trocas.forEach((item) => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${item.idPedido}</td>
-    <td>${item.cliente}</td>
-    <td>${item.produto}</td>
-    <td>${item.dataSolicitacao}</td>
-    <td>${item.motivo}</td>
-    <td>${item.status}</td>
-    <td>
-      <button class="btn-acao-tabela btnAlterarStatusTroca"><i class='bx bx-edit'></i></button>
-    </td>
-  `;
-  tbodyTrocas.appendChild(tr);
-});
+// --- ADICIONADO: Função para carregar trocas da API ---
+async function carregarTrocas() {
+    if (!tbodyTrocas) return;
+    tbodyTrocas.innerHTML = '<tr><td colspan="7" style="text-align:center;">Carregando solicitações de troca...</td></tr>';
 
-document.querySelectorAll(".btnAlterarStatusTroca").forEach((btn) => {
-  btn.addEventListener("click", () => modalStatusTroca.classList.add("active"));
-});
+    try {
+        const res = await fetch("/admin/trocas"); // Chama o novo endpoint GET /admin/trocas
+        if (!res.ok) {
+            throw new Error(`Erro ao buscar trocas: ${res.status} ${res.statusText}`);
+        }
+        const data = await res.json(); // Lista de SolicitacaoTrocaDTO
+        renderizarTrocas(data);
 
+    } catch (err) {
+        console.error("Erro ao carregar trocas:", err);
+        tbodyTrocas.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">${err.message}</td></tr>`;
+    }
+}
+
+// --- ADICIONADO: Função para renderizar trocas reais ---
+function renderizarTrocas(solicitacoes) {
+    if (!tbodyTrocas) return;
+    tbodyTrocas.innerHTML = ""; // Limpa a tabela
+
+    if (solicitacoes.length === 0) {
+        tbodyTrocas.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhuma solicitação de troca encontrada.</td></tr>';
+        return;
+    }
+
+    solicitacoes.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.dataset.solicitacaoId = item.id;
+
+        // Formata a data (LocalDateTime)
+        const dataFormatada = new Date(item.dataSolicitacao).toLocaleString("pt-BR", {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        // Tabela de Trocas: ID Pedido, Cliente, Produto, Data, Motivo, Status, Ações
+        tr.innerHTML = `
+            <td>${item.pedidoId}</td>
+            <td>${item.clienteNome}</td>
+            <td>${item.nomeProduto}</td>
+            <td>${dataFormatada}</td>
+            <td>${item.motivo}</td>
+            <td>${item.status}</td>
+            <td>
+                <button class="btn-acao-tabela btnAlterarStatusTroca" data-id="${item.id}" data-status-atual="${item.status}">
+                    <i class='bx bx-edit'></i>
+                </button>
+            </td>
+        `;
+        tbodyTrocas.appendChild(tr);
+
+        // Adiciona listener para o botão de status
+        tr.querySelector(".btnAlterarStatusTroca").addEventListener("click", (e) => {
+            const btn = e.currentTarget;
+            const solicitacaoId = btn.dataset.id;
+            const statusAtual = btn.dataset.statusAtual;
+
+            // TODO: Implementar lógica de atualização de status
+            // Por enquanto, apenas abre o modal e seleciona o status atual
+            const formStatusTroca = document.getElementById("formStatusTroca");
+            const selectStatus = document.getElementById("novoStatusTroca");
+
+            // Mapeia o Enum do backend para os valores do <option>
+            // Seus enums são: PENDENTE, AUTORIZADA, RECEBIDA, RECUSADA
+            // Seu HTML de modal é: "Pendente", "Aprovada", "Recusada", "Concluída"
+
+            let statusHtml = "Pendente"; // PENDENTE
+            if (statusAtual === "AUTORIZADA") statusHtml = "Aprovada";
+            if (statusAtual === "RECUSADA") statusHtml = "Recusada";
+            if (statusAtual === "RECEBIDA") statusHtml = "Concluída"; // Assumindo que RECEBIDA = Concluída
+
+            selectStatus.value = statusHtml;
+            formStatusTroca.dataset.solicitacaoId = solicitacaoId;
+
+            console.log(`Abrindo modal para troca ID: ${solicitacaoId}, Status: ${statusAtual}`);
+            modalStatusTroca.classList.add("active");
+        });
+    });
+}
+
+
+// --- Lógica do Modal (Existente) ---
 btnFecharStatus?.addEventListener("click", () =>
   modalStatusTroca.classList.remove("active")
 );
@@ -573,4 +610,6 @@ btnFecharDetalhesBtn?.addEventListener(
 window.addEventListener("click", (e) => {
   if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
 });
+
+// Inicializa os listeners dos modais de Vendas (que são importados)
 inicializarListenersVendas();

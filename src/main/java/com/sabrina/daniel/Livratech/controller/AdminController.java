@@ -1,6 +1,7 @@
 package com.sabrina.daniel.Livratech.controller;
 
 
+import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
 import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.dtos.FiltroCliente;
 import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
@@ -9,14 +10,12 @@ import com.sabrina.daniel.Livratech.service.AdminService;
 import com.sabrina.daniel.Livratech.service.ClienteService;
 import com.sabrina.daniel.Livratech.service.TrocaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @RestController
@@ -93,5 +92,21 @@ public class AdminController {
     public ResponseEntity<List<SolicitacaoTrocaDTO>> buscarSolicitacoesDeTroca() {
         List<SolicitacaoTrocaDTO> solicitacoes = trocaService.listarTodasSolicitacoesAdmin();
         return ResponseEntity.ok(solicitacoes);
+    }
+
+    @PutMapping("/trocas/{solicitacaoId}/status")
+    public ResponseEntity<?> atualizarStatusTroca(
+            @PathVariable Long solicitacaoId,
+            @RequestParam String novoStatus) { // Recebe ex: "AUTORIZADA"
+        try {
+            SolicitacaoTrocaDTO dto = trocaService.atualizarStatusTrocaAdmin(solicitacaoId, novoStatus);
+            return ResponseEntity.ok(dto);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (ValidacaoException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }
