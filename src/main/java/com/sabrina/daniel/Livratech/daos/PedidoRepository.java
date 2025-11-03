@@ -20,4 +20,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     // Buscar por Status (Exemplo simples)
     List<Pedido> findByTransacoes_Status(StatusCompra status);
+
+    @Query("SELECT p FROM Pedido p WHERE p.status NOT IN :statuses")
+    List<Pedido> findByStatusNotIn(@Param("statuses") List<StatusCompra> statuses);
 }
