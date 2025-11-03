@@ -21,30 +21,32 @@ import java.util.*;
 @Transactional
 public class AdminService {
     Map<String, List<IStrategy>> rns = new HashMap<String, List<IStrategy>>();
-
     List<IStrategy> regrasCliente = new ArrayList<IStrategy>();
-
     Map<String, JpaRepository> repositories = new HashMap<String, JpaRepository>();
 
     ClienteRepository clienteRepository;
     PedidoRepository pedidoRepository;
 
+    // Lista de status que devem ser tratados como "Troca" e não "Venda"
+    private static final List<StatusCompra> STATUS_DE_TROCA = List.of(
+            StatusCompra.EM_TROCA,
+            StatusCompra.TROCA_AUTORIZADA,
+            StatusCompra.TROCADO
+    );
+
     public AdminService(ClienteRepository clienteRepository, PedidoRepository pedidoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.clienteRepository = clienteRepository;
 
-
         rns.put(Cliente.class.getName(), regrasCliente);
-
         repositories.put(Cliente.class.getName(),  clienteRepository);
     }
-
-
 
     public List<Cliente> findAll(FiltroCliente clienteASerConsultado) {
         List<Cliente> clientes = clienteRepository.findAllByFiltros(clienteASerConsultado);
         return clientes;
     }
+
     public DadosConsultaCliente findDTOById(Long id) throws Exception {
         Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new Exception("Cliente não encontrado"));
         return toDTO(cliente);
@@ -57,7 +59,7 @@ public class AdminService {
                 cliente.getGenero(),
                 cliente.getDataNascimento(),
                 cliente.getCpf(),
-                List.copyOf(cliente.getTelefones()), // evita mutabilidade externa
+                List.copyOf(cliente.getTelefones()),
                 cliente.getEmail(),
                 cliente.getStatus(),
                 List.copyOf(cliente.getEnderecos()),
@@ -72,9 +74,11 @@ public class AdminService {
         return toDTO(cliente);
     }
 
-
     public List<Map<String, Object>> buscarVendas() {
-        return pedidoRepository.findAll().stream().map(pedido -> {
+        // MODIFICADO: Busca pedidos que NÃO ESTÃO na lista de status de troca
+        List<Pedido> pedidosFiltrados = pedidoRepository.findByStatusNotIn(STATUS_DE_TROCA);
+
+        return pedidosFiltrados.stream().map(pedido -> {
             Map<String, Object> vendaDetalhes = new HashMap<>();
             vendaDetalhes.put("pedidoId", pedido.getId());
             vendaDetalhes.put("clienteNome", pedido.getCliente().getNome());
@@ -103,42 +107,32 @@ public class AdminService {
             vendaDetalhes.put("valorTotal", pedido.getValorTotal());
             return vendaDetalhes;
         }).toList();
-
     }
 
     public Map<String, Object> buscarDetalhesDoPedido(Long pedidoId) {
-
-        // 1. BUSCA O PEDIDO ESPECÍFICO PELO ID
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado com ID: " + pedidoId));
 
-        // 2. MAPEA OS DETALHES DESTE ÚNICO PEDIDO
         Map<String, Object> pedidoDetalhes = new HashMap<>();
-
-        // Adiciona campos de nível superior
         pedidoDetalhes.put("pedidoId", pedido.getId());
-        pedidoDetalhes.put("valorTotal", pedido.getValorTotal()); // Assumindo que Pedido tem getValorTotal()
+        pedidoDetalhes.put("valorTotal", pedido.getValorTotal());
         pedidoDetalhes.put("status", pedido.getStatus());
         pedidoDetalhes.put("clienteNome", pedido.getCliente().getNome());
-         //endereço
+
         Endereco endereco = pedido.getEnderecoPedido();
         if (endereco != null) {
             Map<String, Object> enderecoDetalhe = new HashMap<>();
-
-            // Mapeie apenas os campos necessários para a exibição no Front-End
-            enderecoDetalhe.put("logradouro", endereco.getLogradouro() != null ? endereco.getLogradouro() : "N/A"); // Usando logradouro (Rua/Av)
+            enderecoDetalhe.put("logradouro", endereco.getLogradouro() != null ? endereco.getLogradouro() : "N/A");
             enderecoDetalhe.put("numero", endereco.getNumero() != null ? endereco.getNumero() : "N/A");
             enderecoDetalhe.put("bairro", endereco.getBairro() != null ? endereco.getBairro() : "N/A");
             enderecoDetalhe.put("cidade", endereco.getCidade() != null ? endereco.getCidade() : "N/A");
             enderecoDetalhe.put("estado", endereco.getEstado() != null ? endereco.getEstado() : "N/A");
             enderecoDetalhe.put("cep", endereco.getCep() != null ? endereco.getCep() : "N/A");
-
-            pedidoDetalhes.put("enderecoEntrega", enderecoDetalhe); // Adiciona o mapa de endereço
+            pedidoDetalhes.put("enderecoEntrega", enderecoDetalhe);
         } else {
-            pedidoDetalhes.put("enderecoEntrega", null); // Garante que o Front-End saiba que não há endereço
+            pedidoDetalhes.put("enderecoEntrega", null);
         }
 
-        // Mapeamento dos Itens
         List<Map<String, Object>> itensDetalhes = new ArrayList<>();
         pedido.getItens().forEach(item -> {
             Map<String, Object> itemDetalhe = new HashMap<>();
@@ -150,7 +144,6 @@ public class AdminService {
         });
         pedidoDetalhes.put("itens", itensDetalhes);
 
-        // Mapeamento das Transações
         List<Map<String, Object>> transacoesDetalhes = new ArrayList<>();
         pedido.getTransacoes().forEach(transacao -> {
             Map<String, Object> transacaoDetalhe = new HashMap<>();
@@ -173,34 +166,22 @@ public class AdminService {
         });
         pedidoDetalhes.put("transacoes", transacoesDetalhes);
 
-        // 3. RETORNA O ÚNICO MAPA DE DETALHES
         return pedidoDetalhes;
     }
 
-    @Transactional // Garante que a operação de persistência seja concluída
+    @Transactional
     public void atualizarStatusDoPedido(Long pedidoId, String novoStatus) throws IllegalArgumentException, NoSuchElementException {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado com ID: " + pedidoId));
 
-            // 1. Encontra o Pedido
-            Pedido pedido = pedidoRepository.findById(pedidoId)
-                    .orElseThrow(() -> new NoSuchElementException("Pedido não encontrado com ID: " + pedidoId));
+        StatusCompra novoStatusEnum;
+        try {
+            novoStatusEnum = StatusCompra.valueOf(novoStatus.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Status de compra inválido: " + novoStatus);
+        }
 
-            // 2. Converte a String de status para o Enum
-            StatusCompra novoStatusEnum;
-            try {
-                novoStatusEnum = StatusCompra.valueOf(novoStatus.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                // Lança uma exceção se o status fornecido não for válido
-                throw new IllegalArgumentException("Status de compra inválido: " + novoStatus);
-            }
-
-            // 3. Atualiza o status
-            pedido.setStatus(novoStatusEnum);
-
-            // 4. Salva a mudança no banco de dados
-            pedidoRepository.save(pedido);
-
-            // Você pode adicionar aqui lógica de log ou notificação, se necessário.
-
-
+        pedido.setStatus(novoStatusEnum);
+        pedidoRepository.save(pedido);
     }
 }

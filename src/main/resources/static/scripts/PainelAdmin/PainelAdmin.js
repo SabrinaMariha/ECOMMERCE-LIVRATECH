@@ -1,3 +1,5 @@
+// Arquivo: src/main/resources/static/scripts/PainelAdmin/PainelAdmin.js
+
 import { carregarVendas, inicializarListenersVendas } from "./GerenciarVendas.js";
 // ======================= CONTROLE DE ABAS =======================
 const buttons = document.querySelectorAll(".menu-btn");
@@ -10,10 +12,8 @@ buttons.forEach((btn) => {
 
     btn.classList.add("active");
 
-    // CORREÇÃO: Pegue o ID da seção (data-section) do botão antes de usá-lo
-    const sectionId = btn.dataset.section; // <--- Variável 'sectionId' definida aqui!
-
-    const section = document.getElementById(sectionId); // Use 'sectionId' para obter o elemento
+    const sectionId = btn.dataset.section;
+    const section = document.getElementById(sectionId);
     if (section) section.classList.add("active");
 
     // Fechar todos os modais que usam a classe 'active'
@@ -27,9 +27,12 @@ buttons.forEach((btn) => {
       if (modal) modal.style.display = "none";
     });
 
-    // AGORA FUNCIONA: Usa a variável 'sectionId' definida acima
     if (sectionId === 'vendas') {
         carregarVendas();
+    }
+
+    if (sectionId === 'trocas') {
+        carregarTrocas();
     }
   });
 });
@@ -71,9 +74,7 @@ async function carregarClientes() {
     const data = await res.json();
     clientesCarregados = data.clientes || [];
 
-    // Ordenar por ID antes de renderizar
     clientesCarregados.sort((a, b) => a.id - b.id);
-
     renderizarClientes(clientesCarregados);
   } catch (err) {
     tbodyClientes.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">${err.message}</td></tr>`;
@@ -81,10 +82,9 @@ async function carregarClientes() {
 }
 
 function renderizarClientes(clientes) {
-  tbodyClientes.innerHTML = ""; // Limpa a tabela
+  tbodyClientes.innerHTML = "";
 
   if (clientes.length === 0) {
-    // Ajustado colspan para 8
     tbodyClientes.innerHTML =
       '<tr><td colspan="8" style="text-align:center;">Nenhum cliente encontrado.</td></tr>';
     return;
@@ -92,7 +92,7 @@ function renderizarClientes(clientes) {
 
   clientes.forEach((c) => {
     const tr = document.createElement("tr");
-    tr.dataset.clienteId = c.id; // Mantém o dataset se precisar
+    tr.dataset.clienteId = c.id;
     tr.innerHTML = `
       <td>${c.id}</td>
       <td>${c.nome || "-"}</td>
@@ -124,19 +124,15 @@ function renderizarClientes(clientes) {
     tbodyClientes.appendChild(tr);
 
     // --- Adiciona os event listeners novamente ---
-    // Botão detalhes (código existente)
     const btnDetalhes = tr.querySelector(".btn-detalhes");
-    // ... (seu código existente para o event listener de detalhes) ...
     if (btnDetalhes) {
       btnDetalhes.addEventListener("click", async (e) => {
-        // Seu código para buscar e exibir detalhes aqui...
         try {
           const clienteId = e.currentTarget.dataset.id;
           const res = await fetch(`admin/cliente/${clienteId}`);
           if (!res.ok) throw new Error("Erro ao carregar cliente");
           const data = await res.json();
 
-          // ... (código para formatar telefones, endereços, cartões) ...
           const telefones =
             data.telefones?.map((t) => `(${t.ddd}) ${t.numero}`).join(", ") ||
             "-";
@@ -187,9 +183,7 @@ function renderizarClientes(clientes) {
       });
     }
 
-    // Botão histórico (código modificado no passo 1)
     const btnHistorico = tr.querySelector(".btn-historico");
-    // ... (seu código modificado para o event listener de histórico) ...
     if (btnHistorico) {
       btnHistorico.addEventListener("click", async (e) => {
         const clienteId = e.currentTarget.dataset.id;
@@ -232,17 +226,15 @@ function renderizarClientes(clientes) {
       });
     }
 
-    // Botão inativar (código existente)
     const btnInativar = tr.querySelector(".btn-inativar");
-    // ... (seu código existente para o event listener de inativar) ...
     if (btnInativar) {
       btnInativar.addEventListener("click", (e) => {
         clienteParaInativar = e.currentTarget.dataset.id;
         inativarModal.style.display = "flex";
       });
     }
-  }); // Fim do forEach
-} // Fim da função renderizarClientes
+  });
+}
 
 carregarClientes();
 
@@ -264,7 +256,6 @@ window.addEventListener("click", (e) => {
   if (e.target === inativarModal) inativarModal.style.display = "none";
 });
 
-// botão "sim" (inativar)
 btnSim?.addEventListener("click", async () => {
   if (!clienteParaInativar) return;
   try {
@@ -281,16 +272,6 @@ btnSim?.addEventListener("click", async () => {
 });
 
 // ======================= FILTROS =======================
-// function criarFiltro(btnAbrir, painel, btnFechar, btnLimpar, formId) {
-//   btnAbrir?.addEventListener("click", () => painel?.classList.toggle("active"));
-//   btnFechar?.addEventListener("click", () =>
-//     painel?.classList.remove("active")
-//   );
-//   btnLimpar?.addEventListener("click", () =>
-//     document.getElementById(formId)?.reset()
-//   );
-// }
-
 document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
   const form = document.getElementById("formFiltro");
   const filtros = {
@@ -322,48 +303,38 @@ document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
   renderizarClientes(clientesFiltrados);
 });
 
-// criarFiltro(
-//   document.getElementById("btnAbrirFiltro"),
-//   document.getElementById("painelFiltro"),
-//   document.getElementById("btnFecharFiltro"),
-//   document.getElementById("btnLimpar"),
-//   "formFiltro"
-// );
-
 // ======================= ESTOQUE =======================
 const tbodyEstoque = document.getElementById("estoque-tbody");
 const modalEditarEstoque = document.getElementById("modalEditarEstoque");
-const formEditarEstoque = document.getElementById("formEditarEstoque"); // Pegar o form
+const formEditarEstoque = document.getElementById("formEditarEstoque");
 const btnFecharModalEstoque = document.getElementById("btnFecharModalEstoque");
 const btnCancelarEditar = document.getElementById("btnCancelarEditar");
-let produtoParaEditarId = null; // Para guardar o ID do produto sendo editado
+let produtoParaEditarId = null;
 
-// Função para buscar e renderizar produtos no estoque
 async function carregarEstoque() {
     if (!tbodyEstoque) return;
-    tbodyEstoque.innerHTML = '<tr><td colspan="7" style="text-align:center;">Carregando estoque...</td></tr>'; // Colspan 8
+    tbodyEstoque.innerHTML = '<tr><td colspan="7" style="text-align:center;">Carregando estoque...</td></tr>';
 
     try {
-        const res = await fetch("/produtos"); // Chama GET /produtos
+        const res = await fetch("/produtos");
         if (!res.ok) throw new Error("Erro ao carregar estoque");
-        const produtos = await res.json(); // Lista de objetos Produto
+        const produtos = await res.json();
 
-        tbodyEstoque.innerHTML = ""; // Limpa a tabela
+        tbodyEstoque.innerHTML = "";
 
         if (produtos.length === 0) {
             tbodyEstoque.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhum produto encontrado.</td></tr>';
             return;
         }
 
-        // Ordenar por ID (opcional, mas consistente com clientes)
         produtos.sort((a, b) => a.id - b.id);
 
         produtos.forEach((produto) => {
             const tr = document.createElement("tr");
-            tr.dataset.produtoId = produto.id; // Adiciona dataset para fácil acesso
+            tr.dataset.produtoId = produto.id;
             tr.innerHTML = `
-                <td>${produto.id}</td>          
-                <td>${produto.nome || '-'}</td> 
+                <td>${produto.id}</td>
+                <td>${produto.nome || '-'}</td>
                 <td>${produto.autor || '-'}</td>
                 <td>${produto.preco ? produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '-'}</td>
                 <td>${produto.estoque !== null ? produto.estoque : '-'}</td>
@@ -374,12 +345,11 @@ async function carregarEstoque() {
             `;
             tbodyEstoque.appendChild(tr);
 
-            // Adiciona listener ao botão Editar desta linha
             const btnEditar = tr.querySelector(".btnEditarEstoque");
             if (btnEditar) {
                 btnEditar.addEventListener("click", async (e) => {
-                    produtoParaEditarId = e.currentTarget.dataset.id; // Guarda o ID
-                    abrirModalEditarEstoque(produtoParaEditarId); // Chama função para buscar dados e abrir modal
+                    produtoParaEditarId = e.currentTarget.dataset.id;
+                    abrirModalEditarEstoque(produtoParaEditarId);
                 });
             }
         });
@@ -390,19 +360,16 @@ async function carregarEstoque() {
     }
 }
 
-// Função para buscar dados do produto e preencher o modal
 async function abrirModalEditarEstoque(produtoId) {
     if (!formEditarEstoque || !modalEditarEstoque) return;
-
-    formEditarEstoque.reset(); // Limpa o formulário
+    formEditarEstoque.reset();
 
     try {
-        const res = await fetch(`/produtos/${produtoId}`); // Chama GET /produtos/{id}
+        const res = await fetch(`/produtos/${produtoId}`);
         if (!res.ok) throw new Error('Produto não encontrado para edição.');
         const produto = await res.json();
 
-        // Preenche o formulário no modal com os dados do produto
-        formEditarEstoque.querySelector("#editId").value = produto.id; // Campo ID (somente leitura)
+        formEditarEstoque.querySelector("#editId").value = produto.id;
         formEditarEstoque.querySelector("#editNome").value = produto.nome || '';
         formEditarEstoque.querySelector("#editAutor").value = produto.autor || '';
         formEditarEstoque.querySelector("#editDescricao").value = produto.descricao || '';
@@ -410,10 +377,8 @@ async function abrirModalEditarEstoque(produtoId) {
         formEditarEstoque.querySelector("#editPreco").value = produto.preco !== null ? produto.preco : '';
         formEditarEstoque.querySelector("#editEstoque").value = produto.estoque !== null ? produto.estoque : '';
         formEditarEstoque.querySelector("#editImagemUrl").value = produto.imagemUrl || '';
-        // Status não vem do backend, pode ser removido ou gerenciado de outra forma se necessário
-        // formEditarEstoque.querySelector("#editStatus").value = "Ativo"; 
 
-        modalEditarEstoque.style.display = "flex"; // Abre o modal
+        modalEditarEstoque.style.display = "flex";
 
     } catch (err) {
         console.error("Erro ao buscar produto para edição:", err);
@@ -421,19 +386,17 @@ async function abrirModalEditarEstoque(produtoId) {
     }
 }
 
-// Listener para o submit do formulário de edição de estoque
 if (formEditarEstoque) {
     formEditarEstoque.addEventListener('submit', async (e) => {
-        e.preventDefault(); // Impede o envio padrão do formulário
+        e.preventDefault();
 
         if (!produtoParaEditarId) {
             alert("Nenhum produto selecionado para edição.");
             return;
         }
 
-        // Pega apenas a nova quantidade do formulário
         const novaQuantidadeInput = formEditarEstoque.querySelector("#editEstoque");
-        
+
         if (!novaQuantidadeInput || novaQuantidadeInput.value === '') {
              alert("Por favor, insira uma quantidade válida.");
              return;
@@ -446,13 +409,11 @@ if (formEditarEstoque) {
              return;
         }
 
-
         try {
-            // Chama o endpoint PUT para atualizar APENAS o estoque
             const res = await fetch(`/produtos/${produtoParaEditarId}/estoque`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ quantidade: novaQuantidade }) // Envia o DTO esperado
+                body: JSON.stringify({ quantidade: novaQuantidade })
             });
 
             if (!res.ok) {
@@ -460,11 +421,10 @@ if (formEditarEstoque) {
                  throw new Error(`Erro ao atualizar estoque: ${errorMsg}`);
             }
 
-            // Se a atualização foi bem-sucedida
             alert("Estoque atualizado com sucesso!");
-            modalEditarEstoque.style.display = "none"; // Fecha o modal
-            produtoParaEditarId = null; // Limpa o ID guardado
-            await carregarEstoque(); // Recarrega a tabela de estoque
+            modalEditarEstoque.style.display = "none";
+            produtoParaEditarId = null;
+            await carregarEstoque();
 
         } catch (err) {
             console.error("Erro ao salvar estoque:", err);
@@ -473,82 +433,148 @@ if (formEditarEstoque) {
     });
 }
 
-
-// Listeners Modais Estoque
 btnFecharModalEstoque?.addEventListener("click", () => { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; });
 btnCancelarEditar?.addEventListener("click", () => { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; });
 window.addEventListener("click", (e) => { if(e.target === modalEditarEstoque) { modalEditarEstoque.style.display="none"; produtoParaEditarId = null; } });
 
-// Cria Filtro Estoque (sem função de filtro real por enquanto)
-// criarFiltro(
-//   "btnAbrirFiltroEstoque",
-//   "painelFiltroEstoque",
-//   "btnFecharFiltroEstoque",
-//   "btnLimparEstoque",
-//   "formFiltroEstoque",
-//   null, // ID do botão filtrar (se existir)
-//   null // Função de filtro de estoque (a ser criada se necessário)
-// );
-
-// Carrega o estoque ao iniciar a página
 carregarEstoque();
 
 
 // ======================= VENDAS =======================
+// (Lógica importada de GerenciarVendas.js)
 
 
-// ======================= TROCAS/DEVOLUÇÕES =======================
-const trocas = [
-  {
-    idPedido: 1,
-    cliente: "Ana Maria",
-    produto: "Livro A",
-    dataSolicitacao: "2025-08-15",
-    motivo: "Defeito na impressão",
-    status: "Pendente",
-  },
-  {
-    idPedido: 2,
-    cliente: "Carlos Souza",
-    produto: "Livro B",
-    dataSolicitacao: "2025-08-18",
-    motivo: "Troca por outro título",
-    status: "Aprovada",
-  },
-  {
-    idPedido: 3,
-    cliente: "Fernanda Lima",
-    produto: "Livro C",
-    dataSolicitacao: "2025-08-20",
-    motivo: "Devolução por arrependimento",
-    status: "Recusada",
-  },
-];
-
+// ======================= TROCAS/DEVOLUÇÕES (MODIFICADO) =======================
 const tbodyTrocas = document.getElementById("trocas-tbody");
 const modalStatusTroca = document.getElementById("modalStatusTroca");
+const formStatusTroca = document.getElementById("formStatusTroca"); // <-- Adicionado
 const btnFecharStatus = document.getElementById("btnFecharStatus");
 const btnCancelarStatus = document.getElementById("btnCancelarStatus");
 
-trocas.forEach((item) => {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td>${item.idPedido}</td>
-    <td>${item.cliente}</td>
-    <td>${item.produto}</td>
-    <td>${item.dataSolicitacao}</td>
-    <td>${item.motivo}</td>
-    <td>${item.status}</td>
-    <td>
-      <button class="btn-acao-tabela btnAlterarStatusTroca"><i class='bx bx-edit'></i></button>
-    </td>
-  `;
-  tbodyTrocas.appendChild(tr);
+async function carregarTrocas() {
+    if (!tbodyTrocas) return;
+    tbodyTrocas.innerHTML = '<tr><td colspan="7" style="text-align:center;">Carregando solicitações de troca...</td></tr>';
+
+    try {
+        const res = await fetch("/admin/trocas");
+        if (!res.ok) {
+            throw new Error(`Erro ao buscar trocas: ${res.status} ${res.statusText}`);
+        }
+        const data = await res.json();
+        renderizarTrocas(data);
+
+    } catch (err) {
+        console.error("Erro ao carregar trocas:", err);
+        tbodyTrocas.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">${err.message}</td></tr>`;
+    }
+}
+
+function renderizarTrocas(solicitacoes) {
+    if (!tbodyTrocas) return;
+    tbodyTrocas.innerHTML = "";
+
+    if (solicitacoes.length === 0) {
+        tbodyTrocas.innerHTML = '<tr><td colspan="7" style="text-align:center;">Nenhuma solicitação de troca encontrada.</td></tr>';
+        return;
+    }
+
+    solicitacoes.forEach((item) => {
+        const tr = document.createElement("tr");
+        tr.dataset.solicitacaoId = item.id;
+
+        const dataFormatada = new Date(item.dataSolicitacao).toLocaleString("pt-BR", {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        tr.innerHTML = `
+            <td>${item.pedidoId}</td>
+            <td>${item.clienteNome}</td>
+            <td>${item.nomeProduto}</td>
+            <td>${dataFormatada}</td>
+            <td>${item.motivo}</td>
+            <td>${item.status}</td>
+            <td>
+                <button class="btn-acao-tabela btnAlterarStatusTroca" data-id="${item.id}" data-status-atual="${item.status}">
+                    <i class='bx bx-edit'></i>
+                </button>
+            </td>
+        `;
+        tbodyTrocas.appendChild(tr);
+
+        tr.querySelector(".btnAlterarStatusTroca").addEventListener("click", (e) => {
+            const btn = e.currentTarget;
+            const solicitacaoId = btn.dataset.id;
+            const statusAtual = btn.dataset.statusAtual;
+
+            const selectStatus = document.getElementById("novoStatusTroca");
+
+            // Mapeia Backend (Enum) -> Frontend (Option text)
+            // Enums: PENDENTE, AUTORIZADA, RECEBIDA, RECUSADA
+            // HTML: "Pendente", "Aprovada", "Recusada", "Concluída"
+
+            let statusHtml = "Pendente"; // PENDENTE
+            if (statusAtual === "AUTORIZADA") statusHtml = "Aprovada";
+            if (statusAtual === "RECUSADA") statusHtml = "Recusada";
+            if (statusAtual === "RECEBIDA") statusHtml = "Concluída";
+
+            selectStatus.value = statusHtml;
+            formStatusTroca.dataset.solicitacaoId = solicitacaoId; // Salva o ID no formulário
+
+            modalStatusTroca.classList.add("active");
+        });
+    });
+}
+
+// --- ADICIONADO: Event listener para salvar a alteração de status da troca ---
+formStatusTroca?.addEventListener("submit", async (e) => {
+    e.preventDefault(); // Impede o envio padrão
+
+    const solicitacaoId = e.currentTarget.dataset.solicitacaoId;
+    const selectStatus = document.getElementById("novoStatusTroca");
+    const statusHtml = selectStatus.value; // Ex: "Aprovada"
+
+    if (!solicitacaoId) {
+        alert("Erro: ID da solicitação não encontrado.");
+        return;
+    }
+
+    // Mapeia Frontend (Option text) -> Backend (Enum String)
+    let statusBackend = "PENDENTE";
+    if (statusHtml === "Aprovada") statusBackend = "AUTORIZADA";
+    if (statusHtml === "Recusada") statusBackend = "RECUSADA";
+    if (statusHtml === "Concluída") statusBackend = "RECEBIDA";
+
+    const btnSubmit = formStatusTroca.querySelector('button[type="submit"]');
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = "Salvando...";
+
+    try {
+        const url = `/admin/trocas/${solicitacaoId}/status?novoStatus=${statusBackend}`;
+
+        const res = await fetch(url, {
+            method: 'PUT'
+            // Não precisamos de body, pois o status está na URL
+        });
+
+        if (!res.ok) {
+            const errorMsg = await res.text();
+            throw new Error(errorMsg || `Falha ao atualizar status: ${res.status}`);
+        }
+
+        alert("Status da troca atualizado com sucesso!");
+        modalStatusTroca.classList.remove("active");
+        await carregarTrocas(); // Recarrega a lista de trocas
+
+    } catch (err) {
+        console.error("Erro ao salvar status da troca:", err);
+        alert("Erro: " + err.message);
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = "Salvar";
+    }
 });
 
-document.querySelectorAll(".btnAlterarStatusTroca").forEach((btn) => {
-  btn.addEventListener("click", () => modalStatusTroca.classList.add("active"));
-});
 
 btnFecharStatus?.addEventListener("click", () =>
   modalStatusTroca.classList.remove("active")
@@ -560,6 +586,7 @@ window.addEventListener("click", (e) => {
   if (e.target === modalStatusTroca)
     modalStatusTroca.classList.remove("active");
 });
+
 
 // ======================= DETALHES CLIENTE =======================
 btnFecharDetalhes?.addEventListener(
@@ -573,4 +600,6 @@ btnFecharDetalhesBtn?.addEventListener(
 window.addEventListener("click", (e) => {
   if (e.target === modalDetalhes) modalDetalhes.style.display = "none";
 });
+
+// Inicializa os listeners dos modais de Vendas (que são importados)
 inicializarListenersVendas();

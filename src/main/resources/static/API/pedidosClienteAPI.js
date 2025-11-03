@@ -23,7 +23,36 @@ document.addEventListener("DOMContentLoaded", async () => {
             const valorTotal = pedido.valorTotal.toFixed(2).replace(".", ",");
 
             // Monta os itens do pedido corretamente
-            const itensHTML = pedido.itens.map(item => `
+            const itensHTML = pedido.itens.map(item => {
+
+                // **INÍCIO DA MODIFICAÇÃO**
+                // Lógica para decidir qual botão/label mostrar
+                const pedidoId = pedido.id;
+                const itemId = item.id; // Este é o ID da entidade Item
+                let botaoTrocaHTML = "";
+
+                switch (pedido.status) {
+                    case "ENTREGUE":
+                        botaoTrocaHTML = `<button class="btn-principal btn-troca"
+                                onclick="window.location.href='telaTroca.html?pedidoId=${pedidoId}&itemId=${itemId}'">Trocar</button>`;
+                        break;
+                    case "EM_TROCA":
+                        botaoTrocaHTML = `<label class="label-campo label-troca" style="color: #007bff;">Troca em análise</label>`;
+                        break;
+                    case "TROCA_AUTORIZADA":
+                        botaoTrocaHTML = `<label class="label-campo label-troca" style="color: #007bff;">Troca autorizada</label>`;
+                        break;
+                    case "TROCADO":
+                        // Label para itens que já estão em processo de troca
+                        botaoTrocaHTML = `<label class="label-campo label-troca" style="color: #229a00;">Troca realizada</label>`;
+                        break;
+                    default:
+                        // Botão desabilitado para pedidos não entregues
+                        botaoTrocaHTML = `<button class="btn-principal btn-troca" disabled title="Aguarde a entrega para solicitar a troca">Trocar</button>`;
+                }
+                // **FIM DA MODIFICAÇÃO**
+
+                return `
                 <div class="cart-item">
                     <img src="${item.imagemProduto || 'https://via.placeholder.com/100'}" alt="${item.nomeProduto}">
                     <div class="item-info">
@@ -38,13 +67,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                                     </div>
                                     <label>Total: R$ ${(item.precoProduto * item.quantidade).toFixed(2).replace(".", ",")}</label>
                                 </div>
-                                <button class="btn-principal btn-troca"
-                                    onclick="window.location.href='telaTroca.html'">Trocar</button>
+                                ${botaoTrocaHTML}
                             </div>
                         </div>
                     </div>
                 </div>
-            `).join("");
+            `}).join("");
 
             // Monta o card completo do pedido
             const pedidoHTML = `
