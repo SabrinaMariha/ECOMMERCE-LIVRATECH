@@ -8,6 +8,7 @@ public record SolicitacaoTrocaDTO(
         Long pedidoId,
         Long itemId,
         String nomeProduto,
+        String clienteNome,
         String motivo,
         LocalDateTime dataSolicitacao,
         StatusTroca status
