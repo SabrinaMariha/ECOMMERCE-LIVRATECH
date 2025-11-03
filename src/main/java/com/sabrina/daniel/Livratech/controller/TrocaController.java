@@ -77,17 +77,5 @@ public class TrocaController {
         }
     }
 
-    // --- Endpoints para ADMIN (Exemplos) ---
-    /*
-    @GetMapping("/admin/pendentes")
-    public ResponseEntity<?> listarTrocasPendentesAdmin() { ... }
 
-    @PutMapping("/admin/{solicitacaoId}/autorizar")
-    public ResponseEntity<?> autorizarTroca(@PathVariable Long solicitacaoId) { ... }
-
-    @PutMapping("/admin/{solicitacaoId}/confirmar-recebimento")
-    public ResponseEntity<?> confirmarRecebimento(
-            @PathVariable Long solicitacaoId,
-            @RequestParam(required = true) boolean retornarEstoque) { ... }
-    */
 }
