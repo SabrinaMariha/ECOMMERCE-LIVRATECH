@@ -46,11 +46,17 @@ public class TrocaService {
             nomeProduto = solicitacao.getItem().getProduto().getNome();
         }
 
+        String clienteNome = "N/A";
+        if (solicitacao.getPedido() != null && solicitacao.getPedido().getCliente() != null) {
+            clienteNome = solicitacao.getPedido().getCliente().getNome();
+        }
+
         return new SolicitacaoTrocaDTO(
                 solicitacao.getId(),
                 pedidoId,
                 itemId,
                 nomeProduto,
+                clienteNome,
                 solicitacao.getMotivo(),
                 solicitacao.getDataSolicitacao(),
                 solicitacao.getStatus()
@@ -92,16 +98,11 @@ public class TrocaService {
                 .collect(Collectors.toList());
     }
 
-    public List<SolicitacaoTrocaDTO> listarSolicitacoesPendentesAdmin() {
-
-        return List.of();
-    }
-    public SolicitacaoTrocaDTO autorizarTroca(Long solicitacaoId) {
-
-        return null;
-    }
-    public SolicitacaoTrocaDTO confirmarRecebimentoTroca(Long solicitacaoId, boolean retornarEstoque) {
-
-        return null;
+    public List<SolicitacaoTrocaDTO> listarTodasSolicitacoesAdmin() {
+        // Usa o novo método do repositório
+        List<SolicitacaoTroca> solicitacoes = solicitacaoTrocaRepository.findAllByOrderByDataSolicitacaoDesc();
+        return solicitacoes.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -14,4 +14,5 @@ public interface SolicitacaoTrocaRepository extends JpaRepository<SolicitacaoTro
     @Query("SELECT st FROM SolicitacaoTroca st JOIN FETCH st.pedido p WHERE p.cliente.id = :clienteId")
     List<SolicitacaoTroca> findByPedidoClienteId(@Param("clienteId") Long clienteId);
 
+    List<SolicitacaoTroca> findAllByOrderByDataSolicitacaoDesc();
 }
