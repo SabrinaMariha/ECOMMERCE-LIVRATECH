@@ -4,9 +4,11 @@ import com.sabrina.daniel.Livratech.daos.ProdutoRepository;
 import com.sabrina.daniel.Livratech.model.Produto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.sabrina.daniel.Livratech.enums.Categoria;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProdutoService {
@@ -17,6 +19,27 @@ public class ProdutoService {
     //Busca todos os produtos
     public List<Produto> findAll(){
         return produtoRepository.findAllByOrderByIdAsc();
+    }
+
+     public List<Produto> filtrarProdutos(String nome, String autor, Double precoMin, Double precoMax, List<String> categorias) {
+        List<Categoria> categoriasEnum = null;
+
+        if (categorias != null && !categorias.isEmpty()) {
+            categoriasEnum = categorias.stream()
+                    .map(String::toUpperCase)
+                    .filter(cat -> {
+                        try {
+                            Categoria.valueOf(cat);
+                            return true;
+                        } catch (IllegalArgumentException e) {
+                            return false;
+                        }
+                    })
+                    .map(Categoria::valueOf)
+                    .collect(Collectors.toList());
+        }
+
+        return produtoRepository.filtrarProdutos(nome, autor, precoMin, precoMax, categoriasEnum);
     }
 
     // Buscar produto por id
