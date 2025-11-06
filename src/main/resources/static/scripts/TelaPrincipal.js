@@ -38,6 +38,7 @@ let currentPage = 1;
 async function fetchBooks(params = "") {
   try {
     const response = await fetch(`http://localhost:8080/produtos${params}`);
+    console.log(`http://localhost:8080/produtos${params}`)
     if (!response.ok) {
       throw new Error("Erro ao buscar livros");
     }

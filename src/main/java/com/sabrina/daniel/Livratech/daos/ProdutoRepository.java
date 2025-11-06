@@ -1,4 +1,5 @@
-package com.sabrina.daniel.Livratech.daos;// Arquivo: ProdutoRepository.java
+package com.sabrina.daniel.Livratech.daos;
+// Arquivo: ProdutoRepository.java
 
 import com.sabrina.daniel.Livratech.enums.Categoria;
 import com.sabrina.daniel.Livratech.model.Produto;
@@ -14,9 +15,8 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     List<Produto> findAllByOrderByIdAsc();
 
-    // VERSÃO SEM LOWER() - ATENÇÃO: É Case Sensitive
     @Query("""
-    SELECT p FROM Produto p
+    SELECT DISTINCT p FROM Produto p  
     WHERE 
         (COALESCE(NULLIF(:nome, ''), NULL) IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%')))
         AND (COALESCE(NULLIF(:autor, ''), NULL) IS NULL OR LOWER(p.autor) LIKE LOWER(CONCAT('%', :autor, '%')))

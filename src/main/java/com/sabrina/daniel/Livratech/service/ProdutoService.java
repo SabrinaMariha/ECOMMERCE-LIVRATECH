@@ -38,10 +38,18 @@ public class ProdutoService {
                     .map(Categoria::valueOf)
                     .collect(Collectors.toList());
         }
+         List<Produto> resultadosComDuplicata = produtoRepository.filtrarProdutos(nome, autor, precoMin, precoMax, categoriasEnum);
 
-
-         return produtoRepository.filtrarProdutos(nome, autor, precoMin, precoMax, categoriasEnum);
-    }
+         // 2. ✅ CORREÇÃO: Remove duplicatas (usando o ID como chave)
+         return resultadosComDuplicata.stream()
+                 .collect(Collectors.toMap(
+                         Produto::getId,         // Chave: ID do Produto
+                         produto -> produto,     // Valor: O próprio Produto
+                         (existing, replacement) -> existing // Função de Merge: se houver duplicata, mantém o primeiro encontrado
+                 ))
+                 .values().stream()         // Pega todos os valores (produtos únicos)
+                 .collect(Collectors.toList()); // Converte de volta para List
+     }
 
     // Buscar produto por id
     public Optional<Produto> findById(Long id){

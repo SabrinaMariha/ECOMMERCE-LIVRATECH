@@ -28,8 +28,7 @@ public class ProdutoController {
         if (nome == null && autor == null && precoMin == null && precoMax == null && (categorias == null || categorias.isEmpty())) {
             return produtoService.findAll();
         }
-//        System.out.println("DEBUG - Nome: " + nome.getClass());
-//        System.out.println("DEBUG - Autor: " + autor.getClass());
+
 
         return produtoService.filtrarProdutos(nome, autor, precoMin, precoMax, categorias);
     }
