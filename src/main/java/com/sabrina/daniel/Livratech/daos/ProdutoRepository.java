@@ -18,11 +18,12 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
     @Query("""
     SELECT p FROM Produto p
     WHERE 
-       (:precoMin IS NULL OR p.preco >= :precoMin)
+        (COALESCE(NULLIF(:nome, ''), NULL) IS NULL OR LOWER(p.nome) LIKE LOWER(CONCAT('%', :nome, '%')))
+        AND (COALESCE(NULLIF(:autor, ''), NULL) IS NULL OR LOWER(p.autor) LIKE LOWER(CONCAT('%', :autor, '%')))
+        AND (:precoMin IS NULL OR p.preco >= :precoMin)
         AND (:precoMax IS NULL OR p.preco <= :precoMax)
-        
         AND (:#{#categorias == null || #categorias.isEmpty()} = true OR p.categoria IN (:categorias))
-    """)
+""")
     List<Produto> filtrarProdutos(
             @Param("nome") String nome,
             @Param("autor") String autor,

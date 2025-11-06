@@ -39,7 +39,8 @@ public class ProdutoService {
                     .collect(Collectors.toList());
         }
 
-        return produtoRepository.filtrarProdutos(nome, autor, precoMin, precoMax, categoriasEnum);
+
+         return produtoRepository.filtrarProdutos(nome, autor, precoMin, precoMax, categoriasEnum);
     }
 
     // Buscar produto por id
