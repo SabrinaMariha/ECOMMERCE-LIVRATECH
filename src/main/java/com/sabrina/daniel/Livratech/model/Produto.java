@@ -1,5 +1,6 @@
 package com.sabrina.daniel.Livratech.model;
 
+import com.sabrina.daniel.Livratech.enums.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,4 +25,7 @@ public class Produto {
     private Double preco;
     private Integer estoque;
     private String imagemUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Categoria categoria;
 }
