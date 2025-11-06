@@ -15,11 +15,12 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     SELECT c FROM Cliente c
     WHERE (:#{#filtros.nome} IS NULL OR LOWER(c.nome) LIKE LOWER(CONCAT('%', :#{#filtros.nome}, '%')))
       AND (:#{#filtros.dataNascimento} IS NULL OR c.dataNascimento = :#{#filtros.dataNascimento})
-      AND (:#{#filtros.cpf} IS NULL OR c.cpf = :#{#filtros.cpf})
+      AND (:#{#filtros.cpf} IS NULL OR LOWER(c.cpf) LIKE LOWER(CONCAT('%', :#{#filtros.cpf}, '%')))
       AND (:#{#filtros.email} IS NULL OR LOWER(c.email) LIKE LOWER(CONCAT('%', :#{#filtros.email}, '%')))
+      AND (:#{#filtros.genero} IS NULL OR c.genero = :#{#filtros.genero})
       AND (:#{#filtros.telefone} IS NULL OR EXISTS (
             SELECT t FROM Telefone t 
-            WHERE t.cliente = c AND t.numero = :#{#filtros.telefone}
+            WHERE t.cliente = c AND CONCAT(t.ddd, t.numero) LIKE CONCAT('%', :#{#filtros.telefone}, '%')
       ))
 """)
     List<Cliente> findAllByFiltros(@Param("filtros") FiltroCliente filtros);
