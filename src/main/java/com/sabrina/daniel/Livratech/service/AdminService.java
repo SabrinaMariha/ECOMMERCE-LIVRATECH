@@ -6,10 +6,7 @@ import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
 import com.sabrina.daniel.Livratech.dtos.FiltroCliente;
 import com.sabrina.daniel.Livratech.enums.Status;
 import com.sabrina.daniel.Livratech.enums.StatusCompra;
-import com.sabrina.daniel.Livratech.model.CartaoDeCredito;
-import com.sabrina.daniel.Livratech.model.Cliente;
-import com.sabrina.daniel.Livratech.model.Endereco;
-import com.sabrina.daniel.Livratech.model.Pedido;
+import com.sabrina.daniel.Livratech.model.*;
 import com.sabrina.daniel.Livratech.negocio.IStrategy;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -63,7 +60,8 @@ public class AdminService {
                 cliente.getEmail(),
                 cliente.getStatus(),
                 List.copyOf(cliente.getEnderecos()),
-                List.copyOf(cliente.getCartoesCredito())
+                List.copyOf(cliente.getCartoesCredito()),
+                List.copyOf(cliente.getCupons())
         );
     }
 
@@ -177,6 +175,7 @@ public class AdminService {
         StatusCompra novoStatusEnum;
         try {
             novoStatusEnum = StatusCompra.valueOf(novoStatus.toUpperCase());
+
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Status de compra inválido: " + novoStatus);
         }
@@ -184,4 +183,6 @@ public class AdminService {
         pedido.setStatus(novoStatusEnum);
         pedidoRepository.save(pedido);
     }
+
+
 }

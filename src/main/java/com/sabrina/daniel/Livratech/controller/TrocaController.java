@@ -1,7 +1,9 @@
 package com.sabrina.daniel.Livratech.controller;
 
 import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
+import com.sabrina.daniel.Livratech.daos.ClienteRepository;
 import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
+import com.sabrina.daniel.Livratech.model.Cupom;
 import com.sabrina.daniel.Livratech.service.TrocaService;
 import com.sabrina.daniel.Livratech.daos.PedidoRepository;
 import com.sabrina.daniel.Livratech.model.Pedido;
@@ -77,5 +79,29 @@ public class TrocaController {
         }
     }
 
+    @PostMapping("/{clienteId}/gerarCupomPorPagamento")
+    public ResponseEntity<?> gerarCupomPorPagamento(@PathVariable Long clienteId, @RequestBody Double valorExcessivo) {
+        try {
+            trocaService.gerarCupomDeTrocaPorPagamento(clienteId, valorExcessivo);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Cupom criado com sucesso!");
+        } catch (Exception e) {
+            logger.error("Erro ao gerar cupom por pagamento para cliente {}", clienteId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao gerar o cupom.");
+        }
+    }
+
+    @DeleteMapping("/{cupomId}")
+    public ResponseEntity<?> deletarCupomDeTroca(@PathVariable Long cupomId) {
+        try {
+            trocaService.deletarCupomDeTroca(cupomId);
+            return ResponseEntity.ok("Cupom deletado com sucesso!");
+        } catch (NoSuchElementException e) {
+            logger.error("Erro ao deletar cupom (Recurso não encontrado): {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            logger.error("Erro interno ao deletar cupom com ID {}", cupomId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao deletar o cupom.");
+        }
+    }
 
 }

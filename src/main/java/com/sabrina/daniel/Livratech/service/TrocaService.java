@@ -1,15 +1,11 @@
 package com.sabrina.daniel.Livratech.service;
 
 import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
-import com.sabrina.daniel.Livratech.daos.ItemRepository;
-import com.sabrina.daniel.Livratech.daos.PedidoRepository;
-import com.sabrina.daniel.Livratech.daos.SolicitacaoTrocaRepository;
+import com.sabrina.daniel.Livratech.daos.*;
 import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
 import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import com.sabrina.daniel.Livratech.enums.StatusTroca;
-import com.sabrina.daniel.Livratech.model.Item;
-import com.sabrina.daniel.Livratech.model.Pedido;
-import com.sabrina.daniel.Livratech.model.SolicitacaoTroca;
+import com.sabrina.daniel.Livratech.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException; // Importar
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,11 +23,18 @@ public class TrocaService {
     private final PedidoRepository pedidoRepository;
     private final ItemRepository itemRepository;
     private final SolicitacaoTrocaRepository solicitacaoTrocaRepository;
+    private final CupomRepository cupomRepository;
+    private final ClienteRepository clienteRepository;
+
 
     @Autowired
     public TrocaService(PedidoRepository pedidoRepository,
                         ItemRepository itemRepository,
-                        SolicitacaoTrocaRepository solicitacaoTrocaRepository) {
+                        SolicitacaoTrocaRepository solicitacaoTrocaRepository,
+                        CupomRepository cupomRepository, ClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
+
+        this.cupomRepository = cupomRepository;
         this.pedidoRepository = pedidoRepository;
         this.itemRepository = itemRepository;
         this.solicitacaoTrocaRepository = solicitacaoTrocaRepository;
@@ -135,6 +139,9 @@ public class TrocaService {
                 case RECEBIDA: // "Concluída" no front-end
                     pedido.setStatus(StatusCompra.TROCADO);
                     // TODO: Adicionar lógica para retornar item ao estoque se necessário
+
+                    cupomRepository.save(gerarCupomDeTroca(solicitacao));
+
                     break;
                 case RECUSADA:
                     // Se recusada, o pedido volta ao status "Entregue" (pois a troca não vai acontecer)
@@ -151,6 +158,22 @@ public class TrocaService {
         return toDTO(solicitacaoSalva);
     }
 
+    public void gerarCupomDeTrocaPorPagamento(Long clienteId, Double valor){
+        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
+        Cupom cupom = new Cupom();
+        cupom.setCliente(cliente.get());
+        cupom.setValor(valor);
+        cupom.setDescricao("CUPOM DE TROCA");
+       cupomRepository.save(cupom);
+    }
+    public Cupom gerarCupomDeTroca(SolicitacaoTroca solicitacao){
+        Cliente cliente = solicitacao.getPedido().getCliente();
+        Cupom cupom = new Cupom();
+        cupom.setCliente(cliente);
+        cupom.setValor(solicitacao.getItem().getProduto().getPreco());
+        cupom.setDescricao("CUPOM DE TROCA");
+        return cupom;
+    }
 
     public SolicitacaoTrocaDTO autorizarTroca(Long solicitacaoId) {
         // Este método agora pode usar o novo
@@ -160,5 +183,9 @@ public class TrocaService {
     public SolicitacaoTrocaDTO confirmarRecebimentoTroca(Long solicitacaoId, boolean retornarEstoque) {
         // TODO: Adicionar lógica de 'retornarEstoque'
         return atualizarStatusTrocaAdmin(solicitacaoId, "RECEBIDA");
+    }
+
+    public void deletarCupomDeTroca(Long cupomId) {
+        cupomRepository.deleteById(cupomId);
     }
 }
