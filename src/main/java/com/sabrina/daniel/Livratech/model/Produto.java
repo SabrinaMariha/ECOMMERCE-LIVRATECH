@@ -16,8 +16,13 @@ public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "nome", length = 255)
     private String nome;
+
+    @Column(name = "autor", length = 255)
     private String autor;
+
     @Column(length = 1000)
     private String descricao;
     @Column(length = 5000)
