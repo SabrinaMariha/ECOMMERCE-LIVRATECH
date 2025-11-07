@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       preencherTelefones(cliente.telefones || []);
       preencherEnderecos(cliente.enderecos || []);
       preencherCartoes(cliente.cartoesCredito || []);
+      preencherCupons(cliente.cupons || []);
     } catch (error) {
       console.error("Erro na consulta:", error);
     }
@@ -35,6 +36,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("email").value = cliente.email || "";
   }
 
+// --- Cupons ---
+function preencherCupons(cupons) {
+  const container = document.getElementById("cupons-container");
+
+  container
+    .querySelectorAll(".cupom-container:not(#cupom-template)")
+    .forEach((el) => el.remove());
+
+  cupons.forEach((cupom) => {
+    const template = document.getElementById("cupom-template");
+    if (!template) return;
+
+    const clone = template.cloneNode(true);
+    clone.style.display = "block";
+    clone.removeAttribute("id");
+    clone.dataset.id = cupom.id;
+
+    // Formata o valor
+    const valorFormatado = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(cupom.valor);
+
+    // Usa as novas propriedades da classe Cupom (codigo e descricao)
+    clone.querySelector('[data-name="desconto-cupom"]').textContent = valorFormatado;
+
+    container.appendChild(clone);
+  });
+}
   // --- Telefones ---
   function preencherTelefones(telefones) {
     const container = document.getElementById("telefones-container");

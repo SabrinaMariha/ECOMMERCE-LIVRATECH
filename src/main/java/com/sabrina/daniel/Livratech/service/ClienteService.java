@@ -185,7 +185,8 @@ public class ClienteService  {
                 cliente.getEmail(),
                 cliente.getStatus(),
                 List.copyOf(cliente.getEnderecos()),
-                List.copyOf(cliente.getCartoesCredito())
+                List.copyOf(cliente.getCartoesCredito()),
+                List.copyOf(cliente.getCupons())
         );
     }
 

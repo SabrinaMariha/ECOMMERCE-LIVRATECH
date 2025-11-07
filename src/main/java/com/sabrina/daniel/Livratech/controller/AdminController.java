@@ -44,7 +44,8 @@ public class AdminController {
                         cliente.getEmail(),
                         cliente.getStatus(),
                         cliente.getEnderecos(),
-                        cliente.getCartoesCredito()
+                        cliente.getCartoesCredito(),
+                        cliente.getCupons()
                 ))
                 .toList();
 

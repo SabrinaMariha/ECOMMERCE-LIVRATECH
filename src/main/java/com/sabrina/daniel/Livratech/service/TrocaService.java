@@ -1,15 +1,11 @@
 package com.sabrina.daniel.Livratech.service;
 
 import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
-import com.sabrina.daniel.Livratech.daos.ItemRepository;
-import com.sabrina.daniel.Livratech.daos.PedidoRepository;
-import com.sabrina.daniel.Livratech.daos.SolicitacaoTrocaRepository;
+import com.sabrina.daniel.Livratech.daos.*;
 import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
 import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import com.sabrina.daniel.Livratech.enums.StatusTroca;
-import com.sabrina.daniel.Livratech.model.Item;
-import com.sabrina.daniel.Livratech.model.Pedido;
-import com.sabrina.daniel.Livratech.model.SolicitacaoTroca;
+import com.sabrina.daniel.Livratech.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException; // Importar
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,12 +23,22 @@ public class TrocaService {
     private final PedidoRepository pedidoRepository;
     private final ItemRepository itemRepository;
     private final SolicitacaoTrocaRepository solicitacaoTrocaRepository;
+    private final CupomRepository cupomRepository;
+    private final ClienteRepository clienteRepository;
+
     private final ProdutoService produtoService; // ✅ 1. Novo atributo
 
     @Autowired
     public TrocaService(PedidoRepository pedidoRepository,
                         ItemRepository itemRepository,
-                        SolicitacaoTrocaRepository solicitacaoTrocaRepository, ProdutoService produtoService) {
+                        SolicitacaoTrocaRepository solicitacaoTrocaRepository,
+                        CupomRepository cupomRepository,
+                        ClienteRepository clienteRepository,
+                        ProdutoService produtoService) {
+        this.clienteRepository = clienteRepository;
+
+        this.cupomRepository = cupomRepository;
+
         this.pedidoRepository = pedidoRepository;
         this.produtoService = produtoService; // ✅ 2. Injeção de dependência
         this.itemRepository = itemRepository;
@@ -136,6 +143,10 @@ public class TrocaService {
                     break;
                 case RECEBIDA: // "Concluída" no front-end
                     pedido.setStatus(StatusCompra.TROCADO);
+                    // TODO: Adicionar lógica para retornar item ao estoque se necessário
+
+                    cupomRepository.save(gerarCupomDeTroca(solicitacao));
+
 // ✅ LÓGICA DE RETORNO AO ESTOQUE
                     Item itemTrocado = solicitacao.getItem();
                     if (itemTrocado != null && itemTrocado.getProduto() != null) {
@@ -164,6 +175,22 @@ public class TrocaService {
         return toDTO(solicitacaoSalva);
     }
 
+    public void gerarCupomDeTrocaPorPagamento(Long clienteId, Double valor){
+        Optional<Cliente> cliente = clienteRepository.findById(clienteId);
+        Cupom cupom = new Cupom();
+        cupom.setCliente(cliente.get());
+        cupom.setValor(valor);
+        cupom.setDescricao("CUPOM DE TROCA");
+       cupomRepository.save(cupom);
+    }
+    public Cupom gerarCupomDeTroca(SolicitacaoTroca solicitacao){
+        Cliente cliente = solicitacao.getPedido().getCliente();
+        Cupom cupom = new Cupom();
+        cupom.setCliente(cliente);
+        cupom.setValor(solicitacao.getItem().getProduto().getPreco());
+        cupom.setDescricao("CUPOM DE TROCA");
+        return cupom;
+    }
 
     public SolicitacaoTrocaDTO autorizarTroca(Long solicitacaoId) {
         // Este método agora pode usar o novo
@@ -174,5 +201,9 @@ public class TrocaService {
         // TODO: Adicionar lógica de 'retornarEstoque'
         return atualizarStatusTrocaAdmin(solicitacaoId, "RECEBIDA");
 
+    }
+
+    public void deletarCupomDeTroca(Long cupomId) {
+        cupomRepository.deleteById(cupomId);
     }
 }
