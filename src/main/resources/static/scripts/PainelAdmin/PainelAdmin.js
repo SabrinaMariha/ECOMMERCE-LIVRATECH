@@ -58,7 +58,8 @@ const detalhesClienteContent = document.getElementById(
 let clientesCarregados = []; // Para armazenar os clientes e usar no filtro
 let clienteParaInativar = null; // variável global
 
-async function carregarClientes() {
+// === FUNÇÃO DE CARREGAMENTO/FILTRO ATUALIZADA ===
+async function carregarClientes(filtros = {}) { // Aceita filtros como parâmetro
   tbodyClientes.innerHTML =
     '<tr><td colspan="8" style="text-align:center;">Carregando clientes...</td></tr>';
 
@@ -66,7 +67,7 @@ async function carregarClientes() {
     const res = await fetch("/admin/clientes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
+      body: JSON.stringify(filtros), // Envia o objeto de filtros (ou {})
     });
 
     if (!res.ok) throw new Error("Erro ao carregar clientes");
@@ -76,6 +77,13 @@ async function carregarClientes() {
 
     clientesCarregados.sort((a, b) => a.id - b.id);
     renderizarClientes(clientesCarregados);
+
+    // Se houver filtro, você pode querer fechar o painel de filtro (necessita do ID 'painelFiltro' no HTML)
+    const painelFiltro = document.getElementById("painelFiltro");
+    if (painelFiltro && Object.keys(filtros).length > 0) {
+        // painelFiltro.style.display = "none"; // Descomente se você quiser que o filtro feche automaticamente após filtrar
+    }
+
   } catch (err) {
     tbodyClientes.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">${err.message}</td></tr>`;
   }
@@ -236,8 +244,6 @@ function renderizarClientes(clientes) {
   });
 }
 
-carregarClientes();
-
 // ======================= MODAIS CLIENTES =======================
 btnFecharHistorico?.addEventListener("click", () =>
   modalHistorico.classList.remove("active")
@@ -271,37 +277,89 @@ btnSim?.addEventListener("click", async () => {
   }
 });
 
-// ======================= FILTROS =======================
-document.getElementById("btnFiltrarClientes")?.addEventListener("click", () => {
-  const form = document.getElementById("formFiltro");
-  const filtros = {
-    nome: form.nome.value.toLowerCase(),
-    dataNascimento: form.dataNascimento.value,
-    cpf: form.cpf.value.toLowerCase(),
-    genero: form.genero.value.toLowerCase(),
-    telefone: form.telefone.value.toLowerCase(),
-    email: form.email.value.toLowerCase(),
-  };
+// ======================= CONTROLE DE PAINÉIS DE FILTRO =======================
+const painelFiltroClientes = document.getElementById("painelFiltro");
+const btnAbrirFiltroClientes = document.getElementById("btnAbrirFiltro");
+const btnFecharFiltroClientes = document.getElementById("btnFecharFiltro");
 
-  const clientesFiltrados = clientesCarregados.filter((c) => {
-    const telefone = c.telefones.length
-      ? c.telefones[0].ddd + " " + c.telefones[0].numero
-      : "";
-    return (
-      (!filtros.nome || c.nome.toLowerCase().includes(filtros.nome)) &&
-      (!filtros.dataNascimento ||
-        c.dataNascimento === filtros.dataNascimento) &&
-      (!filtros.cpf || c.cpf.toLowerCase().includes(filtros.cpf)) &&
-      (!filtros.genero ||
-        (c.genero && c.genero.toLowerCase().includes(filtros.genero))) &&
-      (!filtros.telefone ||
-        telefone.toLowerCase().includes(filtros.telefone)) &&
-      (!filtros.email || c.email.toLowerCase().includes(filtros.email))
-    );
-  });
-
-  renderizarClientes(clientesFiltrados);
+btnAbrirFiltroClientes?.addEventListener('click', () => {
+    if (painelFiltroClientes) {
+        painelFiltroClientes.style.display = "block";
+    }
 });
+
+btnFecharFiltroClientes?.addEventListener('click', () => {
+    if (painelFiltroClientes) {
+        painelFiltroClientes.style.display = "none";
+    }
+});
+
+// Lógica para abrir/fechar o filtro de Estoque (Se aplicável)
+const painelFiltroEstoque = document.getElementById("painelFiltroEstoque");
+const btnAbrirFiltroEstoque = document.getElementById("btnAbrirFiltroEstoque");
+const btnFecharFiltroEstoque = document.getElementById("btnFecharFiltroEstoque");
+const btnLimparEstoque = document.getElementById("btnLimparEstoque");
+const formFiltroEstoque = document.getElementById("formFiltroEstoque");
+
+btnAbrirFiltroEstoque?.addEventListener('click', () => {
+    if (painelFiltroEstoque) {
+        painelFiltroEstoque.style.display = "block";
+    }
+});
+
+btnFecharFiltroEstoque?.addEventListener('click', () => {
+    if (painelFiltroEstoque) {
+        painelFiltroEstoque.style.display = "none";
+    }
+});
+
+btnLimparEstoque?.addEventListener('click', () => {
+    formFiltroEstoque.reset();
+    // Você pode querer chamar carregarEstoque() aqui se quiser recarregar tudo após limpar
+});
+
+// ======================= FILTROS CLIENTES (CORRIGIDO) =======================
+const btnFiltrarClientes = document.getElementById("btnFiltrarClientes");
+const formFiltro = document.getElementById("formFiltro");
+
+async function aplicarFiltroClientes() {
+    const filtros = {
+        nome: formFiltro.nome.value || null,
+        dataNascimento: formFiltro.dataNascimento.value || null,
+        cpf: formFiltro.cpf.value || null,
+        genero: formFiltro.genero.value || null,
+        telefone: formFiltro.telefone.value || null,
+        email: formFiltro.email.value || null,
+    };
+
+    // Remove propriedades nulas ou vazias antes de enviar ao backend
+    Object.keys(filtros).forEach(key => {
+        if (filtros[key] === null || filtros[key].trim() === "") {
+            delete filtros[key];
+        }
+    });
+
+    try {
+        await carregarClientes(filtros); // Chama a função que faz o POST para o Backend
+
+
+    } catch (error) {
+        console.error("Erro ao aplicar o filtro de clientes:", error);
+        alert("Erro ao aplicar o filtro de clientes.");
+    }
+}
+
+btnFiltrarClientes?.addEventListener("click", aplicarFiltroClientes);
+
+// Listener para o botão de limpar
+document.getElementById("btnLimpar")?.addEventListener("click", () => {
+    formFiltro.reset();
+    carregarClientes({}); // Recarrega todos os clientes sem filtros
+});
+
+// === CHAMADA INICIAL CORRETA ===
+// Esta é a única chamada de carregamento inicial, usando a função atualizada
+carregarClientes();
 
 // ======================= ESTOQUE =======================
 const tbodyEstoque = document.getElementById("estoque-tbody");

@@ -1,4 +1,7 @@
-// Carrosel
+// ----------------------
+// Carrossel
+// ----------------------
+
 let currentIndex = 0;
 const slides = document.querySelectorAll(".slide");
 const dots = document.querySelectorAll(".dot");
@@ -21,31 +24,34 @@ function currentSlide(index) {
   showSlide(index);
 }
 
-// Troca automática
-setInterval(() => {
-  showSlide(currentIndex + 1);
-}, 7000);
-
-// Inicializa carrosel
+setInterval(() => showSlide(currentIndex + 1), 7000);
 showSlide(0);
+
+// ----------------------
+// Livros
+// ----------------------
 
 let books = [];
 const booksPerPage = 20;
 let currentPage = 1;
 
-async function fetchBooks() {
-  try{
-    const response = await fetch("http://localhost:8080/produtos");
+async function fetchBooks(params = "") {
+  try {
+    const response = await fetch(`http://localhost:8080/produtos${params}`);
+    console.log(`http://localhost:8080/produtos${params}`)
     if (!response.ok) {
       throw new Error("Erro ao buscar livros");
     }
+
     const data = await response.json();
     books = data;
+    currentPage = 1;
     renderBooks(currentPage);
     renderPagination();
-  }catch(error){
+  } catch (error) {
     console.error("Erro ao buscar livros:", error);
-    document.getElementById("books-container").innerHTML = "<p>Erro ao carregar livros. Tente novamente mais tarde.</p>";
+    document.getElementById("books-container").innerHTML =
+      "<p>Erro ao carregar livros. Tente novamente mais tarde.</p>";
   }
 }
 
@@ -53,9 +59,14 @@ function renderBooks(page) {
   const start = (page - 1) * booksPerPage;
   const end = start + booksPerPage;
   const currentBooks = books.slice(start, end);
-
   const container = document.getElementById("books-container");
+
   container.innerHTML = "";
+
+  if (currentBooks.length === 0) {
+    container.innerHTML = "<p>Nenhum livro encontrado.</p>";
+    return;
+  }
 
   currentBooks.forEach((book) => {
     const card = document.createElement("div");
@@ -64,34 +75,27 @@ function renderBooks(page) {
     card.innerHTML = `
       <img src="${book.imagemUrl}" alt="${book.nome}">
       <div class="book-info">
-        <p class = "book-name"><strong>${book.nome}</strong></p>
+        <p class="book-name"><strong>${book.nome}</strong></p>
         <p>${book.autor}</p>
         <p class="preco-card">R$ ${book.preco.toFixed(2)}</p>
         <button class="comprar-btn">Comprar</button>
       </div>
     `;
 
-    // Adiciona evento no card inteiro
-    card.addEventListener('click', () => {
+    // Clique no card → detalhes
+    card.addEventListener("click", () => {
       window.location.href = `./detalhesProduto.html?id=${book.id}`;
     });
 
-    // Clica na imagem ou botão abre detalhes
-    card.querySelector('.comprar-btn').addEventListener('click', (e) => {
-      e.stopPropagation(); // impede abrir detalhes
-      const produtoId = book.id;
-
-      // Limpa qualquer compra anterior ou carrinho temporário
+    // Clique no botão → compra direta
+    card.querySelector(".comprar-btn").addEventListener("click", (e) => {
+      e.stopPropagation();
       localStorage.removeItem("compraDireta");
       localStorage.removeItem("itensCarrinhoTemp");
-
-      // Salva o produto e quantidade (padrão = 1)
-      localStorage.setItem("compraDireta", JSON.stringify({
-        produtoId: produtoId,
-        quantidade: 1
-      }));
-
-      // Redireciona para a página de finalização
+      localStorage.setItem(
+        "compraDireta",
+        JSON.stringify({ produtoId: book.id, quantidade: 1 })
+      );
       window.location.href = "./finalizarCompra.html";
     });
 
@@ -102,17 +106,14 @@ function renderBooks(page) {
 function renderPagination() {
   const totalPages = Math.ceil(books.length / booksPerPage);
   const pagination = document.getElementById("pagination");
-
   pagination.innerHTML = "";
 
-  // Botão Anterior
   const prev = document.createElement("button");
   prev.textContent = "Anterior";
   prev.disabled = currentPage === 1;
   prev.addEventListener("click", () => changePage(currentPage - 1));
   pagination.appendChild(prev);
 
-  // Botões numéricos
   Array.from({ length: totalPages }, (_, i) => {
     const btn = document.createElement("button");
     btn.textContent = i + 1;
@@ -121,7 +122,6 @@ function renderPagination() {
     pagination.appendChild(btn);
   });
 
-  // Botão Próximo
   const next = document.createElement("button");
   next.textContent = "Próximo";
   next.disabled = currentPage === totalPages;
@@ -135,5 +135,46 @@ function changePage(page) {
   renderPagination();
 }
 
-// Inicialização dos card dos livros e paginação
+// ----------------------
+// Filtros (nome, autor, preço, categoria)
+// ----------------------
+
+async function filterBooks() {
+  const params = new URLSearchParams();
+
+  // Nome
+  const nome = document.getElementById("book-name").value.trim();
+  if (nome) params.append("nome", nome);
+
+  // Autor
+  const autor = document.getElementById("author").value.trim();
+  if (autor) params.append("autor", autor);
+
+  // Categorias
+  const categoriasSelecionadas = Array.from(
+    document.querySelectorAll('.filter-group:nth-of-type(2) input[type="checkbox"]:checked')
+  ).map((c) => c.value);
+
+  categoriasSelecionadas.forEach((cat) => params.append("categorias", cat));
+
+  // Faixa de preço
+  const precos = document.querySelectorAll(".filter-price input");
+  const precoMin = precos[0].value;
+  const precoMax = precos[1].value;
+  if (precoMin) params.append("precoMin", precoMin);
+  if (precoMax) params.append("precoMax", precoMax);
+
+  const queryString = params.toString() ? `?${params.toString()}` : "";
+  await fetchBooks(queryString);
+}
+
+// ----------------------
+// Inicialização
+// ----------------------
+
 fetchBooks();
+
+// Aplicar filtro apenas quando clicar no botão "Filtrar"
+document.querySelector(".filter-btn").addEventListener("click", async () => {
+  await filterBooks();
+});

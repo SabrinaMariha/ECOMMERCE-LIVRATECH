@@ -18,8 +18,19 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @GetMapping
-    public List<Produto> buscarProdutos(){
-        return produtoService.findAll();
+    public List<Produto> filtrarOuListarProdutos(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String autor,
+            @RequestParam(required = false) Double precoMin,
+            @RequestParam(required = false) Double precoMax,
+            @RequestParam(required = false) List<String> categorias
+    ) {
+        if (nome == null && autor == null && precoMin == null && precoMax == null && (categorias == null || categorias.isEmpty())) {
+            return produtoService.findAll();
+        }
+
+
+        return produtoService.filtrarProdutos(nome, autor, precoMin, precoMax, categorias);
     }
 
     @GetMapping("/{id}")
@@ -45,4 +56,6 @@ public class ProdutoController {
                 .map(produto -> ResponseEntity.ok(new EstoqueDTO(produto.getEstoque())))
                 .orElse(ResponseEntity.notFound().build());
     }
+
+   
 }

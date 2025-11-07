@@ -1,5 +1,6 @@
 package com.sabrina.daniel.Livratech.model;
 
+import com.sabrina.daniel.Livratech.enums.Categoria;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,8 +16,13 @@ public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "nome", length = 255)
     private String nome;
+
+    @Column(name = "autor", length = 255)
     private String autor;
+
     @Column(length = 1000)
     private String descricao;
     @Column(length = 5000)
@@ -24,4 +30,7 @@ public class Produto {
     private Double preco;
     private Integer estoque;
     private String imagemUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Categoria categoria;
 }

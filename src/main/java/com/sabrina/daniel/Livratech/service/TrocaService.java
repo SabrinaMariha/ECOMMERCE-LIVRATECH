@@ -26,16 +26,21 @@ public class TrocaService {
     private final CupomRepository cupomRepository;
     private final ClienteRepository clienteRepository;
 
+    private final ProdutoService produtoService; // ✅ 1. Novo atributo
 
     @Autowired
     public TrocaService(PedidoRepository pedidoRepository,
                         ItemRepository itemRepository,
                         SolicitacaoTrocaRepository solicitacaoTrocaRepository,
-                        CupomRepository cupomRepository, ClienteRepository clienteRepository) {
+                        CupomRepository cupomRepository,
+                        ClienteRepository clienteRepository,
+                        ProdutoService produtoService) {
         this.clienteRepository = clienteRepository;
 
         this.cupomRepository = cupomRepository;
+
         this.pedidoRepository = pedidoRepository;
+        this.produtoService = produtoService; // ✅ 2. Injeção de dependência
         this.itemRepository = itemRepository;
         this.solicitacaoTrocaRepository = solicitacaoTrocaRepository;
     }
@@ -142,6 +147,18 @@ public class TrocaService {
 
                     cupomRepository.save(gerarCupomDeTroca(solicitacao));
 
+// ✅ LÓGICA DE RETORNO AO ESTOQUE
+                    Item itemTrocado = solicitacao.getItem();
+                    if (itemTrocado != null && itemTrocado.getProduto() != null) {
+                        Long produtoId = itemTrocado.getProduto().getId();
+                        Integer quantidade = itemTrocado.getQuantidade();
+
+                        // Chamamos o ProdutoService para aumentar o estoque
+                        produtoService.adicionarEstoque(produtoId, quantidade);
+                    } else {
+                        // Opcional: Logar um aviso se o item estiver malformado
+                        System.err.println("Aviso: Item ou Produto nulo na solicitação de troca ID " + solicitacaoId);
+                    }
                     break;
                 case RECUSADA:
                     // Se recusada, o pedido volta ao status "Entregue" (pois a troca não vai acontecer)
@@ -183,6 +200,7 @@ public class TrocaService {
     public SolicitacaoTrocaDTO confirmarRecebimentoTroca(Long solicitacaoId, boolean retornarEstoque) {
         // TODO: Adicionar lógica de 'retornarEstoque'
         return atualizarStatusTrocaAdmin(solicitacaoId, "RECEBIDA");
+
     }
 
     public void deletarCupomDeTroca(Long cupomId) {

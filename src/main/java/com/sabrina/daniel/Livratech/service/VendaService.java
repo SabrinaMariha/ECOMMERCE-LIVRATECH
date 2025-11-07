@@ -194,6 +194,7 @@ public class VendaService {
 
             Produto produto = produtoService.findById(itemReq.produtoId())
                     .orElseThrow(() -> new ValidacaoException("Produto com ID " + itemReq.produtoId() + " não encontrado"));
+            produtoService.deduzirEstoque(itemReq.produtoId(), itemReq.quantidade());
 
             Item item = new Item();
             item.setProduto(produto);
