@@ -85,4 +85,16 @@ public class ProdutoService {
         produto.setEstoque(estoqueAtual - quantidadeVendida);
         return produtoRepository.save(produto);
     }
+    @Transactional
+    public void adicionarEstoque(Long produtoId, Integer quantidade) {
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new ValidacaoException("Produto não encontrado com id: " + produtoId));
+
+        if (quantidade <= 0) {
+            throw new ValidacaoException("A quantidade a adicionar deve ser positiva.");
+        }
+
+        produto.setEstoque(produto.getEstoque() + quantidade);
+        produtoRepository.save(produto);
+    }
 }
