@@ -1,6 +1,8 @@
 // Arquivo: src/main/resources/static/scripts/PainelAdmin/PainelAdmin.js
 
 import { carregarVendas, inicializarListenersVendas } from "./GerenciarVendas.js";
+import { inicializarRelatorios } from "../relatorios/Relatorio.js";
+
 // ======================= CONTROLE DE ABAS =======================
 const buttons = document.querySelectorAll(".menu-btn");
 const sections = document.querySelectorAll(".section");
@@ -34,6 +36,9 @@ buttons.forEach((btn) => {
     if (sectionId === 'trocas') {
         carregarTrocas();
     }
+    if (sectionId === 'relatorios') {
+            inicializarRelatorios();
+        }
   });
 });
 

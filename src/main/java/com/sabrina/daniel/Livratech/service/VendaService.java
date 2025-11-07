@@ -1,10 +1,7 @@
 package com.sabrina.daniel.Livratech.service;
 
 import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
-import com.sabrina.daniel.Livratech.daos.CartaoRepository;
-import com.sabrina.daniel.Livratech.daos.ClienteRepository;
-import com.sabrina.daniel.Livratech.daos.EnderecoRepository;
-import com.sabrina.daniel.Livratech.daos.PedidoRepository;
+import com.sabrina.daniel.Livratech.daos.*;
 import com.sabrina.daniel.Livratech.dtos.*;
 import com.sabrina.daniel.Livratech.enums.StatusCompra;
 import com.sabrina.daniel.Livratech.model.*;
@@ -16,10 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.Calendar.MONTH;
 
 @Service
 @Transactional
@@ -322,5 +322,16 @@ public class VendaService {
 
         // O valor Total do Pedido é o Total Geral (Itens + Frete - Cupom)
         return totalGeral;
+    }
+
+    public List<PedidoRepository.VendaCategoriaProjection> getVendasPorCategoriaEPeriodo(Date dataInicio, Date dataFim) {
+        // REAPROVEITE O AJUSTE DA DATA FIM!
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dataFim);
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        cal.add(Calendar.MILLISECOND, -1);
+        Date dataFimAjustada = cal.getTime();
+
+        return pedidoRepository.findVendasPorCategoriaEPeriodo(dataInicio, dataFimAjustada);
     }
 }

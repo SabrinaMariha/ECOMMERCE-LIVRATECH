@@ -69,9 +69,10 @@
   align-items: center;
   margin-bottom: 10px;
 }
-
-.painel-filtro {
+.painel-filtro{
   display: none;
+  }
+.painel-filtro, .painel-filtro-relatorio{
   background-color: #fff;
   padding: 15px;
   margin-bottom: 15px;
