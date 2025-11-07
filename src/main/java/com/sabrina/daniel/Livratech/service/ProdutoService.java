@@ -1,7 +1,9 @@
 package com.sabrina.daniel.Livratech.service;
 
+import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
 import com.sabrina.daniel.Livratech.daos.ProdutoRepository;
 import com.sabrina.daniel.Livratech.model.Produto;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.sabrina.daniel.Livratech.enums.Categoria;
@@ -66,6 +68,21 @@ public class ProdutoService {
 
     // Salva ou atualizar um produto
     public Produto save(Produto produto){
+        return produtoRepository.save(produto);
+    }
+
+    @Transactional
+    public Produto deduzirEstoque(Long id, Integer quantidadeVendida) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado com id: " + id));
+
+        Integer estoqueAtual = produto.getEstoque();
+
+        if (estoqueAtual < quantidadeVendida) {
+            throw new ValidacaoException("Estoque insuficiente para o produto: " + produto.getNome() + ". Disponível: " + estoqueAtual);
+        }
+
+        produto.setEstoque(estoqueAtual - quantidadeVendida);
         return produtoRepository.save(produto);
     }
 }
