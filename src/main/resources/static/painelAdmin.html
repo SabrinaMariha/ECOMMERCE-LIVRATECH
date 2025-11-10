@@ -13,499 +13,480 @@
 </head>
 
 <body>
-  <header id="navbar-container"></header>
+<header id="navbar-container"></header>
 
-  <main class="main">
-    <div class="container">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <button class="menu-btn active" data-section="clientes"><i class="fas fa-users"></i> Clientes</button>
-        <button class="menu-btn" data-section="estoque"><i class="fas fa-box"></i> Controle de Estoque</button>
-        <button class="menu-btn" data-section="vendas"><i class="fas fa-coins"></i> Gerenciar Vendas</button>
-        <button class="menu-btn" data-section="relatorios"><i class="fas fa-chart-bar"></i> Relatórios de
-          Análise</button>
-        <button class="menu-btn" data-section="trocas"><i class="fas fa-exchange-alt"></i> Trocas e Devoluções</button>
-      </aside>
+<main class="main">
+  <div class="container">
+    <aside class="sidebar">
+      <button class="menu-btn active" data-section="clientes"><i class="fas fa-users"></i> Clientes</button>
+      <button class="menu-btn" data-section="estoque"><i class="fas fa-box"></i> Controle de Estoque</button>
+      <button class="menu-btn" data-section="vendas"><i class="fas fa-coins"></i> Gerenciar Vendas</button>
+      <button class="menu-btn" data-section="relatorios"><i class="fas fa-chart-bar"></i> Relatórios de
+        Análise</button>
+      <button class="menu-btn" data-section="trocas"><i class="fas fa-exchange-alt"></i> Trocas e Devoluções</button>
+    </aside>
 
-      <div class="content">
-        <!-- Seção Clientes -->
-        <div id="clientes" class="section active">
-          <div class="header-clientes">
-            <h2>Clientes Cadastrados</h2>
-            <button id="btnAbrirFiltro" class="btn-principal">Filtrar</button>
-          </div>
+    <div class="content">
+      <div id="clientes" class="section active">
+        <div class="header-clientes">
+          <h2>Clientes Cadastrados</h2>
+          <button id="btnAbrirFiltro" class="btn-principal">Filtrar</button>
+        </div>
 
-          <!-- Painel de filtro -->
-          <div id="painelFiltro" class="painel-filtro">
-            <form id="formFiltro" class="formulario-consulta">
-              <div class="grid-filtros">
-                <div class="campo-filtro">
-                  <label for="nome">Nome</label>
-                  <input type="text" id="nome" placeholder="Digite o nome">
-                </div>
-                <div class="campo-filtro">
-                  <label for="dataNascimento">Data de Nascimento</label>
-                  <input type="date" id="dataNascimento">
-                </div>
-                <div class="campo-filtro">
-                  <label for="cpf">CPF</label>
-                  <input type="text" id="cpf" placeholder="Digite o CPF">
-                </div>
-                <div class="campo-filtro">
-                  <label for="genero">Gênero</label>
-                  <select id="genero">
-                    <option value="">Escolha...</option>
-                    <option value="MASCULINO">Masculino</option>
-                    <option value="FEMININO">Feminino</option>
-                  </select>
-                </div>
-                <div class="campo-filtro">
-                  <label for="telefone">Telefone</label>
-                  <input type="text" id="telefone" placeholder="Digite o telefone">
-                </div>
-                <div class="campo-filtro">
-                  <label for="email">E-mail</label>
-                  <input type="email" id="email" placeholder="Digite o e-mail">
-                </div>
+        <div id="painelFiltro" class="painel-filtro">
+          <form id="formFiltro" class="formulario-consulta">
+            <div class="grid-filtros">
+              <div class="campo-filtro">
+                <label for="nome">Nome</label>
+                <input type="text" id="nome" placeholder="Digite o nome">
               </div>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal" id="btnFiltrarClientes">Filtrar</button>
-                <button type="button" class="btn-principal" id="btnLimpar">Limpar</button>
-                <button type="button" class="btn-principal btnFechar" id="btnFecharFiltro">Fechar</button>
+              <div class="campo-filtro">
+                <label for="dataNascimento">Data de Nascimento</label>
+                <input type="date" id="dataNascimento">
               </div>
-            </form>
-          </div>
+              <div class="campo-filtro">
+                <label for="cpf">CPF</label>
+                <input type="text" id="cpf" placeholder="Digite o CPF">
+              </div>
+              <div class="campo-filtro">
+                <label for="genero">Gênero</label>
+                <select id="genero">
+                  <option value="">Escolha...</option>
+                  <option value="MASCULINO">Masculino</option>
+                  <option value="FEMININO">Feminino</option>
+                </select>
+              </div>
+              <div class="campo-filtro">
+                <label for="telefone">Telefone</label>
+                <input type="text" id="telefone" placeholder="Digite o telefone">
+              </div>
+              <div class="campo-filtro">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" placeholder="Digite o e-mail">
+              </div>
+            </div>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal" id="btnFiltrarClientes">Filtrar</button>
+              <button type="button" class="btn-principal" id="btnLimpar">Limpar</button>
+              <button type="button" class="btn-principal btnFechar" id="btnFecharFiltro">Fechar</button>
+            </div>
+          </form>
+        </div>
 
-          <!-- Tabela de clientes -->
-          <table class="tabela-clientes">
-            <thead>
+        <table class="tabela-clientes">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Data de Nascimento</th>
+            <th>CPF</th>
+            <th>Telefone</th>
+            <th>E-mail</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+          </thead>
+          <tbody id="clientes-tbody">
+          </tbody>
+        </table>
+        <div id="modalHistorico" class="modal-filtro">
+          <div class="modal-conteudo">
+            <h3>Histórico de Pedidos</h3>
+            <table class="tabela-clientes" id="tabelaHistorico">
+              <thead>
               <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Data de Nascimento</th>
-                <th>CPF</th>
-                <th>Telefone</th>
-                <th>E-mail</th>
+                <th>ID Pedido</th>
+                <th>Data</th>
+                <th>Valor Total</th>
                 <th>Status</th>
-                <th>Ações</th>
               </tr>
-            </thead>
-            <tbody id="clientes-tbody">
-              <!-- Clientes adicionados via JS -->
-            </tbody>
-          </table>
-          <!-- Modal de Histórico de Pedidos -->
-          <div id="modalHistorico" class="modal-filtro">
-            <div class="modal-conteudo">
-              <h3>Histórico de Pedidos</h3>
-              <table class="tabela-clientes" id="tabelaHistorico">
-                <thead>
-                  <tr>
-                    <th>ID Pedido</th>
-                    <th>Data</th>
-                    <th>Valor Total</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <!-- Histórico preenchido via JS -->
-                </tbody>
-              </table>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal btnFechar" id="btnFecharHistorico">Fechar</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal inativar cliente -->
-          <div id="inativar-modal" class="modal">
-            <div class="modal-content">
-              <span class="close-btn close">&times;</span>
-              <p>Deseja realmente inativar cliente?</p>
-              <div class="botoes-inativar">
-                <button type="button" class="btn-principal btn-nao btnFechar">Não</button>
-                <button type="button" class="btn-principal btn-sim">Sim</button>
-              </div>
-            </div>
-          </div>
-          <!-- Modal Detalhes Cliente -->
-          <!-- Modal Detalhes Cliente -->
-          <div id="modalDetalhesCliente" class="modal-filtro">
-            <div class="modal-conteudo">
-              <h3>Detalhes do Cliente</h3>
-              <div id="detalhesClienteContent">
-                <!-- Informações preenchidas via JS -->
-              </div>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal btnFechar" id="btnFecharDetalhes">Fechar</button>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Seção Estoque -->
-        <div id="estoque" class="section">
-          <div class="header-estoque">
-            <h2>Controle de Estoque</h2>
-          </div>
-
-          <!-- Painel de filtro -->
-          <div id="painelFiltroEstoque" class="painel-filtro">
-            <form id="formFiltroEstoque" class="formulario-consulta">
-              <div class="grid-filtros">
-                <div class="campo-filtro">
-                  <label for="idLivro">ID do Livro</label>
-                  <input type="text" id="idLivro" placeholder="Digite o ID do livro">
-                </div>
-                <div class="campo-filtro">
-                  <label for="tituloLivro">Título do Livro</label>
-                  <input type="text" id="tituloLivro" placeholder="Digite o título">
-                </div>
-                <div class="campo-filtro">
-                  <label for="quantidadeMin">Quantidade Mínima</label>
-                  <input type="number" id="quantidadeMin" placeholder="Qtd mínima">
-                </div>
-                <div class="campo-filtro">
-                  <label for="quantidadeMax">Quantidade Máxima</label>
-                  <input type="number" id="quantidadeMax" placeholder="Qtd máxima">
-                </div>
-                <div class="campo-filtro">
-                  <label for="dataEntrada">Data de Entrada</label>
-                  <input type="date" id="dataEntrada">
-                </div>
-                <div class="campo-filtro">
-                  <label for="fornecedor">Fornecedor</label>
-                  <input type="text" id="fornecedor" placeholder="Digite o fornecedor">
-                </div>
-              </div>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal">Filtrar</button>
-                <button type="button" class="btn-principal" id="btnLimparEstoque">Limpar</button>
-                <button type="button" class="btn-principal btnFechar" id="btnFecharFiltroEstoque">Fechar</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Tabela de Estoque -->
-          <div class="tabela-container">
-            <table class="tabela-clientes">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Título</th>
-                  <th>Autor</th>
-                  <th>Preço</th>
-                  <th>Quantidade</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
               </thead>
-              <tbody id="estoque-tbody">
-                <!-- Itens adicionados via JS -->
+              <tbody>
               </tbody>
             </table>
-          </div>
-
-          <!-- Modal Editar Estoque -->
-          <div id="modalEditarEstoque" class="modal">
-            <div class="modal-content">
-              <span id="btnFecharModalEstoque" class="close">&times;</span>
-              <h2>Editar Livro</h2>
-              <form id="formEditarEstoque" class="formulario-consulta">
-                <input type="hidden" id="editId" name="editId">
-
-                <div class="grid-filtros">
-                  <div class="campo-filtro">
-                    <label for="editNome">Título</label>
-                    <input type="text" id="editNome" name="editNome" />
-                  </div>
-                  <div class="campo-filtro">
-                    <label for="editAutor">Autor</label>
-                    <input type="text" id="editAutor" name="editAutor" />
-                  </div>
-                  <div class="campo-filtro" style="flex-basis: 100%;">
-                    <label for="editDescricao">Descrição Curta</label>
-                    <textarea id="editDescricao" name="editDescricao" rows="2"></textarea>
-                  </div>
-                  <div class="campo-filtro" style="flex-basis: 100%;">
-                    <label for="editDescDetalhada">Descrição Detalhada</label>
-                    <textarea id="editDescDetalhada" name="editDescDetalhada" rows="4"></textarea>
-                  </div>
-                  <div class="campo-filtro">
-                    <label for="editPreco">Preço (R$)</label>
-                    <input type="number" step="0.01" id="editPreco" name="editPreco" />
-                  </div>
-                  <div class="campo-filtro">
-                    <label for="editEstoque">Quantidade (Estoque)</label>
-                    <input type="number" id="editEstoque" name="editEstoque" />
-                  </div>
-                  <div class="campo-filtro">
-                    <label for="editImagemUrl">URL da Imagem</label>
-                    <input type="text" id="editImagemUrl" name="editImagemUrl" />
-                  </div>
-                  <div class="campo-filtro">
-                    <label for="editStatus">Status</label>
-                    <select id="editStatus" name="editStatus">
-                      <option value="Ativo">Ativo</option>
-                      <option value="Inativo">Inativo</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="btn-acao">
-                  <button type="button" class="btn-principal btnFechar" id="btnCancelarEditar">Cancelar</button>
-                  <button type="submit" class="btn-principal">Salvar Estoque</button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Seção Relatórios -->
-        <div id="relatorios" class="section">
-          <div class="header-relatorios">
-            <h2>Relatórios de Análise</h2>
-          </div>
-
-          <!-- Filtro de período para análise -->
-          <div id="filtroRelatorio" class="painel-filtro">
-            <form class="formulario-consulta">
-              <div class="grid-filtros">
-                <div class="campo-filtro">
-                  <label for="dataInicio">Data de Início</label>
-                  <input type="date" id="dataInicio">
-                </div>
-                <div class="campo-filtro">
-                  <label for="dataFim">Data de Fim</label>
-                  <input type="date" id="dataFim">
-                </div>
-              </div>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal" id="btnFiltrarRelatorio">Filtrar</button>
-                <button type="button" class="btn-principal" id="btnLimparRelatorio">Limpar</button>
-              </div>
-            </form>
-          </div>
-
-          <div class="dashboard-graficos">
-            <!-- Gráfico de linhas: histórico de vendas -->
-            <div class="grafico-container">
-              <h3>Histórico de Vendas</h3>
-              <canvas id="graficoVendasLinha" width="400" height="200"></canvas>
-            </div>
-
-            <!-- Gráfico de barras: vendas por status -->
-            <div class="grafico-container">
-              <h3>Vendas por Status</h3>
-              <canvas id="graficoVendasStatus" width="400" height="200"></canvas>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal btnFechar" id="btnFecharHistorico">Fechar</button>
             </div>
           </div>
         </div>
 
-        <!-- Seção Vendas -->
-        <div id="vendas" class="section">
-          <div class="header-vendas">
-            <h2>Transações Realizadas</h2>
-          </div>
-
-          <!-- Painel de filtro -->
-          <div id="painelFiltroVendas" class="painel-filtro">
-            <form id="formFiltroVendas" class="formulario-consulta">
-              <div class="grid-filtros">
-                <div class="campo-filtro">
-                  <label for="idVenda">ID da Venda</label>
-                  <input type="text" id="idVenda" placeholder="Digite o ID da venda">
-                </div>
-                <div class="campo-filtro">
-                  <label for="nomeCliente">Cliente</label>
-                  <input type="text" id="nomeCliente" placeholder="Nome do cliente">
-                </div>
-                <div class="campo-filtro">
-                  <label for="dataVendaInicio">Data Inicial</label>
-                  <input type="date" id="dataVendaInicio">
-                </div>
-                <div class="campo-filtro">
-                  <label for="dataVendaFim">Data Final</label>
-                  <input type="date" id="dataVendaFim">
-                </div>
-                <div class="campo-filtro">
-                  <label for="statusVenda">Status</label>
-                  <select id="statusVenda">
-                    <option value="EM_PROCESSAMENTO">Em Processamento</option>
-                    <option value="APROVADA">Aprovada</option>
-                    <option value="REPROVADA">Reprovada</option>
-                    <option value="EM_TRANSITO">Em Trânsito</option>
-                    <option value="ENTREGUE">Entregue</option>
-                  </select>
-                </div>
-                <div class="campo-filtro">
-                  <label for="valorMax">Valor Máximo</label>
-                  <input type="number" id="valorMax" placeholder="R$">
-                </div>
-              </div>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal">Filtrar</button>
-                <button type="button" class="btn-principal" id="btnLimparVendas">Limpar</button>
-                <button type="button" class="btn-principal btnFechar" id="btnFecharFiltroVendas">Fechar</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Tabela de Vendas -->
-          <div class="tabela-container">
-            <table class="tabela-clientes">
-              <thead>
-                <tr>
-                  <th>ID Venda</th>
-                  <th>Cliente</th>
-                  <th>Data</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="vendas-tbody">
-                <!-- Vendas adicionadas via JS -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Modal Alterar Status Venda -->
-          <div id="modalStatusVenda" class="modal">
-            <div class="modal-content">
-              <span class="close" id="btnFecharStatusVenda">&times;</span>
-              <h2>Status da Venda</h2>
-              <form id="formStatusVenda">
-                <div class="campo-filtro">
-                  <label for="novoStatusVenda">Novo Status</label>
-                  <select id="novoStatusVenda" name="novoStatus">
-                    <option value="EM_PROCESSAMENTO">Em Processamento</option>
-                    <option value="APROVADA">Aprovada</option>
-                    <option value="REPROVADA">Reprovada</option>
-                    <option value="EM_TRANSITO">Em Trânsito</option>
-                    <option value="ENTREGUE">Entregue</option>
-                  </select>
-                </div>
-                <div class="btn-acao">
-                  <button type="button" class="btn-principal btnFechar" id="btnCancelarStatusVenda">Cancelar</button>
-                  <button type="submit" class="btn-principal">Salvar</button>
-                </div>
-              </form>
-            </div>
-          </div>
-            <!-- Modal Detalhes Venda -->
-          <div id="modalDetalhesVenda" class="modal-filtro">
-            <div class="modal-conteudo modal-detalhes-venda-tamanho">
-              <h3>Detalhes do Pedido <span id="detalhePedidoId">#</span></h3>
-              <div id="detalhesVendaContent">
-              </div>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal btnFechar" id="btnFecharDetalhesVenda">Fechar</button>
-              </div>
+        <div id="inativar-modal" class="modal">
+          <div class="modal-content">
+            <span class="close-btn close">&times;</span>
+            <p>Deseja realmente inativar cliente?</p>
+            <div class="botoes-inativar">
+              <button type="button" class="btn-principal btn-nao btnFechar">Não</button>
+              <button type="button" class="btn-principal btn-sim">Sim</button>
             </div>
           </div>
         </div>
-
-        <!-- Seção Trocas e Devoluções -->
-        <div id="trocas" class="section">
-          <div class="header-vendas">
-            <h2>Trocas e Devoluções</h2>
-          </div>
-
-          <!-- Painel de filtro -->
-          <div id="painelFiltroTrocas" class="painel-filtro">
-            <form id="formFiltroTrocas" class="formulario-consulta">
-              <div class="grid-filtros">
-                <div class="campo-filtro">
-                  <label for="idPedido">ID do Pedido</label>
-                  <input type="text" id="idPedido" placeholder="Digite o ID do pedido">
-                </div>
-                <div class="campo-filtro">
-                  <label for="nomeClienteTroca">Cliente</label>
-                  <input type="text" id="nomeClienteTroca" placeholder="Nome do cliente">
-                </div>
-                <div class="campo-filtro">
-                  <label for="dataTrocaInicio">Data Inicial</label>
-                  <input type="date" id="dataTrocaInicio">
-                </div>
-                <div class="campo-filtro">
-                  <label for="dataTrocaFim">Data Final</label>
-                  <input type="date" id="dataTrocaFim">
-                </div>
-                <div class="campo-filtro">
-                  <label for="statusTroca">Status</label>
-                  <select id="statusTroca">
-                    <option value="">Todos</option>
-                    <option>Pendente</option>
-                    <option>Aprovada</option>
-                    <option>Recusada</option>
-                    <option>Concluída</option>
-                  </select>
-                </div>
-              </div>
-              <div class="linha btn-acao">
-                <button type="button" class="btn-principal">Filtrar</button>
-                <button type="button" class="btn-principal" id="btnLimparTrocas">Limpar</button>
-                <button type="button" class="btn-principal btnFechar" id="btnFecharFiltroTrocas">Fechar</button>
-              </div>
-            </form>
-          </div>
-
-          <!-- Tabela de Trocas e Devoluções -->
-          <div class="tabela-container">
-            <table class="tabela-clientes">
-              <thead>
-                <tr>
-                  <th>ID Pedido</th>
-                  <th>Cliente</th>
-                  <th>Produto</th>
-                  <th>Data Solicitação</th>
-                  <th>Motivo</th>
-                  <th>Status</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="trocas-tbody">
-                <!-- Solicitações adicionadas via JS -->
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Modal Alterar Status -->
-          <div id="modalStatusTroca" class="modal">
-            <div class="modal-content">
-              <span class="close" id="btnFecharStatus">&times;</span>
-              <h2>Status da Solicitação</h2>
-              <form id="formStatusTroca">
-                <div class="campo-filtro"> <label for="novoStatusTroca">Novo Status</label> <select
-                    id="novoStatusTroca">
-                    <option>Pendente</option>
-                    <option>Aprovada</option>
-                    <option>Recusada</option>
-                    <option>Concluída</option>
-                  </select> </div>
-                <div class="btn-acao">
-                  <button type="button" class="btn-principal btnFechar" id="btnCancelarStatus">Cancelar</button>
-                  <button type="submit" class="btn-principal">Salvar</button>
-                </div>
-              </form>
+        <div id="modalDetalhesCliente" class="modal-filtro">
+          <div class="modal-conteudo">
+            <h3>Detalhes do Cliente</h3>
+            <div id="detalhesClienteContent">
+            </div>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal btnFechar" id="btnFecharDetalhes">Fechar</button>
             </div>
           </div>
         </div>
 
       </div>
 
-    </div>
-    </div>
-  </main>
+      <div id="estoque" class="section">
+        <div class="header-estoque">
+          <h2>Controle de Estoque</h2>
+        </div>
 
-  <footer class="footer">
-    <p>&copy; 2025 LivraTec. Todos os direitos reservados.</p>
-  </footer>
-  <script src="scripts/Script.js"></script>
-  <script type="module" src="scripts/PainelAdmin/PainelAdmin.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <div id="painelFiltroEstoque" class="painel-filtro">
+          <form id="formFiltroEstoque" class="formulario-consulta">
+            <div class="grid-filtros">
+              <div class="campo-filtro">
+                <label for="idLivro">ID do Livro</label>
+                <input type="text" id="idLivro" placeholder="Digite o ID do livro">
+              </div>
+              <div class="campo-filtro">
+                <label for="tituloLivro">Título do Livro</label>
+                <input type="text" id="tituloLivro" placeholder="Digite o título">
+              </div>
+              <div class="campo-filtro">
+                <label for="quantidadeMin">Quantidade Mínima</label>
+                <input type="number" id="quantidadeMin" placeholder="Qtd mínima">
+              </div>
+              <div class="campo-filtro">
+                <label for="quantidadeMax">Quantidade Máxima</label>
+                <input type="number" id="quantidadeMax" placeholder="Qtd máxima">
+              </div>
+              <div class="campo-filtro">
+                <label for="dataEntrada">Data de Entrada</label>
+                <input type="date" id="dataEntrada">
+              </div>
+              <div class="campo-filtro">
+                <label for="fornecedor">Fornecedor</label>
+                <input type="text" id="fornecedor" placeholder="Digite o fornecedor">
+              </div>
+            </div>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal">Filtrar</button>
+              <button type="button" class="btn-principal" id="btnLimparEstoque">Limpar</button>
+              <button type="button" class="btn-principal btnFechar" id="btnFecharFiltroEstoque">Fechar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="tabela-container">
+          <table class="tabela-clientes">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Título</th>
+              <th>Autor</th>
+              <th>Preço</th>
+              <th>Quantidade</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody id="estoque-tbody">
+            </tbody>
+          </table>
+        </div>
+
+        <div id="modalEditarEstoque" class="modal">
+          <div class="modal-content">
+            <span id="btnFecharModalEstoque" class="close">&times;</span>
+            <h2>Editar Livro</h2>
+            <form id="formEditarEstoque" class="formulario-consulta">
+              <input type="hidden" id="editId" name="editId">
+
+              <div class="grid-filtros">
+                <div class="campo-filtro">
+                  <label for="editNome">Título</label>
+                  <input type="text" id="editNome" name="editNome" />
+                </div>
+                <div class="campo-filtro">
+                  <label for="editAutor">Autor</label>
+                  <input type="text" id="editAutor" name="editAutor" />
+                </div>
+                <div class="campo-filtro" style="flex-basis: 100%;">
+                  <label for="editDescricao">Descrição Curta</label>
+                  <textarea id="editDescricao" name="editDescricao" rows="2"></textarea>
+                </div>
+                <div class="campo-filtro" style="flex-basis: 100%;">
+                  <label for="editDescDetalhada">Descrição Detalhada</label>
+                  <textarea id="editDescDetalhada" name="editDescDetalhada" rows="4"></textarea>
+                </div>
+                <div class="campo-filtro">
+                  <label for="editPreco">Preço (R$)</label>
+                  <input type="number" step="0.01" id="editPreco" name="editPreco" />
+                </div>
+                <div class="campo-filtro">
+                  <label for="editEstoque">Quantidade (Estoque)</label>
+                  <input type="number" id="editEstoque" name="editEstoque" />
+                </div>
+                <div class="campo-filtro">
+                  <label for="editImagemUrl">URL da Imagem</label>
+                  <input type="text" id="editImagemUrl" name="editImagemUrl" />
+                </div>
+                <div class="campo-filtro">
+                  <label for="editStatus">Status</label>
+                  <select id="editStatus" name="editStatus">
+                    <option value="Ativo">Ativo</option>
+                    <option value="Inativo">Inativo</option>
+                  </select>
+                </div>
+              </div>
+              <div class="btn-acao">
+                <button type="button" class="btn-principal btnFechar" id="btnCancelarEditar">Cancelar</button>
+                <button type="submit" class="btn-principal">Salvar Estoque</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="relatorios" class="section">
+        <div class="header-relatorios">
+          <h2>Relatórios de Análise</h2>
+        </div>
+
+        <div id="filtroRelatorio" class="painel-filtro-relatorio">
+          <form class="formulario-consulta">
+            <div class="grid-filtros">
+              <div class="campo-filtro">
+                <label for="dataInicio">Data de Início</label>
+                <input type="date" id="dataInicio">
+              </div>
+              <div class="campo-filtro">
+                <label for="dataFim">Data de Fim</label>
+                <input type="date" id="dataFim">
+              </div>
+            </div>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal" id="btnFiltrarRelatorio">Filtrar</button>
+              <button type="button" class="btn-principal" id="btnLimparRelatorio">Limpar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="dashboard-graficos">
+          <div class="grafico-container">
+            <h3>Histórico de Vendas por Período</h3>
+            <div style="width: 100%; height: 400px;">
+              <canvas id="graficoVendasLinha"></canvas>
+            </div>
+          </div>
+
+          <div class="tabela-container tabela-analise-categoria">
+            <h3>Vendas por Categoria no Período</h3>
+            <table class="tabela-clientes tabela-analise" id="tabelaVendasCategoria">
+              <thead>
+              <tr>
+                <th>Categoria</th>
+                <th>Volume Vendas</th>
+                <th>Valor Total</th>
+              </tr>
+              </thead>
+              <tbody id="tbodyVendasCategoria">
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+      <div id="vendas" class="section">
+        <div class="header-vendas">
+          <h2>Transações Realizadas</h2>
+        </div>
+
+        <div id="painelFiltroVendas" class="painel-filtro">
+          <form id="formFiltroVendas" class="formulario-consulta">
+            <div class="grid-filtros">
+              <div class="campo-filtro">
+                <label for="idVenda">ID da Venda</label>
+                <input type="text" id="idVenda" placeholder="Digite o ID da venda">
+              </div>
+              <div class="campo-filtro">
+                <label for="nomeCliente">Cliente</label>
+                <input type="text" id="nomeCliente" placeholder="Nome do cliente">
+              </div>
+              <div class="campo-filtro">
+                <label for="dataVendaInicio">Data Inicial</label>
+                <input type="date" id="dataVendaInicio">
+              </div>
+              <div class="campo-filtro">
+                <label for="dataVendaFim">Data Final</label>
+                <input type="date" id="dataVendaFim">
+              </div>
+              <div class="campo-filtro">
+                <label for="statusVenda">Status</label>
+                <select id="statusVenda">
+                  <option value="EM_PROCESSAMENTO">Em Processamento</option>
+                  <option value="APROVADA">Aprovada</option>
+                  <option value="REPROVADA">Reprovada</option>
+                  <option value="EM_TRANSITO">Em Trânsito</option>
+                  <option value="ENTREGUE">Entregue</option>
+                </select>
+              </div>
+              <div class="campo-filtro">
+                <label for="valorMax">Valor Máximo</label>
+                <input type="number" id="valorMax" placeholder="R$">
+              </div>
+            </div>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal">Filtrar</button>
+              <button type="button" class="btn-principal" id="btnLimparVendas">Limpar</button>
+              <button type="button" class="btn-principal btnFechar" id="btnFecharFiltroVendas">Fechar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="tabela-container">
+          <table class="tabela-clientes">
+            <thead>
+            <tr>
+              <th>ID Venda</th>
+              <th>Cliente</th>
+              <th>Data</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody id="vendas-tbody">
+            </tbody>
+          </table>
+        </div>
+
+        <div id="modalStatusVenda" class="modal">
+          <div class="modal-content">
+            <span class="close" id="btnFecharStatusVenda">&times;</span>
+            <h2>Status da Venda</h2>
+            <form id="formStatusVenda">
+              <div class="campo-filtro">
+                <label for="novoStatusVenda">Novo Status</label>
+                <select id="novoStatusVenda" name="novoStatus">
+                  <option value="EM_PROCESSAMENTO">Em Processamento</option>
+                  <option value="APROVADA">Aprovada</option>
+                  <option value="REPROVADA">Reprovada</option>
+                  <option value="EM_TRANSITO">Em Trânsito</option>
+                  <option value="ENTREGUE">Entregue</option>
+                </select>
+              </div>
+              <div class="btn-acao">
+                <button type="button" class="btn-principal btnFechar" id="btnCancelarStatusVenda">Cancelar</button>
+                <button type="submit" class="btn-principal">Salvar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="modalDetalhesVenda" class="modal-filtro">
+          <div class="modal-conteudo modal-detalhes-venda-tamanho">
+            <h3>Detalhes do Pedido <span id="detalhePedidoId">#</span></h3>
+            <div id="detalhesVendaContent">
+            </div>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal btnFechar" id="btnFecharDetalhesVenda">Fechar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="trocas" class="section">
+        <div class="header-vendas">
+          <h2>Trocas e Devoluções</h2>
+        </div>
+
+        <div id="painelFiltroTrocas" class="painel-filtro">
+          <form id="formFiltroTrocas" class="formulario-consulta">
+            <div class="grid-filtros">
+              <div class="campo-filtro">
+                <label for="idPedido">ID do Pedido</label>
+                <input type="text" id="idPedido" placeholder="Digite o ID do pedido">
+              </div>
+              <div class="campo-filtro">
+                <label for="nomeClienteTroca">Cliente</label>
+                <input type="text" id="nomeClienteTroca" placeholder="Nome do cliente">
+              </div>
+              <div class="campo-filtro">
+                <label for="dataTrocaInicio">Data Inicial</label>
+                <input type="date" id="dataTrocaInicio">
+              </div>
+              <div class="campo-filtro">
+                <label for="dataTrocaFim">Data Final</label>
+                <input type="date" id="dataTrocaFim">
+              </div>
+              <div class="campo-filtro">
+                <label for="statusTroca">Status</label>
+                <select id="statusTroca">
+                  <option value="">Todos</option>
+                  <option>Pendente</option>
+                  <option>Aprovada</option>
+                  <option>Recusada</option>
+                  <option>Concluída</option>
+                </select>
+              </div>
+            </div>
+            <div class="linha btn-acao">
+              <button type="button" class="btn-principal">Filtrar</button>
+              <button type="button" class="btn-principal" id="btnLimparTrocas">Limpar</button>
+              <button type="button" class="btn-principal btnFechar" id="btnFecharFiltroTrocas">Fechar</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="tabela-container">
+          <table class="tabela-clientes">
+            <thead>
+            <tr>
+              <th>ID Pedido</th>
+              <th>Cliente</th>
+              <th>Produto</th>
+              <th>Data Solicitação</th>
+              <th>Motivo</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody id="trocas-tbody">
+            </tbody>
+          </table>
+        </div>
+
+        <div id="modalStatusTroca" class="modal">
+          <div class="modal-content">
+            <span class="close" id="btnFecharStatus">&times;</span>
+            <h2>Status da Solicitação</h2>
+            <form id="formStatusTroca">
+              <div class="campo-filtro"> <label for="novoStatusTroca">Novo Status</label> <select
+                      id="novoStatusTroca">
+                <option>Pendente</option>
+                <option>Aprovada</option>
+                <option>Recusada</option>
+                <option>Concluída</option>
+              </select> </div>
+              <div class="btn-acao">
+                <button type="button" class="btn-principal btnFechar" id="btnCancelarStatus">Cancelar</button>
+                <button type="submit" class="btn-principal">Salvar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>&copy; 2025 LivraTec. Todos os direitos reservados.</p>
+</footer>
+<script src="scripts/Script.js"></script>
+<script type="module" src="scripts/PainelAdmin/PainelAdmin.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 
 </html>

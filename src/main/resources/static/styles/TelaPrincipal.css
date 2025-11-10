@@ -20,6 +20,11 @@
   min-width: 100%;
   height: 100%;
 }
+#graficoVendasLinha {
+  width: 100% !important;
+  height: 400px !important; /* altura fixa */
+  max-height: 400px;
+}
 
 .slide img {
   width: 100%;
