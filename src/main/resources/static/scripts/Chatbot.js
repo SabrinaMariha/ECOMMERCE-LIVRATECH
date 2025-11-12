@@ -12,21 +12,30 @@ document.addEventListener("DOMContentLoaded", function () {
       const sendBtn = document.getElementById("chatbot-send");
       const input = document.getElementById("chatbot-input");
       const messages = document.getElementById("chatbot-messages");
+      const categorySelect = document.getElementById("chatbot-category-select");
 
-      // Abre e fecha o modal
+      // --- Função para converter Markdown simples em HTML ---
+      function formatMarkdownToHTML(text) {
+        return text
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // **negrito**
+          .replace(/\*(.*?)\*/g, "<em>$1</em>")             // *itálico*
+          .replace(/^\s*[\*\-]\s+(.*)$/gm, "<li>$1</li>")   // listas com * ou -
+          .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")       // agrupa as listas
+          .replace(/\n/g, "<br>");                          // quebras de linha
+      }
+
+      // --- Abre e fecha modal ---
       btn.addEventListener("click", () => modal.classList.toggle("active"));
       close.addEventListener("click", () => modal.classList.remove("active"));
-
-      // Fecha modal ao clicar fora do conteúdo
       window.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          modal.classList.remove("active");
-        }
+        if (e.target === modal) modal.classList.remove("active");
       });
 
-      // Função para enviar mensagens
-      function sendMessage() {
+      // --- Função para enviar mensagens ---
+      async function sendMessage() {
         const msg = input.value.trim();
+        const categoria = categorySelect.value;
+
         if (!msg) return;
 
         // Mensagem do usuário
@@ -34,27 +43,46 @@ document.addEventListener("DOMContentLoaded", function () {
         userMsg.className = "user-msg";
         userMsg.textContent = msg;
         messages.appendChild(userMsg);
-
-        // Limpa input
         input.value = "";
 
-        // Resposta simulada da IA
-        setTimeout(() => {
+        // Scroll automático
+        messages.scrollTop = messages.scrollHeight;
+
+        try {
+          // Envia para sua API Spring Boot
+          const response = await fetch(`/chat/mensagem/livros-disponíveis/${categoria}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mensagem: msg })
+          });
+
+          if (!response.ok) {
+            throw new Error("Erro na comunicação com a IA");
+          }
+
+          const data = await response.text();
+
+          // Mensagem da IA (com formatação Markdown → HTML)
           const botMsg = document.createElement("p");
           botMsg.className = "bot-msg";
-          botMsg.textContent = "Essa é uma resposta simulada da IA 😃";
+          botMsg.innerHTML = formatMarkdownToHTML(data); // <-- Aqui o segredo!
           messages.appendChild(botMsg);
-
-          // Scroll automático para a última msg
+        } catch (error) {
+          const botMsg = document.createElement("p");
+          botMsg.className = "bot-msg error";
+          botMsg.textContent = "⚠️ Ocorreu um erro ao se comunicar com a IA.";
+          messages.appendChild(botMsg);
+          console.error(error);
+        } finally {
           messages.scrollTop = messages.scrollHeight;
-        }, 800);
+        }
       }
 
-      // Eventos de envio
+      // Eventos
       sendBtn.addEventListener("click", sendMessage);
       input.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
-          e.preventDefault(); // Evita quebra de linha
+          e.preventDefault();
           sendMessage();
         }
       });

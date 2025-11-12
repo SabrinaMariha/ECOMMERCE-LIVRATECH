@@ -8,13 +8,27 @@
   <div id="chatbot-modal">
     <div class="chatbot-content">
       <header class="chatbot-header">
-        <h2>Chat IA</h2>
+        <h2>Chat IA LivraTec</h2>
         <button class="remove-btn" id="chatbot-close">&times;</button>
       </header>
-      <div class="chatbot-messages" id="chatbot-messages">
-        <p class="bot-msg">Olá! Como posso te ajudar hoje?</p>
-        <p class="user-msg">Quero indicações de livros de tecnologia</p>
+
+      <!-- Seleção de categoria -->
+      <div class="chatbot-category">
+        <label for="chatbot-category-select">Escolha uma categoria:</label>
+        <select id="chatbot-category-select">
+          <option value="ROMANCE">Romance</option>
+          <option value="TECNICO">Técnico</option>
+          <option value="INFANTIL">Infantil</option>
+          <option value="SUSPENSE">Suspense</option>
+        </select>
       </div>
+
+      <!-- Mensagens -->
+      <div class="chatbot-messages" id="chatbot-messages">
+        <p class="bot-msg">Olá! Escolha uma categoria e me diga o que procura 😊</p>
+      </div>
+
+      <!-- Rodapé -->
       <footer class="chatbot-footer">
         <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." />
         <button id="chatbot-send">Enviar</button>

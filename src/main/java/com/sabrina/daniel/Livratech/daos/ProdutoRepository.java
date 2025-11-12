@@ -32,4 +32,5 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
             @Param("categorias") List<Categoria> categorias
     );
 
+    List<Produto> findByCategoria(Categoria categoria);
 }

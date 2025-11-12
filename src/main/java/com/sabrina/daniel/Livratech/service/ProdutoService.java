@@ -23,6 +23,7 @@ public class ProdutoService {
         return produtoRepository.findAllByOrderByIdAsc();
     }
 
+
      public List<Produto> filtrarProdutos(String nome, String autor, Double precoMin, Double precoMax, List<String> categorias) {
         List<Categoria> categoriasEnum = null;
 
