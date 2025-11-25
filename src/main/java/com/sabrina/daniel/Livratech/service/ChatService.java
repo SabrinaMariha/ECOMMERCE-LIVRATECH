@@ -18,24 +18,47 @@ public class ChatService {
     private ProdutoRepository produtoRepository;
 
     public String consultarLivrosDisponiveis(DadosMensagemCliente dto) {
+        // Busca todos os produtos
         List<Produto> produtos = produtoRepository.findAll();
 
-        StringBuilder sbPergunta = new StringBuilder();
-        sbPergunta.append("""
-                Você é um assistente educado e simpático da livraria LivraTec. 
-                Use os livros abaixo para responder às dúvidas do cliente sobre indicações, preços ou autores.
-                Seja breve e gentil:
-                """).append("\n\n");
-
+        StringBuilder sbContexto = new StringBuilder();
         for (Produto produto : produtos) {
-            sbPergunta.append("📘 **").append(produto.getNome())
-                    .append("** — ").append(produto.getAutor())
-                    .append(" (R$").append(produto.getPreco()).append(")\n");
+            sbContexto.append(String.format("""
+                    - Título: %s | Autor: %s | Categoria: %s | Preço: R$ %.2f | Sinopse: %s
+                    """,
+                    produto.getNome(),
+                    produto.getAutor(),
+                    produto.getCategoria(),
+                    produto.getPreco(),
+                    produto.getDescricao()
+            ));
         }
 
-        sbPergunta.append("\nCliente perguntou: ").append(dto.mensagem());
+        StringBuilder sbPrompt = new StringBuilder();
+        sbPrompt.append("""
+                Você é um atendente experiente, simpático e sagaz da livraria 'LivraTec'.
+                Converse de forma natural, fluida e humana.
 
-        return obterReposta(sbPergunta);
+                SUAS DIRETRIZES:
+                
+                1. **Perguntas Estranhas/Inusitadas:** Se o cliente fizer perguntas absurdas (ex: ler mergulhando, livro à prova de fogo), informe **resumidamente** que isso não é recomendado ou possível e mude o assunto para livros normais. Não dê longas explicações.
+                
+                2. **Fora do Escopo (Out of Scope):**
+                   Se a pergunta NÃO for sobre livros ou sobre a livraria (ex: receitas, conselhos de vida, política, futebol), responda educadamente que **não pode ajudar com esse assunto** e que seu foco são apenas indicações e dúvidas sobre livros.
+                
+                3. **Aterramento (Grounding):** Recomende APENAS livros que estão na lista de 'ESTOQUE' abaixo. Se o cliente pedir um livro que não está na lista, diga que infelizmente não tem. NUNCA invente livros.
+                
+                4. **Vendas:** Sempre cite o preço ao sugerir um livro.
+
+                ESTOQUE DA LIVRATEC (Use apenas estes dados):
+                """);
+
+        sbPrompt.append(sbContexto);
+
+        sbPrompt.append("\n\nCLIENTE DISSE: ").append(dto.mensagem());
+        sbPrompt.append("\nSUA RESPOSTA:");
+
+        return obterReposta(sbPrompt);
     }
 
     private String obterReposta(StringBuilder mensagemUsuario) {
