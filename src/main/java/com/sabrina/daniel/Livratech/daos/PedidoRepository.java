@@ -18,41 +18,45 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
         Long getVolumeVendas();
         BigDecimal getValorTotal();
     }
+
     public interface VendaCategoriaProjection {
-
-        // O nome da Categoria (campo `nome` da entidade Categoria)
+        // O nome da Categoria (campo `categoria` da entidade Produto)
         String getCategoria();
-
         // A soma dos valores de venda para essa Categoria
         Double getValorTotal();
-
-        // O volume de vendas (COUNT)
+        // Data da venda (Dia)
+        String getData();
+        // O volume de vendas (Soma das quantidades)
         Long getVolumeVendas();
     }
-    // Consulta de Agregação por Período
-    @Query("SELECT TO_CHAR(t.data, 'YYYY-MM-DD') AS data, " + // <-- Usando t.data
+
+    // Consulta de Agregação por Período (Vendas por Dia)
+    @Query("SELECT TO_CHAR(t.data, 'YYYY-MM-DD') AS data, " +
             "SUM(i.quantidade) AS volumeVendas, " +
             "SUM(i.quantidade * i.produto.preco) AS valorTotal " +
             "FROM Pedido p JOIN p.itens i " +
-            "JOIN p.transacoes t " + // <-- NOVO JOIN com Transacao (alias 't')
+            "JOIN p.transacoes t " +
             "WHERE p.status IN ('APROVADA', 'ENTREGUE', 'EM_TRANSITO') " +
-            "AND t.data BETWEEN :dataInicio AND :dataFim " + // <-- Usando t.data para filtro
+            "AND t.data BETWEEN :dataInicio AND :dataFim " +
             "GROUP BY data ORDER BY data")
     List<VendaDiaProjection> findVendasAgregadasPorPeriodo(@Param("dataInicio") Date dataInicio, @Param("dataFim") Date dataFim);
 
-    @Query("SELECT prod.categoria AS categoria, " +
-                  "SUM(prod.preco * i.quantidade) AS valorTotal, " +
-                  "COUNT(i.id) AS volumeVendas " +
-                  "FROM Pedido p " +
-                  "JOIN p.itens i " +
-                  "JOIN i.produto prod " +
-                  "JOIN p.transacoes t " +
-                  "WHERE p.status IN ('APROVADA', 'ENTREGUE', 'EM_TRANSITO') " +
-                  // Tente usar apenas o BETWEEN se o campo 'data' na Transacao for apenas DATE ou se a query abaixo estiver funcionando:
-                  // Se a query 'findVendasAgregadasPorPeriodo' funciona, vamos replicar a lógica de data dela:
-                  "AND t.data BETWEEN :dataInicio AND :dataFim " +
-                  "GROUP BY prod.categoria " +
-                  "ORDER BY valorTotal DESC")
+    /**
+     * Retorna as vendas agregadas por Categoria e por Dia.
+     * Esta é a query corrigida.
+     */
+    @Query("SELECT TO_CHAR(t.data, 'YYYY-MM-DD') AS data, " +
+            "prod.categoria AS categoria, " +
+            "SUM(prod.preco * i.quantidade) AS valorTotal, " +
+            "SUM(i.quantidade) AS volumeVendas " +
+            "FROM Pedido p " +
+            "JOIN p.itens i " +
+            "JOIN i.produto prod " +
+            "JOIN p.transacoes t " +
+            "WHERE p.status IN ('APROVADA', 'ENTREGUE', 'EM_TRANSITO','EM_PROCESSAMENTO') " +
+            "AND t.data BETWEEN :dataInicio AND :dataFim " +
+            "GROUP BY data, prod.categoria " +
+            "ORDER BY data, valorTotal DESC")
     List<VendaCategoriaProjection> findVendasPorCategoriaEPeriodo(
             @Param("dataInicio") Date dataInicio,
             @Param("dataFim") Date dataFim);

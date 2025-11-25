@@ -3,15 +3,10 @@ package com.sabrina.daniel.Livratech.controller;
 
 import com.sabrina.daniel.Livratech.Exceptions.ValidacaoException;
 import com.sabrina.daniel.Livratech.daos.PedidoRepository;
-import com.sabrina.daniel.Livratech.dtos.DadosConsultaCliente;
-import com.sabrina.daniel.Livratech.dtos.FiltroCliente;
-import com.sabrina.daniel.Livratech.dtos.SolicitacaoTrocaDTO;
-import com.sabrina.daniel.Livratech.dtos.VendaDiaDTO;
+import com.sabrina.daniel.Livratech.dtos.*;
+import com.sabrina.daniel.Livratech.dtos.VendasPorCategoriaAgrupadaDTO;
 import com.sabrina.daniel.Livratech.model.Cliente;
-import com.sabrina.daniel.Livratech.service.AdminService;
-import com.sabrina.daniel.Livratech.service.ClienteService;
-import com.sabrina.daniel.Livratech.service.TrocaService;
-import com.sabrina.daniel.Livratech.service.VendaService;
+import com.sabrina.daniel.Livratech.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -35,6 +30,8 @@ public class AdminController {
     private  VendaService vendaService;
     @Autowired
     private PedidoRepository pedidoRepository;
+    @Autowired
+    private  RelatorioService relatorioService;
     @PostMapping("/clientes")
     public ResponseEntity<Map<String, Object>> buscarClientes(@RequestBody FiltroCliente filtroClientes) throws Exception {
         List<Cliente> clientes = adminService.findAll(filtroClientes);
@@ -119,24 +116,27 @@ public class AdminController {
     }
 
 
-//    @GetMapping("relatorios/vendas-periodo")
-//    public ResponseEntity<List<VendaDiaDTO>> getVendasPorPeriodo(
-//            @RequestParam("dataInicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataInicio,
-//            @RequestParam("dataFim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataFim) {
+//    @GetMapping("relatorios/vendas-categoria")
+//    public ResponseEntity<List<PedidoRepository.VendaCategoriaProjection>> findVendasPorCategoria(
+//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataInicio,
+//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataFim) {
 //
-//        List<VendaDiaDTO> data = vendaService.getVolumeVendasPorPeriodo(dataInicio, dataFim);
-//        return ResponseEntity.ok(data);
+//        // CHAMA O SERVIÇO QUE AJUSTA A DATA
+//        List<PedidoRepository.VendaCategoriaProjection> resultado =
+//                vendaService.getVendasPorCategoriaEPeriodo(dataInicio, dataFim);
+//
+//        return ResponseEntity.ok(resultado);
 //    }
+@GetMapping("relatorios/vendas-categoria")
+public ResponseEntity<List<VendasPorCategoriaAgrupadaDTO>> findVendasPorCategoriaAgrupadas(
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataInicio,
+        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataFim) {
 
-    @GetMapping("relatorios/vendas-categoria")
-    public ResponseEntity<List<PedidoRepository.VendaCategoriaProjection>> findVendasPorCategoria(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataInicio,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date dataFim) {
+    // 1. CHAMA O MÉTODO NO SERVICE QUE FAZ O AGRUPAMENTO
+    List<VendasPorCategoriaAgrupadaDTO> resultadoAgrupado =
+            relatorioService.getVendasAgrupadasPorCategoria(dataInicio, dataFim); // O método sugerido anteriormente
 
-        // CHAMA O SERVIÇO QUE AJUSTA A DATA
-        List<PedidoRepository.VendaCategoriaProjection> resultado =
-                vendaService.getVendasPorCategoriaEPeriodo(dataInicio, dataFim);
-
-        return ResponseEntity.ok(resultado);
-    }
+    // 2. RETORNA O NOVO TIPO DE DADO
+    return ResponseEntity.ok(resultadoAgrupado);
+}
 }

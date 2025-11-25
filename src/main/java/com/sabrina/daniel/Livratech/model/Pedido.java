@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -43,6 +44,8 @@ public class Pedido {
     @Column(length = 20)
     private StatusCompra status;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date data;
 
     private BigDecimal valorTotal;
 

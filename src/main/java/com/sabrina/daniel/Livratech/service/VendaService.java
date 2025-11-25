@@ -324,14 +324,5 @@ public class VendaService {
         return totalGeral;
     }
 
-    public List<PedidoRepository.VendaCategoriaProjection> getVendasPorCategoriaEPeriodo(Date dataInicio, Date dataFim) {
-        // REAPROVEITE O AJUSTE DA DATA FIM!
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(dataFim);
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-        cal.add(Calendar.MILLISECOND, -1);
-        Date dataFimAjustada = cal.getTime();
 
-        return pedidoRepository.findVendasPorCategoriaEPeriodo(dataInicio, dataFimAjustada);
-    }
 }
